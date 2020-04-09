@@ -616,7 +616,7 @@ const meteor: Spell = {
     icon: "cometSpark",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 9 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -2385,11 +2385,11 @@ const saber: Spell = {
     width: Pixel,
     length: 0.075,
 
-    movementProportionWhileChannelling: 0.5,
-
+    movementProportionWhileChannelling: 1,
     interruptibleAfterTicks: 20,
+    expireAfterHitHeroTicks: 15,
 
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 9 * TicksPerSecond,
     throttle: false,
 
     icon: "waveStrike",
@@ -2450,8 +2450,9 @@ const dualSaber: Spell = {
 
     movementProportionWhileChannelling: 1,
     interruptibleAfterTicks: 20,
+    expireAfterHitHeroTicks: 15,
 
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 9 * TicksPerSecond,
     throttle: false,
 
     icon: "waveStrike",

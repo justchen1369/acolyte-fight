@@ -56,6 +56,7 @@ export interface World {
 
 	objects: Map<string, WorldObject>,
 	behaviours: Behaviour[],
+	colliders: Collider[],
 
 	physics: pl.World;
 	collisions: Map<pl.Contact, Collision>;
@@ -305,7 +306,10 @@ export interface WorldObjectBase {
 	category: string;
 	categories: number;
 	body: pl.Body;
+
+	createTick: number;
 	destroyedTick?: number;
+
 	blocksTeleporters?: boolean;
 	swappable?: boolean;
 
@@ -315,7 +319,7 @@ export interface WorldObjectBase {
 
 	uiEase?: pl.Vec2;
 
-	colliders?: Set<CollideBehaviour>;
+	colliders?: Set<Collider>;
 }
 
 export interface HighlightSource {
@@ -337,6 +341,7 @@ export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 	health: number;
 
 	createTick: number;
+	expireTick?: number;
 	destroyedTick?: number;
 
 	shape: shapes.Shape;
@@ -810,9 +815,20 @@ export namespace HomingTargets {
 	export const follow = "follow";
 }
 
+export interface Collider {
+	delayed: Behaviour | Behaviour[];
+
+	collideWith: number;
+	against: number;
+
+	afterTicks: number;
+	collideTick?: number;
+
+	done?: boolean;
+}
+
 export type Behaviour =
 	DelayBehaviour
-	| CollideBehaviour
 	| TriggerOnExpiryBehaviour
 	| SpawnProjectileBehaviour
 	| CooldownBehaviour
@@ -854,18 +870,6 @@ export interface DelayBehaviour extends BehaviourBase {
 	type: "delayBehaviour";
 	afterTick: number;
 	delayed: Behaviour;
-}
-
-export interface CollideBehaviour extends BehaviourBase {
-	type: "collideBehaviour";
-	objId: string;
-	delayed: Behaviour;
-
-	collideWith: number;
-	against: number;
-
-	afterTicks: number;
-	collideTick?: number;
 }
 
 export interface TriggerOnExpiryBehaviour extends BehaviourBase {
@@ -1066,7 +1070,7 @@ export interface AuraBehaviour extends BehaviourBase, HitSource {
 
 export interface ExpireBehaviour extends BehaviourBase {
 	type: "expire";
-	projectileId: string;
+	objId: string;
 }
 
 export interface ExpireBuffsBehaviour extends BehaviourBase {

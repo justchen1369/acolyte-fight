@@ -113,6 +113,7 @@ export function initialWorld(mod: Object): w.World {
 
 		objects: new Map(),
 		behaviours: [],
+		colliders: [],
 		physics: pl.World(def),
 		collisions: new Map(),
 
@@ -966,16 +967,14 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 				delayed: behaviour,
 			};
 		} else if (trigger.collideWith) {
-			const collider: w.CollideBehaviour = {
-				type: "collideBehaviour",
-				objId: projectile.id,
+			const collider: w.Collider = {
 				collideWith: trigger.collideWith,
 				against: trigger.against !== undefined ? trigger.against: Alliances.All,
 				afterTicks: trigger.afterTicks || 0,
 				delayed: behaviour,
 			};
 			addCollider(projectile, collider);
-			behaviour = collider;
+			behaviour = null;
 		} else if (trigger.expire) {
 			behaviour = {
 				type: "triggerOnExpiry",
@@ -998,14 +997,14 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 	});
 }
 
-function addCollider(obj: w.WorldObject, collider: w.CollideBehaviour) {
+function addCollider(obj: w.WorldObject, collider: w.Collider) {
 	if (!obj.colliders) {
 		obj.colliders = new Set();
 	}
 	obj.colliders.add(collider);
 }
 
-function removeCollider(obj: w.WorldObject, collider: w.CollideBehaviour) {
+function removeCollider(obj: w.WorldObject, collider: w.Collider) {
 	if (obj.colliders) {
 		obj.colliders.delete(collider);
 	}
@@ -1124,7 +1123,7 @@ function instantiateClearHits(template: ClearHitsTemplate, projectile: w.Project
 function instantiateExpire(template: ExpireTemplate, projectile: w.Projectile, world: w.World): w.ExpireBehaviour {
 	return {
 		type: "expire",
-		projectileId: projectile.id,
+		objId: projectile.id,
 	};
 }
 
@@ -1169,7 +1168,6 @@ export function tick(world: w.World) {
 
 	handleBehaviours(world, {
 		delayBehaviour,
-		collideBehaviour,
 		triggerOnExpiry,
 		homing,
 		accelerate,
@@ -1185,6 +1183,8 @@ export function tick(world: w.World) {
 		updatePartial,
 		clearHits,
 	});
+
+	handleColliders(world);
 
 	move(world);
 	physicsStep(world);
@@ -1249,17 +1249,31 @@ function delayBehaviour(behaviour: w.DelayBehaviour, world: w.World) {
 	}
 }
 
-function collideBehaviour(behaviour: w.CollideBehaviour, world: w.World) {
-	const obj = world.objects.get(behaviour.objId);
-	if (!obj) {
+function handleColliders(world: w.World) {
+	const colliders = new Array<w.Collider>();
+	for (const collider of world.colliders) {
+		const keep = handleCollider(collider, world);
+		if (keep) {
+			colliders.push(collider);
+		}
+	}
+	world.colliders = colliders;
+}
+
+function handleCollider(collider: w.Collider, world: w.World) {
+	if (collider.done) {
 		return false;
 	}
 
-	if (behaviour.collideTick) {
-		removeCollider(obj, behaviour);
+	if (collider.collideTick) {
+		if (world.tick >= collider.collideTick + collider.afterTicks) {
+			if (_.isArray(collider.delayed)) {
+				world.behaviours.push(...collider.delayed);
+			} else {
+				world.behaviours.push(collider.delayed);
+			}
 
-		if (world.tick >= behaviour.collideTick + behaviour.afterTicks) {
-			world.behaviours.push(behaviour.delayed);
+			collider.done = true;
 			return false;
 		} else {
 			return true;
@@ -2944,6 +2958,8 @@ function registerCollision(hit: w.WorldObject, other: w.WorldObject, world: w.Wo
 
 	hit.colliders.forEach(collider => {
 		if (collider.collideTick) {
+			// Already activated
+			removeCollider(hit, collider);
 			return;
 		}
 
@@ -2956,6 +2972,8 @@ function registerCollision(hit: w.WorldObject, other: w.WorldObject, world: w.Wo
 		}
 
 		collider.collideTick = world.tick;
+		world.colliders.push(collider);
+		removeCollider(hit, collider);
 	});
 }
 
@@ -3794,14 +3812,11 @@ function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 }
 
 function expire(behaviour: w.ExpireBehaviour, world: w.World) {
-	const projectile = world.objects.get(behaviour.projectileId);
-	if (!(projectile && projectile.category === "projectile")) {
-		return false;
+	const obj = world.objects.get(behaviour.objId);
+	if (obj && (obj.category === "projectile" || obj.category === "shield" || obj.category === "obstacle")) {
+		obj.expireTick = world.tick;
 	}
-
-	projectile.expireTick = world.tick;
-
-	return true;
+	return false;
 }
 
 function expireOnOwnerDeath(behaviour: w.ExpireOnOwnerDeathBehaviour, world: w.World) {
@@ -4125,7 +4140,7 @@ function reap(world: w.World) {
 				destroyObject(world, obj);
 			}
 		} else if (obj.category === "obstacle") {
-			if (obj.health <= 0) {
+			if (obj.health <= 0 || world.tick >= obj.expireTick) {
 				detonateObstacle(obj, world);
 				destroyObject(world, obj);
 			}
@@ -4752,6 +4767,7 @@ function thrustDecay(behaviour: w.ThrustDecayBehaviour, world: w.World) {
 function saberAction(world: w.World, hero: w.Hero, action: w.Action, spell: SaberSpell) {
 	const saberTick = world.tick - hero.casting.channellingStartTick;
 	if (saberTick === 0) {
+		const sabers = new Array<w.Saber>();
 		spell.angleOffsetsInRevs.forEach(angleOffsetInRevs => {
 			const angleOffset = angleOffsetInRevs * 2 * Math.PI;
 			const saber = addSaber(world, hero, spell, angleOffset);
@@ -4761,7 +4777,20 @@ function saberAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sabe
 				hitInterval: 1,
 				hitTickLookup: new Map(),
 			});
+			sabers.push(saber);
 		});
+
+		if (typeof spell.expireAfterHitHeroTicks === 'number') {
+			const collider: w.Collider = {
+				delayed: sabers.map(saber => ({ type: "expire", objId: saber.id })),
+
+				collideWith: Categories.Hero,
+				against: Alliances.All,
+
+				afterTicks: spell.expireAfterHitHeroTicks,
+			};
+			sabers.forEach(saber => addCollider(saber, collider));
+		}
 	}
 	return saberTick >= spell.maxTicks;
 }
@@ -4843,7 +4872,8 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 			emitPush(saber.owner, swingVelocity, saber.color, obj.id, world);
 		}
 
-		handleSaberHit(saber, obj, world);
+		handleShieldHit(world, shield, obj); // Shield hit other object
+		registerCollision(shield, obj, world); // Other object hit shield
 
 		hit = true;
 	});

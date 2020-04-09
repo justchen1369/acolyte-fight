@@ -1080,6 +1080,7 @@ declare interface SaberSpell extends ShieldSpell {
 
 	categories: number;
 	collidesWith: number;
+	expireAfterHitHeroTicks?: number; // If set, saber will expire this many ticks after it hits an acolyte
 
 	damageTemplate?: DamagePacketTemplate; // Damage to apply to anyone we hit
 	hitInterval?: number; // If saber hits multiple times, only apply damage/buffs at this interval
