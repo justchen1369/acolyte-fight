@@ -628,7 +628,7 @@ const meteor: Spell = {
         swappable: true,
         radius: 0.03,
         speed: 0.2,
-        speedDecayPerTick: 0.5,
+        speedDecayPerTick: 0.2,
         restitution: 0,
         minTicks: 1,
         maxTicks: 2 * TicksPerSecond,
@@ -658,7 +658,7 @@ const meteoriteProjectile: ProjectileTemplate = {
     linkable: true,
     radius: 0.018,
     speed: 0.3,
-    speedDecayPerTick: 0.5,
+    speedDecayPerTick: 0.2,
     restitution: 0,
     minTicks: 1,
     maxTicks: 2 * TicksPerSecond,
@@ -1448,7 +1448,7 @@ const grapple: Spell = {
     description: "Hold the button to grapple. Move your cursor to swing Grapple around. Throw your enemies into the void!",
     action: "focus",
 
-    color: '#f02',
+    color: '#f06',
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
@@ -1456,20 +1456,27 @@ const grapple: Spell = {
     throttle: false,
     unlink: true,
 
-    release: {},
+    strikeCancel: {
+    },
+    release: {
+        interrupt: true,
+        interruptibleAfterTicks: 0.25 * TicksPerSecond,
+    },
     maxChannellingTicks: 2 * TicksPerSecond, // projectile time + link time
     movementProportionWhileChannelling: 1,
 
     projectile: {
         density: 1,
         radius: 0.0025,
-        speed: 0.7,
-        maxTicks: 20,
+        speed: 0.9,
+        fixedSpeed: false,
+        speedDamping: 3,
+        maxTicks: 50,
         damage: 0,
-        collideWith: Categories.All ^ Categories.Projectile,
+        collideWith: Categories.All ^ Categories.Projectile ^ Categories.Hero,
+        sense: Categories.Hero,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
         expireOnMirror: true,
-        shieldTakesOwnership: false,
 
         link: {
             linkWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
@@ -1485,7 +1492,7 @@ const grapple: Spell = {
 
             render: {
                 type: "link",
-                color: '#f02',
+                color: '#f06',
                 width: 1.5 * Pixel,
                 toWidth: 3 * Pixel,
                 "glow": 0.3,
@@ -1515,18 +1522,26 @@ const grapple: Spell = {
         ],
 
         behaviours: [
+            { type: "strafe" },
             { type: "expireOnOwnerDeath" },
             { type: "expireOnChannellingEnd" },
+            {
+                type: "homing",
+                trigger: { afterTicks: 35 },
+                targetType: HomingTargets.self,
+                newSpeed: 1.2,
+                speedDecayPerTick: World.ProjectileSpeedDecayFactorPerTick,
+            },
         ],
 
         sound: "grapple",
-        color: '#f02',
+        color: '#f06',
         renderers: [
             { type: "bloom", radius: 0.05 },
-            { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 4, revolutionInterval: 31, ticks: 1, light: 1, shadow: 0.5 },
+            { type: "polygon", color: '#f06', numPoints: 3, radiusMultiplier: 4, revolutionInterval: 31, ticks: 1, light: 1, shadow: 0.5 },
             {
                 type: "link",
-                color: '#f02',
+                color: '#f06',
                 width: 1 * Pixel,
                 toWidth: 5 * Pixel,
                 "glow": 0.3,

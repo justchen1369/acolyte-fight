@@ -2308,7 +2308,7 @@ function renderUnattachedLink(ctxStack: CanvasCtxStack, projectile: w.Projectile
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, world: w.World, render: RenderLink, highlight?: w.TrailHighlight) {
 	const Visuals = world.settings.Visuals;
 
-	let color = ColTuple.parse(render.color);
+	let color = ColTuple.parse(target.category === "projectile" ? projectileColor(render, target, world) : render.color);
 	let scale = 1;
 
 	if (highlight) {

@@ -445,9 +445,12 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	density: number;
 	radius: number;
 	square?: boolean; // A square projectile will push things directly backwards, not to the side
+
 	speed: number;
 	fixedSpeed?: boolean; // if true or undefined, the projectile's speed will be corrected according to ProjectileSpeedDecayFactorPerTick if it becomes faster or slower due to collisions
 	speedDecayPerTick?: number; // if set, the projectile's speed will be corrected according to this proportion per tick if it becomes faster or slower due to collisions
+	speedDamping?: number; // Controls how quickly the projectile loses speed (does not work if the projectile speeds itself back up again using fixedSpeed or speedDecayPerTick)
+
 	restitution?: number; // 1 means very bouncy, 0 means not bouncy
 
 	attractable?: AttractableTemplate; // Whether the "attract" behaviour (e.g. a whirlwind) can affect this projectile
@@ -774,7 +777,7 @@ declare interface RenderSwirl extends RenderParamsBase {
 	shadow?: number;
 }
 
-declare interface RenderLink extends RenderParamsBase {
+declare interface RenderLink extends RenderParamsBase, ProjectileColorParams {
 	type: "link";
 	color: string;
 	width: number;
@@ -1134,7 +1137,8 @@ declare interface LinkParameters {
 	sidewaysImpulsePerTick?: number; // How much should the link pull the target sideways
 	massInvariant?: boolean; // Same force regardless of the mass that is being pulled
 
-	linkTicks: number;
+	linkTicks: number; // duration of the link
+	linkTicksHero?: number; // duration of the link when attached to an acolyte
 	minDistance: number;
 	maxDistance: number;
 

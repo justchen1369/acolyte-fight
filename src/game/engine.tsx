@@ -752,7 +752,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		type: 'dynamic',
 		position,
 		linearVelocity: velocity,
-		linearDamping: 0,
+		linearDamping: projectileTemplate.speedDamping || 0,
 		angularDamping: 1000,
 		bullet: projectileTemplate.ccd !== undefined ? projectileTemplate.ccd : true,
 	});
@@ -3334,7 +3334,11 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		return false;
 	}
 
-	const maxTicks = link.linkTicks;
+	let maxTicks = link.linkTicks;
+	if (target.category === "hero" && link.linkTicksHero) {
+		maxTicks = link.linkTicksHero;
+	}
+
 	owner.link = {
 		id: `link${world.nextObjectId++}`,
 
