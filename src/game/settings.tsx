@@ -1468,9 +1468,9 @@ const grapple: Spell = {
     projectile: {
         density: 1,
         radius: 0.0025,
-        speed: 0.6,
+        speed: 0.9,
         fixedSpeed: false,
-        speedDamping: 2,
+        speedDamping: 3,
         maxTicks: 50,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile ^ Categories.Hero,
