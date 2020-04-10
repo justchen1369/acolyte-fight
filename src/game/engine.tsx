@@ -4650,7 +4650,7 @@ function shieldCollisionLimit(hero: w.Hero, to: pl.Vec2, world: w.World): number
 			hit = point;
 			return 0; // Stop search after first hit
 		} else {
-			return fraction; // Keep searching after this polygon
+			return 1; // Keep searching after this polygon
 		}
 	});
 
