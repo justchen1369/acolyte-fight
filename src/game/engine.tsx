@@ -2202,7 +2202,13 @@ export function resolveKeyBindings(keyBindings: KeyBindings, settings: AcolyteFi
 
 	let keysToSpells = new Map<string, string>();
 	let spellsToKeys = new Map<string, string>();
-	for (var key in Choices.Options) {
+	for (const keyConfig of Choices.Keys) {
+		if (!keyConfig) {
+			continue;
+		}
+
+		const key = keyConfig.btn;
+
 		let spellId = keyBindings[key];
 
 		const validOptions = _.flatten(Choices.Options[key]);

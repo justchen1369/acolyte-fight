@@ -30,13 +30,12 @@
 				["shield"],
 				["icewall"]
 			],
-			"q": [],
-			"w": [],
-			"e": [],
 			"r": [
 				["kamehameha"]
 			],
-			"d": []
+			"f": [
+				["scourge"]
+			]
 		},
 		"Defaults": {
 			"q": "kamehameha",
