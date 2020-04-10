@@ -133,6 +133,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <ul>
                 <li><a href="static/fireballMod.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>fireballMod.acolytefight.json</a> - this example mod decreases Fireball cooldown.</li>
                 <li><a href="static/acolyteBeamFiesta.mod.json" onClick={(ev) => this.onLoadModHref(ev)}>acolyteBeamFiesta.acolytefight.json</a> - this example mod decreases Acolyte Beam cooldown and removes other spells.</li>
+                <li><a href="static/homingCluster.mod.json" onClick={(ev) => this.onLoadModHref(ev)}>homingCluster.mod.json</a> - this example mod creates a new spell called homing cluster.</li>
                 <li><a href="static/noMove.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>noMove.acolytefight.json</a> - this example mod disables normal movement but reduces the speed of teleport.</li>
             </ul>
             <h2>Note</h2>
