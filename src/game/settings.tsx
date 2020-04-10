@@ -1460,7 +1460,7 @@ const grapple: Spell = {
     },
     release: {
         interrupt: true,
-        interruptibleAfterTicks: 0.25 * TicksPerSecond,
+        interruptibleAfterTicks: 35, // Only after the grapple has caught
     },
     maxChannellingTicks: 2 * TicksPerSecond, // projectile time + link time
     movementProportionWhileChannelling: 1,
@@ -1468,9 +1468,9 @@ const grapple: Spell = {
     projectile: {
         density: 1,
         radius: 0.0025,
-        speed: 0.9,
+        speed: 0.6,
         fixedSpeed: false,
-        speedDamping: 3,
+        speedDamping: 2,
         maxTicks: 50,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile ^ Categories.Hero,
@@ -1527,7 +1527,13 @@ const grapple: Spell = {
             { type: "expireOnChannellingEnd" },
             {
                 type: "homing",
+                targetType: HomingTargets.follow,
+                revolutionsPerSecond: 0.01,
+                maxTicks: 35,
+            },
+            {
                 trigger: { afterTicks: 35 },
+                type: "homing",
                 targetType: HomingTargets.self,
                 newSpeed: 1.2,
                 speedDecayPerTick: World.ProjectileSpeedDecayFactorPerTick,
@@ -1542,8 +1548,8 @@ const grapple: Spell = {
             {
                 type: "link",
                 color: '#f06',
-                width: 1 * Pixel,
-                toWidth: 5 * Pixel,
+                width: 1.5 * Pixel,
+                toWidth: 3 * Pixel,
                 "glow": 0.3,
                 "bloom": 0.01,
                 shadow: 0.5,
