@@ -198,6 +198,7 @@ export function leavePartyAsync(): Promise<void> {
 	}
 
 	StoreProvider.dispatch({ type: "leaveParty", partyId: store.party.id });
+	rooms.leaveRoom();
 
 	return new Promise<void>((resolve, reject) => {
 		let msg: m.PartyStatusRequest = { partyId: store.party.id, kick: true };
