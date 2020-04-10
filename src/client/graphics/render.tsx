@@ -924,7 +924,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 
 	const color = calculateObstacleColor(obstacle, context, fill, world);
 
-	const pos = obstacle.body.getPosition();
+	const pos = context.pos;
 	const angle = obstacle.body.getAngle();
 
 	let scale = 1;
@@ -1065,7 +1065,7 @@ function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 		alpha: fill.glow !== undefined ? fill.glow : DefaultGlow,
 	};
 
-	const pos = obstacle.body.getPosition();
+	const pos = context.pos;
 	const drawPos = vector.scaleAround(pos, MapCenter, scale);
 	const layer = light ? r.Layer.Trail : r.Layer.Solid;
 	glx.circleTrail(ctxStack, drawPos, {
@@ -1086,7 +1086,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 
 	let particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
 
-	let pos = shapes.proportionalEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), Math.random(), Math.random(), particleRadius);
+	let pos = shapes.proportionalEdgePoint(obstacle.shape, params.pos, obstacle.body.getAngle(), Math.random(), Math.random(), particleRadius);
 	const outward = vector.diff(pos, MapCenter);
 	outward.normalize();
 

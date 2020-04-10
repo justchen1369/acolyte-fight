@@ -2606,14 +2606,14 @@ function recheckObstacleHit(obstacle: w.Obstacle, target: pl.Vec2, targetRadius:
 }
 
 function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObject) {
-	if (hit.category === "projectile" || hit.category === "hero") {
-		if (!recheckObstacleHit(obstacle, hit.body.getPosition(), hit.radius)) {
+	if (hit.category === "obstacle") {
+		if (hit.sensor) {
+			// Cannot hit sensors
 			return;
 		}
 	}
 
-	if (hit.category === "obstacle" && hit.sensor) {
-		// Cannot hit sensors
+	if (!recheckObstacleHit(obstacle, hit.body.getPosition(), getMinExtent(hit))) {
 		return;
 	}
 
