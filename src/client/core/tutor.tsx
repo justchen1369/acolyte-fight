@@ -18,8 +18,7 @@ export function onNotification(notifs: w.Notification[]) {
 }
 
 export function needsTutorial(state: s.State): boolean {
-    // return state.tutorialLevel && state.room.id === m.DefaultRoomId && !state.party;
-    return false;
+    return state.tutorialLevel && state.room.id === m.DefaultRoomId && !state.party;
 }
 
 export function tutorialSettings(): matches.JoinParams {
