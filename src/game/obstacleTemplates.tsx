@@ -81,21 +81,20 @@ export const healing: ObstacleTemplate = {
     "render": [
         {
             "type": "solid",
-            "color": "rgba(0, 255, 64, 0.9)",
-            "deadColor": "rgba(0, 255, 64, 0.25)",
+            "color": "#0f9e",
+            "deadColor": "#0f94",
             "glow": 0.2,
         },
         {
             "type": "smoke",
-            "color": "rgba(0, 255, 64, 1)",
+            "color": "#0f9",
             "particleRadius": 0.005,
-            "fade": "rgba(0, 0, 0, 0)",
+            "fade": "#0000",
             "bloom": 0.01,
             "glow": 0.05,
             "ticks": 30,
             "interval": 8,
             "speed": 0.1,
-            "light": 0.5,
         }
     ],
     "buffs": [
@@ -136,6 +135,7 @@ export const slow: ObstacleTemplate = {
             "color": "rgba(64, 255, 255, 0.75)",
             deadColor: "rgba(64, 255, 255, 0.25)",
             glow: 0.2,
+            light: 0.9,
         },
         {
             type: "smoke",
@@ -194,6 +194,7 @@ export const fast: ObstacleTemplate = {
             "color": "rgba(255, 255, 64, 0.75)",
             deadColor: "rgba(255, 255, 64, 0.25)",
             glow: 0.2,
+            light: 0.9,
         },
         {
             type: "smoke",

@@ -215,8 +215,8 @@ export const Layouts: Layouts = {
     },
     "heal": {
         "startMessage": "Game started. Fight over this healing pool!",
-        "color": "#1d2e26",
-        "background": "#0d2118",
+        "color": "#1d2e2c",
+        "background": "#0d211d",
         "obstacles": [
             {
                 "type": "healing",
