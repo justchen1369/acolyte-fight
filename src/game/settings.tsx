@@ -3067,7 +3067,7 @@ const voidRush: Spell = {
                 particleRadius: Hero.Radius,
                 decay: true,
 				"alpha": 0.3,
-				"light": 1,
+				"light": 0.8,
                 glow: 0.7,
                 shine: 0.5,
                 bloom: 0.03,
