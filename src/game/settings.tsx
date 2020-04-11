@@ -1542,7 +1542,7 @@ const grapple: Spell = {
             {
                 type: "homing",
                 targetType: HomingTargets.follow,
-                revolutionsPerSecond: 0.005,
+                revolutionsPerSecond: 0.002,
                 maxTicks: 35,
             },
             {

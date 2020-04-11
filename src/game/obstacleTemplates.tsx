@@ -42,7 +42,7 @@ export const volcano: ObstacleTemplate = {
             type: "burn",
             maxTicks: 15,
             collideWith: Categories.All,
-            packet: { damage: 3, lifeSteal: 0, noKnockback: true, noHit: true, isLava: true },
+            packet: { damage: 3, lifeSteal: 0, noKnockback: true, noHit: true, isLava: true, source: "lava" },
             hitInterval: 5,
             stack: "volcano",
             maxStacks: 1,
