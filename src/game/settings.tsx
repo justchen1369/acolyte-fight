@@ -2136,11 +2136,11 @@ const mines: Spell = {
         },
 
         buffs: [
-            {
+            { // Reduce by 2 damage for each additional mine
                 type: "armor",
                 maxTicks: 15,
-                maxStacks: 1,
-                proportion: -0.5,
+                maxStacks: 4,
+                proportion: -1/6.0,
                 source: "mines",
             }
         ],
