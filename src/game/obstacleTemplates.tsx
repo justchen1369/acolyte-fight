@@ -84,7 +84,6 @@ export const healing: ObstacleTemplate = {
             "color": "rgba(0, 255, 64, 0.9)",
             "deadColor": "rgba(0, 255, 64, 0.25)",
             "glow": 0.2,
-            light: 0.8,
         },
         {
             "type": "smoke",
@@ -137,7 +136,6 @@ export const slow: ObstacleTemplate = {
             "color": "rgba(64, 255, 255, 0.75)",
             deadColor: "rgba(64, 255, 255, 0.25)",
             glow: 0.2,
-            light: 0.8,
         },
         {
             type: "smoke",
@@ -196,7 +194,6 @@ export const fast: ObstacleTemplate = {
             "color": "rgba(255, 255, 64, 0.75)",
             deadColor: "rgba(255, 255, 64, 0.25)",
             glow: 0.2,
-            light: 0.8,
         },
         {
             type: "smoke",
@@ -264,6 +261,7 @@ export const conveyorBase: ObstacleTemplate = {
             "interval": 6,
             speed: 0,
             conveyor: 1,
+            light: 1,
         }
     ],
 }
