@@ -89,6 +89,8 @@ const World: WorldSettings = {
 
     SlopRadius: 0.05,
     SwapDistanceReduction: 0.01,
+
+    MaxLifeSteal: 1.0,
 }
 
 const Obstacle: ObstacleSettings = {

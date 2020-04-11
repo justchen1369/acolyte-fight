@@ -671,8 +671,8 @@ export interface VanishBuff extends BuffBase {
 
 export interface LifeStealBuff extends BuffBase {
 	type: "lifeSteal";
-	lifeSteal?: number;
-	damageMultiplier?: number;
+	lifeSteal: number;
+	damageMultiplier: number;
 	minHealth?: number;
 	decay?: boolean;
 
@@ -790,7 +790,6 @@ export interface DamagePacket {
 	isLava?: boolean;
 	noHit?: boolean;
 	minHealth?: number;
-	noMitigate?: boolean;
 	noRedirect?: boolean;
 	noKnockback?: boolean;
 	source?: string;

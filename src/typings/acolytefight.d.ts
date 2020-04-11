@@ -103,6 +103,8 @@ declare interface WorldSettings {
 	SecondsToShrink: number;
 	ShrinkPowerMinPlayers: number; // Make the shrinking non-linear. Higher values mean faster shrinking at the start of the game.
 	ShrinkPowerMaxPlayers: number;
+
+	MaxLifeSteal: number; // A single hit can never do more than this much lifesteal, no matter how many lifesteal buffs it has
 	
 	ProjectileSpeedDecayFactorPerTick: number; // If a projectile is going faster or slower than its intended speed, correct it by this proportion per tick
 
@@ -433,8 +435,6 @@ declare interface FocusSpell extends SpellBase {
 
 declare interface ProjectileTemplate extends DamagePacketTemplate {
 	damage: number;
-	damageScaling?: boolean; // Whether to apply damage scaling to this projectile
-	knockbackScaling?: boolean; // Increase knockback as acolyte gets more powerful
 
 	partialDamage?: PartialDamageParameters; // Scale damage over time
 	partialDetonateRadius?: PartialDamageParameters; // Scale detonate radius over time, only useful if detonate set
@@ -670,7 +670,6 @@ declare interface DetonateParametersTemplate extends DamagePacketTemplate {
 	
 	minImpulse: number; // The outer rim of the explosion will cause this much knockback
 	maxImpulse: number; // The epicenter of the explosion will cause this much knockback
-	knockbackScaling?: boolean; // Increase knockback as acolyte gets more powerful
 
 	renderTicks: number; // Length of explosion
 	sound?: string;
@@ -866,6 +865,7 @@ declare interface BuffTemplateBase {
 	stack?: string; // If there is another buff with the same stack name as this, replace it, don't add another buff
 	maxStacks?: number; // Cannot have more than this many stacks. Defaults to 1.
 	minStacks?: number; // Only have an effect once there are this many stacks
+	global?: boolean; // Normally there is one stack per enemy. If global, then all enemies contribute to the same stack.
 
 	owner?: boolean; // If this is a projectile that hit, apply the buff to the owner, not to the target
 	cleansable?: boolean; // Whether this buff can be cleansed, defaults to true
@@ -1007,7 +1007,6 @@ declare interface ScourgeSpell extends SpellBase {
 	minSelfHealth: number;
 
 	detonate: DetonateParametersTemplate;
-	knockbackScaling?: boolean; // Increase knockback as acolyte gets more powerful
 
     trailTicks: number;
 }
@@ -1157,7 +1156,6 @@ declare interface RedirectDamageParameters {
 
 declare interface DamagePacketTemplate {
 	damage: number;
-	damageScaling?: boolean;
 	lifeSteal?: number;
 	isLava?: boolean;
 	noHit?: boolean; // Don't count this as a hit - no hero flashing and no halo stripping

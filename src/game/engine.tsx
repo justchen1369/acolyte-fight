@@ -735,8 +735,6 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 
 	const filterGroupIndex = config.filterGroupIndex || objectToFilterGroupIndex(index);
 
-	const knockbackScaling = calculateScaling(config.owner, world, projectileTemplate.knockbackScaling);
-
 	const radius = projectileTemplate.radius;
 	const shape =
 		projectileTemplate.square
@@ -761,7 +759,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		filterGroupIndex: config.initialFilterGroupIndex || filterGroupIndex,
 		filterCategoryBits: categories,
 		filterMaskBits: collideWith,
-		density: projectileTemplate.density * knockbackScaling,
+		density: projectileTemplate.density,
 		restitution: projectileTemplate.restitution !== undefined ? projectileTemplate.restitution : 1.0,
 		isSensor: projectileTemplate.sensor,
 	});
@@ -814,7 +812,6 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 
 		damageTemplate: {
 			damage: projectileTemplate.damage,
-			damageScaling: projectileTemplate.damageScaling,
 			lifeSteal: projectileTemplate.lifeSteal,
 			noHit: projectileTemplate.noHit,
 			noKnockback: projectileTemplate.noKnockback,
@@ -893,19 +890,6 @@ function parseAttractable(attractable: AttractableTemplate): AttractableParamete
 		// Default to attractable
 		return DefaultAttractable;
 	}
-}
-
-export function calculateScaling(heroId: number, world: w.World, scaling: boolean = false) {
-	if (!scaling) {
-		return 1;
-	}
-
-	if (!heroId) {
-		// Environment doesn't scale
-		return 1;
-	}
-
-	return 1;
 }
 
 function ticksTo(distance: number, speed: number) {
@@ -3967,13 +3951,12 @@ function detonateObstacle(obstacle: w.Obstacle, world: w.World) {
 
 function instantiateDetonate(template: DetonateParametersTemplate, fromHeroId: number, world: w.World): w.DetonateParameters {
 	const damagePacket = instantiateDamage(template, fromHeroId, world);
-	const knockbackScaling = calculateScaling(fromHeroId, world, template.knockbackScaling);
 
 	return {
 		...template,
 		...damagePacket,
-		minImpulse: (template.minImpulse || 0) * knockbackScaling,
-		maxImpulse: (template.maxImpulse || 0) * knockbackScaling,
+		minImpulse: template.minImpulse || 0,
+		maxImpulse: template.maxImpulse || 0,
 	};
 }
 
@@ -4069,12 +4052,10 @@ function applyLavaDamage(world: w.World) {
 		return;
 	}
 
-	const damagePacket: w.DamagePacket = {
+	const damageTemplate: DamagePacketTemplate = {
 		damage: (World.LavaDamageInterval / TicksPerSecond) * World.LavaDamagePerSecond,
 		lifeSteal: World.LavaLifestealProportion,
-		fromHeroId: null,
 		isLava: true,
-		noMitigate: true,
 	};
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
@@ -4089,14 +4070,15 @@ function applyLavaDamage(world: w.World) {
 					}
 				});
 
-				const maxDamage = damagePacket.damage * damageMultiplier;
-				const heroDamagePacket = {
-					...damagePacket,
-					damage: damagePacket.damage,
-					minHealth: obj.health - maxDamage, // Use minHealth so that damage still gets redirected to other enemies
-					fromHeroId: calculateKnockbackFromId(obj, world),
-				};
-				applyDamage(obj, heroDamagePacket, world);
+				const maxDamage = damageTemplate.damage * damageMultiplier;
+				const minHealth = obj.health - maxDamage;
+
+				const fromHeroId = calculateKnockbackFromId(obj, world);
+				const damagePacket = instantiateDamage(damageTemplate, fromHeroId, world);
+
+				damagePacket.minHealth = minHealth;
+
+				applyDamage(obj, damagePacket, world);
 
 				if (!hasLavaImmunity) {
 					applyBuffsFrom(World.LavaBuffs, null, obj, world);
@@ -4104,6 +4086,7 @@ function applyLavaDamage(world: w.World) {
 			}
 		} else if (obj.category === "obstacle") {
 			if (!isInsideMap(obj, world)) {
+				const damagePacket = instantiateDamage(damageTemplate, null, world);
 				applyDamageToObstacle(obj, damagePacket, world);
 			}
 		}
@@ -5031,7 +5014,8 @@ function detachBuff(buff: w.Buff, hero: w.Hero, world: w.World) {
 
 function calculateBuffId(template: BuffTemplate, world: w.World, config: BuffContext) {
 	if (template.stack) {
-		return `${config.fromHeroId || "environment"}/${template.type}/${template.stack}`;
+		const from = template.global ? "global" : (config.fromHeroId || "environment");
+		return `${from}/${template.type}/${template.stack}`;
 	} else {
 		return `${template.type}${world.nextBuffId++}`;
 	}
@@ -5190,15 +5174,20 @@ function attachLifesteal(template: LifestealTemplate, hero: w.Hero, world: w.Wor
 		template, hero, world, config,
 		(id, values) => ({
 			...values, id, type: "lifeSteal",
-			lifeSteal: template.lifeSteal,
-			damageMultiplier: template.damageMultiplier,
+			lifeSteal: template.lifeSteal || 0,
+			damageMultiplier: template.damageMultiplier || 1,
 			minHealth: template.minHealth,
 			decay: template.decay,
 			source: template.source,
 		}),
 		(stack) => {
-			const delta = template.damageMultiplier - 1;
-			stack.damageMultiplier = (stack.damageMultiplier || 1) + delta;
+			if (_.isNumber(template.damageMultiplier)) {
+				const delta = template.damageMultiplier - 1.0;
+				stack.damageMultiplier = (stack.damageMultiplier || 1.0) + delta;
+			}
+			if (_.isNumber(template.lifeSteal)) {
+				stack.lifeSteal += template.lifeSteal;
+			}
 		},
 	);
 }
@@ -5396,13 +5385,11 @@ function attachBump(template: BumpTemplate, hero: w.Hero, world: w.World, config
 }
 
 function instantiateDamage(template: DamagePacketTemplate, fromHeroId: number, world: w.World): w.DamagePacket {
-	const Hero = world.settings.Hero;
-
 	if (!template) {
 		return null;
 	}
 
-	let damage = template.damage * calculateScaling(fromHeroId, world, template.damageScaling);
+	let damage = template.damage;
 	let lifeSteal = template.lifeSteal || 0;
 	let minHealth = template.minHealth;
 
@@ -5415,10 +5402,10 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: number, w
 					proportion = Math.max(0, (buff.expireTick - world.tick) / buff.maxTicks);
 				}
 
-				if (_.isNumber(buff.lifeSteal)) {
-					lifeSteal = Math.max(lifeSteal, buff.lifeSteal * proportion);
+				if (buff.lifeSteal > 0) {
+					lifeSteal += buff.lifeSteal * proportion;
 				}
-				if (_.isNumber(buff.damageMultiplier)) {
+				if (buff.damageMultiplier !== 1 && !template.isLava) { // Void damage can't be multiplied
 					damage *= proportion * buff.damageMultiplier + (1 - proportion) * 1;
 				}
 				if (_.isNumber(buff.minHealth)) {
@@ -5430,7 +5417,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: number, w
 
 	return {
 		damage,
-		lifeSteal,
+		lifeSteal: Math.min(world.settings.World.MaxLifeSteal, lifeSteal),
 		fromHeroId,
 		noHit: template.noHit,
 		noKnockback: template.noKnockback,
@@ -5468,7 +5455,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	// Apply damage
 	let amount = packet.damage;
 	amount = applyArmor(toHero, packet.source, amount);
-	if (!packet.noMitigate) {
+	if (!packet.isLava) { // Void damage cannot be mitigated
 		amount = mitigateDamage(toHero, amount, fromHeroId, world);
 	}
 	if (!packet.noRedirect) {
@@ -5481,7 +5468,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	toHero.health = Math.min(toHero.maxHealth, toHero.health - amount);
 
 	// Apply lifesteal
-	if (fromHero && packet.lifeSteal) {
+	if (fromHero && packet.lifeSteal > 0) {
 		fromHero.health = Math.min(fromHero.maxHealth, fromHero.health + amount * packet.lifeSteal);
 		world.ui.events.push({ type: "lifeSteal", tick: world.tick, owner: fromHero.id });
 	}
