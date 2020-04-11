@@ -1429,7 +1429,7 @@ function updateHeroMass(hero: w.Hero) {
 	let restrictCollideWith = Categories.All;
 	let appendCollideWith = Categories.None;
 	hero.buffs.forEach(b => {
-		if (b.type === "mass") {
+		if (b.type === "mass" && b.numStacks >= b.minStacks) {
 			radius = Math.max(radius, b.radius);
 			if (_.isNumber(b.restrictCollideWith)) {
 				restrictCollideWith &= b.restrictCollideWith;
@@ -2775,7 +2775,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 
 		let bumper = false;
 		hero.buffs.forEach(bump => {
-			if (bump.type === "bump") {
+			if (bump.type === "bump" && bump.numStacks >= bump.minStacks) {
 				if (takeHit(bump, other.id, world) && (calculateAlliance(hero.id, other.id, world) & Alliances.Enemy) > 0) {
 					magnitude += bump.impulse;
 					bumper = true;
@@ -3718,7 +3718,7 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 function updateHeroDamping(hero: w.Hero) {
 	let damping = hero.linearDamping;
 	hero.buffs.forEach(buff => {
-		if (buff.type === "glide") {
+		if (buff.type === "glide" && buff.numStacks >= buff.minStacks) {
 			damping *= buff.linearDampingMultiplier;
 		}
 	});
@@ -4083,7 +4083,7 @@ function applyLavaDamage(world: w.World) {
 
 				let damageMultiplier = 1.0;
 				obj.buffs.forEach(buff => {
-					if (buff.type === "lavaImmunity") {
+					if (buff.type === "lavaImmunity" && buff.numStacks >= buff.minStacks) {
 						hasLavaImmunity = true;
 						damageMultiplier *= buff.damageProportion;
 					}
@@ -4394,7 +4394,7 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 	}
 
 	hero.buffs.forEach(buff => {
-		if (buff.type === "movement") {
+		if (buff.type === "movement" && buff.numStacks >= buff.minStacks) {
 			let movementProportion = buff.movementProportion;
 
 			if (buff.decay) {
@@ -5055,6 +5055,7 @@ function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.Worl
 		resetOnGameStart: template.resetOnGameStart,
 		cancelOnBump: template.cancelOnBump,
 		numStacks: 1,
+		minStacks: template.minStacks || 0,
 	};
 
 	if (template.linkOwner) {
@@ -5117,7 +5118,7 @@ function detachCleanse(buff: w.CleanseBuff, hero: w.Hero, world: w.World) {
 function updateCleanse(hero: w.Hero) {
 	let cleanseTick = 0;
 	hero.buffs.forEach(b => {
-		if (b.type === "cleanse") {
+		if (b.type === "cleanse" && b.numStacks >= b.minStacks) {
 			cleanseTick = Math.max(cleanseTick, b.expireTick);
 		}
 	});
@@ -5227,7 +5228,7 @@ function burn(burn: w.BurnBehaviour, world: w.World) {
 	}
 
 	hero.buffs.forEach(buff => {
-		if (buff.type === "burn" && world.tick % buff.hitInterval === 0) {
+		if (buff.type === "burn" && world.tick % buff.hitInterval === 0 && buff.numStacks >= buff.minStacks) {
 			const packet = instantiateDamage(buff.packet, buff.fromHeroId, world);
 			applyDamage(hero, packet, world);
 		}
@@ -5306,6 +5307,7 @@ function updateSilence(hero: w.Hero) {
 		let cooldownRate = 1;
 		hero.buffs.forEach(buff => {
 			if (buff.type === "cooldown"
+				&& buff.numStacks >= buff.minStacks
 				&& (!buff.spellIds || buff.spellIds.has(spellId))
 				&& (!buff.notSpellIds || !buff.notSpellIds.has(spellId))) {
 
@@ -5407,7 +5409,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: number, w
 	const fromHero = world.objects.get(fromHeroId);
 	if (fromHero && fromHero.category === "hero") {
 		fromHero.buffs.forEach(buff => {
-			if (buff.type === "lifeSteal" && (!buff.source || buff.source === template.source)) {
+			if (buff.type === "lifeSteal" && (!buff.source || buff.source === template.source) && buff.numStacks >= buff.minStacks) {
 				let proportion = 1;
 				if (buff.decay) {
 					proportion = Math.max(0, (buff.expireTick - world.tick) / buff.maxTicks);
@@ -5544,7 +5546,7 @@ function updateArmor(hero: w.Hero) {
 	hero.armorProportion = 0;
 
 	hero.buffs.forEach(buff => {
-		if (buff.type === "armor") {
+		if (buff.type === "armor" && buff.numStacks >= buff.minStacks) {
 			if (buff.source) {
 				const current = hero.armorModifiers.get(buff.source) || 0;
 				hero.armorModifiers.set(buff.source, current + buff.proportion);

@@ -614,6 +614,7 @@ export interface BuffValues {
 	cancelOnBump?: boolean;
 	hitTick?: number; // If the hero gets hit, remove the buff
 	numStacks: number;
+	minStacks: number;
 
 	renderStart?: RenderBuff;
 	render?: RenderBuff;

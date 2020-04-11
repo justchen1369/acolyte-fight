@@ -1345,6 +1345,10 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 	const isVisibleToMe = visibleToMe(hero.id, world);
 
 	hero.buffs.forEach(buff => {
+		if (buff.numStacks < buff.minStacks) {
+			return;
+		}
+
 		if (buff.renderStart && !buff.uiStartRendered) {
 			buff.uiStartRendered = true;
 			renderBuffSmoke(ctxStack, buff.renderStart, buff, hero, pos, world);
@@ -1380,7 +1384,7 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 			return;
 		}
 
-		if (buff.renderFinish) {
+		if (buff.renderFinish && buff.uiStartRendered) { // Only render finish if the start was rendered as well
 			renderBuffSmoke(ctxStack, buff.renderFinish, buff, hero, pos, world);
 		}
 
