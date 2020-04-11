@@ -17,7 +17,6 @@ interface Props extends OwnProps {
     mod: ModTree;
     selfId: string;
     party: s.PartyState;
-    isLoggedIn: boolean;
 }
 interface State {
 }
@@ -28,7 +27,6 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         mod: state.room.mod,
         selfId: state.socketId,
         party: state.party,
-        isLoggedIn: state.loggedIn,
     };
 }
 
@@ -39,25 +37,11 @@ class EditorPage extends React.PureComponent<Props, State> {
     }
 
     render() {
-        if (!(this.props.isLoggedIn || isLocal)) {
-            return this.renderNotLoggedIn();
-        } else if (!this.isAdmin()) {
+        if (!this.isAdmin()) {
             return this.renderReadonly();
         } else {
             return this.renderEditor();
         }
-    }
-
-    private renderNotLoggedIn() {
-        return <div className="content-container">
-            <TitleListener subtitle="Modding" />
-            <NavBar />
-            <div className="page">
-                <h1>Modding</h1>
-                <p>Modding allows you to change the rules of the game.</p>
-                <div className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to access modding tools</div>
-            </div>
-        </div>;
     }
 
     private renderReadonly() {

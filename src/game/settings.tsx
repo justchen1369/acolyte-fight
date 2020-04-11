@@ -2585,7 +2585,7 @@ const shield: Spell = {
     name: 'Reflect',
     description: "Reflect away projectile attacks. Ineffective against area-of-effect spells.",
 
-    maxTicks: 2 * TicksPerSecond,
+    maxTicks: 1.5 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     categories: Categories.Shield | Categories.Obstacle,
     throttle: false,
@@ -2602,8 +2602,9 @@ const shield: Spell = {
     buffs: [
         {
             type: "movement",
-            maxTicks: 2 * TicksPerSecond,
+            maxTicks: 1.5 * TicksPerSecond,
             movementProportion: 0.25,
+            channelling: true,
             decay: true,
         },
     ],
