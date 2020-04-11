@@ -4410,7 +4410,7 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 		}
 	});
 
-	const movementProportion = buffIncrease * buffDecrease;
+	const movementProportion = 1.0 + buffIncrease - buffDecrease;
 	return movementProportion;
 }
 
