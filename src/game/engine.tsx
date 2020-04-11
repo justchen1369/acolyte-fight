@@ -4409,6 +4409,7 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 			}
 		}
 	});
+
 	const movementProportion = buffIncrease * buffDecrease;
 	return movementProportion;
 }
@@ -5132,7 +5133,8 @@ function attachMovementBuff(template: MovementBuffTemplate, hero: w.Hero, world:
 			decay: template.decay,
 		}),
 		(stack) => {
-			stack.movementProportion *= template.movementProportion;
+			const delta = template.movementProportion - 1.0; // 1.0 means no speedup or slowdown, calculate the delta from that
+			stack.movementProportion += delta;
 		},
 	);
 }
