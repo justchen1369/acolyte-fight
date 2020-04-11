@@ -5432,6 +5432,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: number, w
 		damage,
 		lifeSteal,
 		fromHeroId,
+		isLava: template.isLava,
 		noHit: template.noHit,
 		noKnockback: template.noKnockback,
 		minHealth,
