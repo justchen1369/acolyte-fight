@@ -98,9 +98,11 @@ declare interface WorldSettings {
 	HeroLayoutProportion: number; // The radius at which to place heroes - 1 means edge of map, 0 means at center
 	HeroResetProportion: number; // When starting the game, of a hero is outside the map, reset it to this proportion
 
-	LavaLifestealProportion: number; // 0 for no lifesteal, 1 for 100% lifesteal
-	LavaDamagePerSecond: number;
+	LavaLifestealProportion?: number; // Deprecated, use LavaDamage instead
+	LavaDamagePerSecond?: number; // Deprecated, use LavaDamage instead
+
 	LavaDamageInterval: number; // Ticks between applying lava damage
+	LavaDamage: DamagePacketTemplate; // Apply this damage every interval the acolyte is in the void
 	LavaBuffs: BuffTemplate[]; // Apply these buffs whenever an acolyte touches the void
 
 	SecondsToShrink: number;
@@ -852,7 +854,6 @@ declare type BuffTemplate =
 	DebuffTemplate
 	| MovementBuffTemplate
 	| GlideTemplate
-	| LavaImmunityBuffTemplate
 	| VanishTemplate
 	| LifestealTemplate
 	| SetCooldownTemplate
@@ -926,11 +927,6 @@ declare interface GlideTemplate extends BuffTemplateBase {
 	linearDampingMultiplier: number; // 0 will make the hero glide
 }
 
-declare interface LavaImmunityBuffTemplate extends BuffTemplateBase {
-	type: "lavaImmunity";
-	damageProportion: number; // 0 will make the hero immune to void damage
-}
-
 declare interface VanishTemplate extends BuffTemplateBase {
 	type: "vanish";
 	noTargetingIndicator?: boolean;
@@ -968,6 +964,7 @@ declare interface BurnTemplate extends BuffTemplateBase {
 declare interface ArmorTemplate extends BuffTemplateBase {
 	type: "armor";
 	proportion: number; // Positive increases damage received, negative negates damage received
+	minHealth?: number; // Don't allow damage received to take us below this amount of health
 
 	source?: string; // Only affect damage packets with the same source
 }

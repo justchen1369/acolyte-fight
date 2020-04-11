@@ -572,7 +572,7 @@ function addHero(world: w.World, heroId: number) {
 		initialRadius: Hero.Radius,
 		radius: Hero.Radius,
 		linearDamping: Hero.Damping,
-		armorProportion: 0,
+		armorModifier: initArmorModifier(),
 		armorModifiers: new Map(),
 		damageSources: new Map(),
 		damageSourceHistory: [],
@@ -4067,36 +4067,32 @@ function applyLavaDamage(world: w.World) {
 	}
 
 	const damageTemplate: DamagePacketTemplate = {
-		damage: (World.LavaDamageInterval / TicksPerSecond) * World.LavaDamagePerSecond,
-		lifeSteal: World.LavaLifestealProportion,
-		isLava: true,
+		...world.settings.World.LavaDamage,
 	};
+
+	if (World.LavaDamagePerSecond) { // backwards compatibility
+		damageTemplate.damage = (World.LavaDamageInterval / TicksPerSecond) * World.LavaDamagePerSecond;
+	}
+	if (World.LavaLifestealProportion) { // backwards compatibility
+		damageTemplate.lifeSteal = World.LavaLifestealProportion;
+	}
+
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (!isInsideMap(obj, world)) {
-				let hasLavaImmunity = false;
-
-				let damageMultiplier = 1.0;
-				obj.buffs.forEach(buff => {
-					if (buff.type === "lavaImmunity") {
-						hasLavaImmunity = true;
-						damageMultiplier *= buff.damageProportion;
-					}
-				});
-
-				const maxDamage = damageTemplate.damage * damageMultiplier;
-				const minHealth = obj.health - maxDamage;
+				const lavaModifier = obj.armorModifiers.get(damageTemplate.source);
+				let hasLavaImmunity = lavaModifier && lavaModifier.proportion <= -1.0; // -1.0 means full immunity
 
 				const fromHeroId = calculateKnockbackFromId(obj, world);
 				const damagePacket = instantiateDamage(damageTemplate, fromHeroId, world);
 
-				damagePacket.minHealth = minHealth;
-
-				applyDamage(obj, damagePacket, world);
-
-				if (!hasLavaImmunity) {
+				if (hasLavaImmunity) {
+					damagePacket.noHit = true; // Don't flash when in the void if immune to the void
+				} else {
 					applyBuffsFrom(World.LavaBuffs, null, obj, world);
 				}
+
+				applyDamage(obj, damagePacket, world);
 			}
 		} else if (obj.category === "obstacle") {
 			if (!isInsideMap(obj, world)) {
@@ -4987,8 +4983,6 @@ function instantiateBuff(template: BuffTemplate, hero: w.Hero, world: w.World, c
 		attachMovementBuff(template, hero, world, config);
 	} else if (template.type === "glide") {
 		attachGlide(template, hero, world, config);
-	} else if (template.type === "lavaImmunity") {
-		attachLavaImmunity(template, hero, world, config);
 	} else if (template.type === "vanish") {
 		attachVanish(template, hero, world, config);
 	} else if (template.type === "lifeSteal") {
@@ -5155,19 +5149,6 @@ function detachGlide(buff: w.GlideBuff, hero: w.Hero, world: w.World) {
 	updateHeroDamping(hero);
 }
 
-function attachLavaImmunity(template: LavaImmunityBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	attachStack<w.LavaImmunityBuff>(
-		template, hero, world, config,
-		(id, values) => ({
-			...values, id, type: "lavaImmunity",
-			damageProportion: template.damageProportion,
-		}),
-		(stack) => {
-			stack.damageProportion *= template.damageProportion;
-		},
-	);
-}
-
 function attachVanish(template: VanishTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	const id = "vanish"; // Only one vanish at a time allowed
 	hero.invisible = {
@@ -5328,6 +5309,7 @@ function attachArmor(template: ArmorTemplate, hero: w.Hero, world: w.World, conf
 			id,
 			type: "armor",
 			proportion: template.proportion,
+			minHealth: template.minHealth,
 			source: template.source,
 		}),
 		(stack) => { // Update
@@ -5485,17 +5467,16 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 
 	// Apply damage
 	let amount = packet.damage;
-	amount = applyArmor(toHero, packet.source, amount);
-	if (!packet.isLava) { // Void damage cannot be mitigated
-		amount = mitigateDamage(toHero, amount, fromHeroId, world);
-	}
 	if (!packet.noRedirect) {
 		amount = redirectDamage(toHero, amount, packet.isLava, world);
 	}
-	if (packet.minHealth) {
-		const maxDamage = Math.max(0, toHero.health - packet.minHealth);
-		amount = Math.min(amount, maxDamage);
+
+	if (!packet.isLava) { // Void damage cannot be mitigated
+		amount = mitigateDamage(toHero, amount, fromHeroId, world);
 	}
+
+	amount = applyArmor(toHero, packet.source, amount, packet.minHealth);
+
 	toHero.health = Math.min(toHero.maxHealth, toHero.health - amount);
 
 	// Apply lifesteal
@@ -5522,13 +5503,25 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	}
 }
 
-function applyArmor(toHero: w.Hero, source: string, amount: number) {
-	let armor = toHero.armorProportion;
-	if (source) {
-		armor += toHero.armorModifiers.get(source) || 0;
+function applyArmor(toHero: w.Hero, source: string, amount: number, minHealth: number = -Infinity) {
+	let armor = toHero.armorModifier.proportion;
+	minHealth = Math.max(minHealth, toHero.armorModifier.minHealth);
+
+	if (source) { // Apply source-specific armor
+		const modifier = toHero.armorModifiers.get(source);
+		if (modifier) {
+			armor += modifier.proportion || 0;
+			minHealth = Math.max(minHealth, modifier.minHealth);
+		}
 	}
 
 	amount += amount * armor;
+
+	if (minHealth >= 0) {
+		const maxDamage = Math.max(0, toHero.health - minHealth);
+		amount = Math.min(amount, maxDamage);
+	}
+
 	return amount;
 }
 
@@ -5561,18 +5554,29 @@ function redirectDamage(toHero: w.Hero, amount: number, isLava: boolean, world: 
 
 function updateArmor(hero: w.Hero) {
 	hero.armorModifiers.clear();
-	hero.armorProportion = 0;
+
+	hero.armorModifier = initArmorModifier();
 
 	hero.buffs.forEach(buff => {
 		if (buff.type === "armor") {
 			if (buff.source) {
-				const current = hero.armorModifiers.get(buff.source) || 0;
-				hero.armorModifiers.set(buff.source, current + buff.proportion);
+				const current = hero.armorModifiers.get(buff.source) || initArmorModifier();
+				accumulateArmorModifier(current, buff);
+				hero.armorModifiers.set(buff.source, current);
 			} else {
-				hero.armorProportion += buff.proportion;
+				accumulateArmorModifier(hero.armorModifier, buff);
 			}
 		}
 	});
+}
+
+function initArmorModifier(): w.ArmorModifier {
+	return { proportion: 0, minHealth: -Infinity };
+}
+
+function accumulateArmorModifier(accumulator: w.ArmorModifier, modifier: w.ArmorModifier) {
+	accumulator.proportion += modifier.proportion;
+	accumulator.minHealth = Math.max(accumulator.minHealth, modifier.minHealth);
 }
 
 function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: number, world: w.World): number {

@@ -401,8 +401,8 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	cleanseTick?: number;
 	exitTick?: number;
 
-	armorProportion: number;
-	armorModifiers: Map<string, number>; // source -> modifier
+	armorModifier: ArmorModifier;
+	armorModifiers: Map<string, ArmorModifier>; // source -> modifier
 
 	damageSources: Map<number, number>; // heroId -> damage
 	damageSourceHistory: DamageSourceHistoryItem[];
@@ -439,6 +439,11 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	uiDestroyedBuffs: Buff[];
 	uiPreviousAngle?: number;
 	uiTurnHighlightTicks?: number;
+}
+
+export interface ArmorModifier {
+	proportion: number;
+	minHealth: number;
 }
 
 export interface DamageSourceHistoryItem {
@@ -690,9 +695,8 @@ export interface BurnBuff extends BuffBase {
 	stack?: string;
 }
 
-export interface ArmorBuff extends BuffBase {
+export interface ArmorBuff extends BuffBase, ArmorModifier {
 	type: "armor";
-	proportion: number;
 
 	stack?: string;
 	source?: string;

@@ -62,14 +62,19 @@ const recoverySpellIds = [
     "voidRush",
 ];
 
+const LavaDamageInterval = 20;
 const World: WorldSettings = {
     InitialRadius: 0.4,
     HeroLayoutProportion: 0.625,
     HeroResetProportion: 0.625,
 
-    LavaDamagePerSecond: 12.5,
-    LavaLifestealProportion: lifeSteal,
-    LavaDamageInterval: 20,
+    LavaDamageInterval,
+    LavaDamage: {
+        damage: 12.5 * (LavaDamageInterval / TicksPerSecond),
+        lifeSteal,
+        isLava: true,
+        source: "lava",
+    },
     LavaBuffs: [
         {
             type: "cooldown",
@@ -2291,14 +2296,6 @@ const horcrux: Spell = {
     cooldown: 6 * TicksPerSecond,
     throttle: true,
 
-    buffs: [
-        { // Normally attacks can make your life go negative, which makes it hard to recover from. With Horcrux any lifesteal should save you.
-            type: "lifeSteal",
-            maxTicks: 2 * TicksPerSecond,
-            minHealth: 0,
-        },
-    ],
-
     projectile: {
         density: 10,
         restitution: 0,
@@ -3048,8 +3045,9 @@ const voidRush: Spell = {
             maxTicks: 2.5 * TicksPerSecond,
         },
         {
-            type: "lavaImmunity",
-            damageProportion: 0,
+            type: "armor",
+            proportion: -1,
+            source: "lava",
             maxTicks: 2.5 * TicksPerSecond,
             sound: "voidRush-lavaImmunity",
             render: {
