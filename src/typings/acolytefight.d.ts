@@ -882,9 +882,9 @@ declare interface BuffTemplateBase {
 	passive?: boolean; // Cancel this buff if the hero stops choosing this spell
 	resetOnGameStart?: boolean; // Cancel this buff when the game starts
 
-	renderStart?: RenderBuff;
-	render?: RenderBuff;
-	renderFinish?: RenderBuff;
+	renderStart?: RenderBuff; // Render some particles when the buff starts
+	render?: RenderBuff; // Render particles for the duration of the buff
+	renderFinish?: RenderBuff; // Render some particles when the buff ends
 	sound?: string;
 }
 
@@ -892,7 +892,7 @@ declare interface RenderBuff {
 	numParticles?: number;
 	invisible?: boolean; // Only show this to players who can see the hero
 	color: string;
-	selfColor?: boolean; // View own buffs in the self color
+	selfColor?: boolean; // If the buff belongs to me, view it in my own color
 	alpha?: number; // Semi-transparent
 	light?: number; // Render additively
 	shine?: number; // Brighter initially
