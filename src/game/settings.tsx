@@ -611,10 +611,10 @@ const firespray: Spell = {
 
         color: '#ff0044',
         renderers: [
-            { type: "bloom", radius: 0.02 },
+            { type: "bloom", radius: 0.02, light: 0.5 },
             { type: "projectile", ticks: 30, light: 0.8, smoke: 0.15, vanish: 1, bloom: 0.01 },
             { type: "ray", intermediatePoints: true, ticks: 7, light: 0.8, vanish: 1 },
-            { type: "strike", ticks: 30, flash: true, numParticles: 1 },
+            { type: "strike", ticks: 10, flash: true, numParticles: 1 },
         ],
     },
 };
@@ -1744,6 +1744,7 @@ const renderGravity: RenderSwirl = {
     shine: 0.4,
     vanish: 0.5,
     bloom: 0.04,
+    light: 0.9,
 
     smoke: {
         axisMultiplier: 0.3,

@@ -21,7 +21,6 @@ export const volcano: ObstacleTemplate = {
             color: "rgba(255, 0, 128, 0.9)",
             deadColor: "rgba(255, 0, 128, 0.25)",
             glow: 0.2,
-            light: 0.8,
         },
         {
             type: "smoke",
