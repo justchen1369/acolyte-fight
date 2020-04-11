@@ -1487,7 +1487,7 @@ const grapple: Spell = {
         speedDamping: 3,
         maxTicks: 50,
         damage: 0,
-        collideWith: Categories.All ^ Categories.Projectile ^ Categories.Hero,
+        collideWith: Categories.Massive | Categories.Obstacle | Categories.Shield,
         sense: Categories.Hero,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
         expireOnMirror: true,
