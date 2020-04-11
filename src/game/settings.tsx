@@ -2602,7 +2602,7 @@ const shield: Spell = {
     buffs: [
         {
             type: "movement",
-            maxTicks: 1.5 * TicksPerSecond,
+            maxTicks: 2 * TicksPerSecond,
             movementProportion: 0.25,
             decay: true,
         },
