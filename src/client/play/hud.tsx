@@ -42,7 +42,7 @@ namespace Tab {
 }
 
 interface Props {
-    myHeroId: string;
+    myHeroId: number;
     exitable: boolean;
     wheelOnRight: boolean;
     customizing: boolean;

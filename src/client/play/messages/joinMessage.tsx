@@ -15,7 +15,7 @@ interface OwnProps {
     message: s.JoinMessage;
 }
 interface Props extends OwnProps {
-    activePlayers: Immutable.Set<string>;
+    activePlayers: Immutable.Set<number>;
 }
 interface State {
 }

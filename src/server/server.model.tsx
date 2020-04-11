@@ -56,9 +56,9 @@ export interface Game extends m.Replay {
     matchmaking: MatchmakingSettings;
 
     active: Map<string, Player>; // socketId -> Player
-    bots: Map<string, string>; // heroId -> socketId
-    controlKeys: Map<number, string>; // controlKey -> heroId
-    reconnectKeys: Map<string, string>; // key -> heroId
+    bots: Map<number, string>; // heroId -> socketId
+    controlKeys: Map<number, number>; // controlKey -> heroId
+    reconnectKeys: Map<string, number>; // key -> heroId
     isRankedLookup: Map<string, boolean>; // userId -> boolean
     socketIds: Set<string>;
     observers: Map<string, Observer>; // socketIds
@@ -76,7 +76,7 @@ export interface Game extends m.Replay {
 
     matched?: boolean;
 
-    actions: Map<string, m.ActionMsg>; // heroId -> actionData
+    actions: Map<number, m.ActionMsg>; // heroId -> actionData
     controlMessages: m.ControlMsg[];
     syncMessage: m.SyncMsg;
 
@@ -87,7 +87,7 @@ export interface Game extends m.Replay {
 export interface Player {
     socketId: string;
     partyId: string;
-    heroId: string;
+    heroId: number;
     userHash: string;
     userId?: string;
     name: string;
@@ -171,7 +171,7 @@ export interface JoinResult {
 	game: m.Replay;
 	live: boolean;
 
-    heroId?: string;
+    heroId?: number;
     controlKey?: number;
 	reconnectKey?: string;
     autoJoin?: boolean;

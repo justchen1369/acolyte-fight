@@ -15,8 +15,8 @@ const workers = new Map<string, AiWorker>();
 let workerCode: string = null;
 
 export interface SendContext {
-    action: (gameId: string, heroId: string, action: w.Action, controlKey: number) => void;
-    spells: (gameId: string, heroId: string, keyBindings: KeyBindings, controlKey: number) => void;
+    action: (gameId: string, heroId: number, action: w.Action, controlKey: number) => void;
+    spells: (gameId: string, heroId: number, keyBindings: KeyBindings, controlKey: number) => void;
 }
 
 export function onTick(world: w.World, send: SendContext) {
@@ -44,7 +44,7 @@ export function onTick(world: w.World, send: SendContext) {
     });
 }
 
-function startBotIfNecessary(world: w.World, heroId: string, controlKey: number, send: SendContext) {
+function startBotIfNecessary(world: w.World, heroId: number, controlKey: number, send: SendContext) {
     if (isMyBot(world, heroId)) {
         const key = workerKey(world.ui.myGameId, heroId, controlKey);
         if (!workers.has(key)) {
@@ -57,11 +57,11 @@ function startBotIfNecessary(world: w.World, heroId: string, controlKey: number,
     }
 }
 
-function workerKey(gameId: string, heroId: string, controlKey: number) {
+function workerKey(gameId: string, heroId: number, controlKey: number) {
     return `${gameId}/${heroId}/${controlKey}`;
 }
 
-function isMyBot(world: w.World, heroId: string) {
+function isMyBot(world: w.World, heroId: number) {
     if (!world.ui.myGameId) {
         return false;
     }
@@ -91,7 +91,7 @@ async function fetchWorkerCode() {
 
 class AiWorker {
     private gameId: string;
-    private heroId: string;
+    private heroId: number;
     private controlKey: number;
     private settings: AcolyteFightSettings;
     private send: SendContext;
@@ -99,7 +99,7 @@ class AiWorker {
     private awaitingTick: number = null;
     private isTerminated = false;
 
-    constructor(world: w.World, heroId: string, controlKey: number, send: SendContext) {
+    constructor(world: w.World, heroId: number, controlKey: number, send: SendContext) {
         this.gameId = world.ui.myGameId;
         this.heroId = heroId;
         this.controlKey = controlKey;
@@ -221,7 +221,7 @@ class AiWorker {
     }
 }
 
-function worldToState(world: w.World, myHeroId: string): AI.World {
+function worldToState(world: w.World, myHeroId: number): AI.World {
     const contract: AI.World = {
         tick: world.tick,
         started: world.tick >= world.startTick,

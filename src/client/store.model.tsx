@@ -161,7 +161,7 @@ export interface SplitMessage extends MessageBase {
 
 export interface KillMessage extends MessageBase {
 	type: "kill";
-	myHeroId: string;
+	myHeroId: number;
 	killed: w.Player;
 	killer: w.Player | null;
 }
@@ -179,7 +179,7 @@ export interface TeamsMessage extends MessageBase {
 
 export interface WinMessage extends MessageBase {
 	type: "win";
-	myHeroId: string;
+	myHeroId: number;
 	winners: w.Player[];
 
 	mostDamage: w.Player;

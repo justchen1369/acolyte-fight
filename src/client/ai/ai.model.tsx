@@ -14,7 +14,7 @@ export interface InitMsgContract {
 
 export interface StateMsgContract {
 	type: "state";
-	heroId: string;
+	heroId: number;
     state: C.World;
     cooldowns: C.CooldownsRemaining;
     difficulty: number;

@@ -21,7 +21,7 @@ interface OwnProps {
 interface Props extends OwnProps {
     userId: string;
     myGameId: string;
-    myHeroId: string;
+    myHeroId: number;
     isFinished: boolean;
     showingHelp: boolean;
     rebindings: KeyBindings;

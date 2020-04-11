@@ -11,7 +11,7 @@ import PlayButton from '../ui/playButton';
 import WinMessage from './messages/winMessage';
 
 interface Props {
-    myHeroId: string;
+    myHeroId: number;
     isDead: boolean;
     isFinished: boolean;
     items: s.MessageItem[];

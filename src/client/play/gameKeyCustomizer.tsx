@@ -15,7 +15,7 @@ import { sendKeyBindingsXX } from '../core/ticker';
 interface Props {
     btn: string;
     gameId: string;
-    heroId: string;
+    heroId: number;
     gameStarted: boolean;
     wheelOnRight: boolean;
     config: KeyBindings;

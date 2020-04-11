@@ -13,7 +13,7 @@ interface OwnProps {
 }
 interface Props extends OwnProps {
     myGameId: string;
-    myHeroId: string;
+    myHeroId: number;
     score: w.HeroScore;
 }
 interface State {

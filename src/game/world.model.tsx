@@ -42,19 +42,19 @@ export interface World {
 	tick: number;
 	startTick: number;
 
-	activePlayers: Immutable.Set<string>; // Set<heroId: string>
-	players: Immutable.Map<string, Player>; // heroId -> Player
-	controlKeysXX: Map<number, string>; // controlKey -> heroId
-	scores: Immutable.Map<string, HeroScore>; // heroId -> HeroScore
-	spellRecords: Map<string, string[]>; // heroId -> spellId[]
-	teamAssignments: Immutable.Map<string, string>; // heroId -> teamId
+	activePlayers: Immutable.Set<number>; // Set<heroId: number>
+	players: Immutable.Map<number, Player>; // heroId -> Player
+	controlKeysXX: Map<number, number>; // controlKey -> heroId
+	scores: Immutable.Map<number, HeroScore>; // heroId -> HeroScore
+	spellRecords: Map<number, string[]>; // heroId -> spellId[]
+	teamAssignments: Immutable.Map<number, string>; // heroId -> teamId
 	teams: Immutable.Map<string, Team>; // teamId -> Team
-	winner: string | null; // heroId
-	winners: string[] | null;
+	winner: number | null; // heroId
+	winners: number[] | null;
 	winTick?: number;
 	finished?: boolean;
 
-	objects: Map<string, WorldObject>,
+	objects: Map<number, WorldObject>,
 	behaviours: Behaviour[],
 	colliders: Collider[],
 
@@ -70,7 +70,7 @@ export interface World {
 	controlMessages: n.ControlMsg[];
 	snapshots: Snapshot[];
 	syncs: Snapshot[];
-	actions: Map<string, Action[]>,
+	actions: Map<number, Action[]>,
 
 	nextPositionId: number;
 	nextObjectId: number;
@@ -92,11 +92,11 @@ export interface Collision {
 export interface Team {
 	teamId: string;
 	color: string;
-	heroIds: string[];
+	heroIds: number[];
 }
 
 export interface HeroScore {
-	heroId: string;
+	heroId: number;
 	kills: number;
 	outlasts: number;
 	damage: number;
@@ -110,7 +110,7 @@ export interface UIState {
 
 	myRoomId: string | null;
 	myGameId: string | null;
-	myHeroId: string | null;
+	myHeroId: number | null;
 	myPartyId: string | null;
 	myUserHash: string | null;
 	controlKeyXX: number | null;
@@ -136,7 +136,7 @@ export interface UIState {
 
 	underlays: Trail[];
 	trails: Trail[];
-	changedTrailHighlights: Map<string, TrailHighlight>;
+	changedTrailHighlights: Map<number, TrailHighlight>;
 	notifications: Notification[];
 
 	buttonBar?: ButtonConfig;
@@ -208,7 +208,7 @@ export interface HitSector {
 }
 
 export interface Player {
-	heroId: string;
+	heroId: number;
 	controlKey: number;
 	userId?: string;
 	userHash: string | null;
@@ -261,7 +261,7 @@ export interface LeaveNotification {
 
 export interface KillNotification {
 	type: "kill";
-	myHeroId: string;
+	myHeroId: number;
 	killed: Player;
 	killer: Player | null;
 }
@@ -279,7 +279,7 @@ export interface TeamsNotification {
 
 export interface WinNotification {
 	type: "win";
-	myHeroId: string;
+	myHeroId: number;
 	winners: Player[];
 
 	mostDamage: Player;
@@ -291,7 +291,7 @@ export interface WinNotification {
 
 export interface Snapshot {
 	tick: number;
-	objectLookup: Map<string, ObjectSnapshot>;
+	objectLookup: Map<number, ObjectSnapshot>;
 }
 
 export interface ObjectSnapshot {
@@ -301,8 +301,8 @@ export interface ObjectSnapshot {
 }
 
 export interface WorldObjectBase {
-	id: string;
-	owner: string;
+	id: number;
+	owner: number;
 	category: string;
 	categories: number;
 	body: pl.Body;
@@ -323,7 +323,7 @@ export interface WorldObjectBase {
 }
 
 export interface HighlightSource {
-	id: string;
+	id: number;
 	uiHighlight?: TrailHighlight;
 }
 
@@ -395,8 +395,8 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	exitTick?: number;
 
 	armorProportion: number;
-	armorModifiers: Map<string, number>;
-	damageSources: Map<string, number>;
+	armorModifiers: Map<string, number>; // source -> modifier
+	damageSources: Map<number, number>; // heroId -> damage
 	damageSourceHistory: DamageSourceHistoryItem[];
 
 	moveTo?: pl.Vec2;
@@ -407,18 +407,18 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	throttleUntilTick: number;
 	uiCastTrail?: CastHistoryItem;
 
-	shieldIds: Set<string>; // Will keep pointing at shield after it is gone
-	horcruxIds: Set<string>; // Will keep pointing at projectiles after they are gone
-	focusIds: Map<string, string>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
+	shieldIds: Set<number>; // Will keep pointing at shield after it is gone
+	horcruxIds: Set<number>; // Will keep pointing at projectiles after they are gone
+	focusIds: Map<string, number>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
 
 	link?: LinkState;
 	thrust?: ThrustState;
 	gravity?: GravityState;
 	invisible?: VanishBuff;
-	buffs: Map<string, Buff>;
+	buffs: Map<string, Buff>; // buffId -> Buff
 
-	killerHeroId?: string;
-	knockbackHeroId?: string;
+	killerHeroId?: number;
+	knockbackHeroId?: number;
 
 	keysToSpells: Map<string, string>;
 	spellsToKeys: Map<string, string>;
@@ -432,7 +432,7 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 }
 
 export interface DamageSourceHistoryItem {
-	heroId: string;
+	heroId: number;
 	amount: number;
 	expireTick: number;
 }
@@ -451,7 +451,7 @@ export interface ShieldBase extends WorldObjectBase {
 	conveyable?: boolean;
 	bumpable?: boolean;
 	destroying?: boolean;
-	owner: string;
+	owner: number;
 
 	color: string;
 	selfColor?: boolean;
@@ -540,7 +540,7 @@ export interface CastHistoryItem {
 
 export interface LinkState extends HighlightSource {
 	spellId: string;
-	targetId: string;
+	targetId: number;
 
 	selfFactor: number;
 	targetFactor: number;
@@ -566,7 +566,7 @@ export interface ThrustState {
 	ticks: number;
 
 	nullified: boolean;
-	alreadyHit: Set<string>;
+	alreadyHit: Set<number>;
 }
 
 export interface GravityState {
@@ -594,7 +594,7 @@ export type Buff =
 	| BumpBuff
 
 export interface BuffValues {
-	owner: string;
+	owner: number;
 	cleansable?: boolean;
 	destroyedTick?: number;
 	maxTicks: number;
@@ -617,7 +617,7 @@ export interface BuffValues {
 }
 
 export interface LinkChannellingBuffParams {
-	owner: string; // heroId
+	owner: number; // heroId
 	spellId: string; // The owner must be casting this link spell
 }
 
@@ -676,7 +676,7 @@ export interface BurnBuff extends BuffBase {
 	type: "burn";
 	hitInterval: number;
 	packet: DamagePacketTemplate;
-	fromHeroId: string;
+	fromHeroId: number;
 	stack?: string;
 }
 
@@ -708,14 +708,14 @@ export interface Cooldowns {
 export interface HitSource {
 	hitInterval?: number;
 	hitTick?: number;
-	hitTickLookup: Map<string, number>; // object id -> tick
+	hitTickLookup: Map<number, number>; // object id -> tick
 }
 
 export interface Projectile extends WorldObjectBase, HitSource, HighlightSource {
 	category: "projectile";
 	type: string;
 
-	owner: string;
+	owner: number;
 	body: pl.Body;
 	collideWith: number;
 	sense: number;
@@ -770,13 +770,13 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 
 export interface ProjectileTargets {
 	pos: pl.Vec2; // Projectile target position
-	heroId: string; // Which hero was closest when firing the projectile
+	heroId: number; // Which hero was closest when firing the projectile
 
 	releasePos: pl.Vec2; // Cursor position when button released
 }
 
 export interface DamagePacket {
-	fromHeroId: string;
+	fromHeroId: number;
 	damage: number;
 	lifeSteal: number;
 	isLava?: boolean;
@@ -880,14 +880,14 @@ export interface TriggerOnExpiryBehaviour extends BehaviourBase {
 
 export interface CooldownBehaviour extends BehaviourBase {
 	type: "cooldown";
-	heroId: string;
+	heroId: number;
 }
 
 export interface FixateBehaviour extends BehaviourBase {
 	type: "fixate";
 	untilGameStarted?: boolean;
 
-	objId: string;
+	objId: number;
 	pos: pl.Vec2;
 	angle: number;
 	proportion: number;
@@ -908,31 +908,31 @@ export interface SpawnProjectileBehaviour extends BehaviourBase {
 
 export interface AlignProjectileBehaviour extends BehaviourBase {
 	type: "alignProjectile";
-	projectileId: string;
+	projectileId: number;
 }
 
 export interface DecayHealthBehaviour extends BehaviourBase {
 	type: "decayHealth";
-	objId: string;
+	objId: number;
 	decayPerTick: number;
 }
 
 export interface LimitSpeedBehaviour extends BehaviourBase {
 	type: "limitSpeed";
-	objId: string;
+	objId: number;
 	speedLimit: number;
 }
 
 export interface DecayMitigationBehaviour extends BehaviourBase {
 	type: "decayMitigation";
-	heroId: string;
+	heroId: number;
 }
 
 export interface HomingBehaviour extends BehaviourBase {
 	type: "homing";
 	targetType: HomingType;
 
-	projectileId: string;
+	projectileId: number;
 
 	turnRate: number;
 	maxTurnProportion: number;
@@ -948,7 +948,7 @@ export interface HomingBehaviour extends BehaviourBase {
 export interface AccelerateBehaviour extends BehaviourBase {
 	type: "accelerate";
 
-	projectileId: string;
+	projectileId: number;
 
 	maxSpeed: number;
 	accelerationPerTick: number;
@@ -956,29 +956,29 @@ export interface AccelerateBehaviour extends BehaviourBase {
 
 export interface DetonateBehaviour extends BehaviourBase {
 	type: "detonate";
-	projectileId: string;
+	projectileId: number;
 }
 
 export interface RetractorBehaviour extends BehaviourBase {
 	type: "retractor";
-	heroId: string;
+	heroId: number;
 	spellId: string;
 }
 
 export interface RemovePassthroughBehaviour extends BehaviourBase {
 	type: "removePassthrough";
-	projectileId: string;
+	projectileId: number;
 }
 
 export interface UpdateCollideWithBehaviour extends BehaviourBase {
 	type: "updateCollideWith";
-	projectileId: string;
+	projectileId: number;
 	collideWith: number;
 }
 
 export interface UpdatePartialBehaviour extends BehaviourBase {
 	type: "updatePartial";
-	projectileId: string;
+	projectileId: number;
 
 	partialDamage?: PartialDamageParameters;
 	partialDetonateRadius?: PartialDamageParameters;
@@ -988,63 +988,63 @@ export interface UpdatePartialBehaviour extends BehaviourBase {
 
 export interface ClearHitsBehaviour extends BehaviourBase {
 	type: "clearHits";
-	projectileId: string;
+	projectileId: number;
 }
 
 export interface LinkBehaviour extends BehaviourBase {
 	type: "linkForce";
-	heroId: string;
+	heroId: number;
 }
 
 export interface GravityBehaviour extends BehaviourBase {
 	type: "gravityForce";
-	heroId: string;
+	heroId: number;
 }
 
 export interface StrafeBehaviour extends BehaviourBase {
 	type: "strafe";
-	projectileId: string;
-	previousOwner: string;
+	projectileId: number;
+	previousOwner: number;
 	previousPos: pl.Vec2;
 	maxSpeed?: number;
 }
 
 export interface ReflectFollowBehaviour extends BehaviourBase {
 	type: "reflectFollow";
-	shieldId: string;
+	shieldId: number;
 }
 
 export interface ThrustVelocityBehaviour extends BehaviourBase {
 	type: "thrustVelocity";
-	heroId: string;
+	heroId: number;
 	velocity: pl.Vec2;
 }
 
 export interface ThrustFollowBehaviour extends BehaviourBase {
 	type: "thrustFollow";
-	heroId: string;
+	heroId: number;
 	speed: number;
 }
 
 export interface ThrustDecayBehaviour extends BehaviourBase {
 	type: "thrustDecay";
-	heroId: string;
+	heroId: number;
 }
 
 export interface SaberBehaviour extends BehaviourBase, HitSource {
 	type: "saberSwing";
-	shieldId: string;
+	shieldId: number;
 }
 
 export interface BurnBehaviour extends BehaviourBase {
 	type: "burn";
-	heroId: string;
+	heroId: number;
 }
 
 export interface AttractBehaviour extends BehaviourBase, HitSource {
 	type: "attract";
-	objectId: string;
-	owner: string;
+	objectId: number;
+	owner: number;
 
 	against: number;
 	collideLike: number;
@@ -1058,8 +1058,8 @@ export interface AttractBehaviour extends BehaviourBase, HitSource {
 
 export interface AuraBehaviour extends BehaviourBase, HitSource {
 	type: "aura";
-	objectId: string;
-	owner: string;
+	objectId: number;
+	owner: number;
 	against: number;
 
 	radius: number;
@@ -1070,29 +1070,29 @@ export interface AuraBehaviour extends BehaviourBase, HitSource {
 
 export interface ExpireBehaviour extends BehaviourBase {
 	type: "expire";
-	objId: string;
+	objId: number;
 }
 
 export interface ExpireBuffsBehaviour extends BehaviourBase {
 	type: "expireBuffs";
-	heroId: string;
+	heroId: number;
 }
 
 export interface ExpireOnOwnerDeathBehaviour extends BehaviourBase {
 	type: "expireOnOwnerDeath";
-	projectileId: string;
+	projectileId: number;
 }
 
 export interface ExpireOnOwnerRetreatBehaviour extends BehaviourBase {
 	type: "expireOnOwnerRetreat";
-	projectileId: string;
+	projectileId: number;
 	anchorPoint: pl.Vec2;
 	maxDistance: number;
 }
 
 export interface ExpireOnChannellingEndBehaviour extends BehaviourBase {
 	type: "expireOnChannellingEnd";
-	projectileId: string;
+	projectileId: number;
 }
 
 export type WorldObject =
@@ -1116,7 +1116,7 @@ export interface WorldEventBase {
 
 export interface DetonateEvent extends WorldEventBase {
 	type: "detonate";
-	sourceId: string;
+	sourceId: number;
 	sound?: string;
 	pos: pl.Vec2;
 	radius: number;
@@ -1125,27 +1125,27 @@ export interface DetonateEvent extends WorldEventBase {
 
 export interface LifeStealEvent extends WorldEventBase {
 	type: "lifeSteal";
-	owner: string;
+	owner: number;
 }
 
 export interface TeleportEvent extends WorldEventBase {
 	type: "teleport";
 	fromPos: pl.Vec2;
 	toPos: pl.Vec2;
-	heroId: string;
+	heroId: number;
 	sound?: string;
 }
 
 export interface SetCooldownEvent extends WorldEventBase {
 	type: "cooldown";
-	heroId: string;
+	heroId: number;
 	color?: string;
 	sound?: string;
 }
 
 export interface CastEvent extends WorldEventBase {
 	type: "cast";
-	heroId: string;
+	heroId: number;
 	target: pl.Vec2;
 	spellId: string;
 	success: boolean;
@@ -1153,15 +1153,15 @@ export interface CastEvent extends WorldEventBase {
 
 export interface PushEvent extends WorldEventBase {
 	type: "push";
-	owner: string;
-	objectId: string;
+	owner: number;
+	objectId: number;
 	direction: pl.Vec2;
 	color?: string;
 }
 
 export interface LeaveEvent extends WorldEventBase {
 	type: "leave";
-	heroId: string;
+	heroId: number;
 	pos: pl.Vec2;
 }
 
@@ -1200,11 +1200,11 @@ export interface TrailBase {
 	glow?: number; // Bloom alpha
 
 	highlight?: TrailHighlight;
-	tag?: string; // Normally based on the projectile id or hero id - used to make the projectile glow on hit
+	tag?: number; // Normally based on the projectile id or hero id - used to make the projectile glow on hit
 }
 
 export interface TrailHighlight {
-	tag: string;
+	tag: number;
 	fromTick: number;
 	maxTicks: number;
 	flash?: boolean;

@@ -11,6 +11,16 @@ export namespace ActionType {
     export const Sync = "sync";
 }
 
+export namespace Ids {
+    export const NumObjectIdBits = 24;
+
+    export const HeroShard = 1 << NumObjectIdBits;
+    export const ObstacleShard = 2 << NumObjectIdBits;
+    export const ProjectileShard = 3 << NumObjectIdBits;
+    export const ShieldShard = 4 << NumObjectIdBits;
+    export const BuffShard = 5 << NumObjectIdBits;
+}
+
 export interface TickMsg {
     u: number; // universe ID
     t: number; // tick
@@ -48,7 +58,7 @@ export interface EnvironmentMsg extends ControlMsgBase {
 
 export interface JoinActionMsg extends ControlMsgBase {
     type: "join";
-    heroId: string;
+    heroId: number;
     controlKey: number;
     userId: string | null;
     userHash: string | null;
@@ -60,14 +70,14 @@ export interface JoinActionMsg extends ControlMsgBase {
 
 export interface BotActionMsg extends ControlMsgBase {
     type: "bot";
-    heroId: string;
+    heroId: number;
     controlKey: number;
     difficulty: number;
 }
 
 export interface LeaveActionMsg extends ControlMsgBase {
     type: "leave";
-    heroId: string;
+    heroId: number;
     controlKey: number | null; // control key for the bot that is left behind, or null if should remove player
     split?: boolean;
 }
@@ -80,7 +90,7 @@ export interface CloseGameMsg extends ControlMsgBase {
 
 export interface TeamsMsg extends ControlMsgBase {
     type: "teams";
-    teams?: string[][]; // heroIds
+    teams?: number[][]; // heroIds
 }
 
 export interface FinishGameMsg extends ControlMsgBase {
@@ -106,7 +116,7 @@ export interface SyncMsg {
 }
 
 export interface ObjectSyncMsg {
-    id: string; // id
+    id: number; // id
     x: number;
     y: number;
     h: number;

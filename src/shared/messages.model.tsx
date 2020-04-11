@@ -198,7 +198,7 @@ export type JoinRoomResponseMsg = JoinRoomResponse | ErrorResponseMsg;
 export interface HeroMsg {
     gameId: string;
     universeId: number;
-    heroId: string | null; // null means observer
+    heroId: number | null; // null means observer
     controlKey: number | null;
     reconnectKey: string | null; // Use this to reconnect to the same hero ID
     userHash: string | null;

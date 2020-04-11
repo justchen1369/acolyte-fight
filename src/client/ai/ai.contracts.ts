@@ -3,7 +3,7 @@ export interface Bot {
 }
 
 export interface InputContract {
-	heroId: string; // The ID of the hero you are controlling
+	heroId: number; // The ID of the hero you are controlling
     cooldowns: CooldownsRemaining; // The remaining cooldowns for your hero
     state: World; // The state of the world
 	settings: AcolyteFightSettings; // The current settings for this mod - see acolytefight.d.ts
@@ -26,15 +26,15 @@ export interface World {
 	tick: number;
 	started: boolean; // Whether heroes can take damage yet
 
-	heroes: { [id: string]: Hero };
-	projectiles: { [id: string]: Projectile };
-	obstacles: { [id: string]: Obstacle };
+	heroes: { [id: number]: Hero };
+	projectiles: { [id: number]: Projectile };
+	obstacles: { [id: number]: Obstacle };
 
 	radius: number; // The current radius of the stage
 }
 
 export interface WorldObject {
-	id: string;
+	id: number;
 	pos: Vec2;
 	velocity: Vec2;
 }
@@ -55,11 +55,11 @@ export interface Hero extends WorldObject {
 
 export interface LinkState {
 	spellId: string; // The type of link
-	targetId: string; // The ID of the other object (e.g. hero or obstacle) currently attached to
+	targetId: number; // The ID of the other object (e.g. hero or obstacle) currently attached to
 }
 
 export interface Projectile extends WorldObject {
-	ownerId: string;
+	ownerId: number;
 	spellId: string;
 
 	radius: number;

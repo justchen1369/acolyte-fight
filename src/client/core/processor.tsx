@@ -46,7 +46,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 	}
 
 	if (tickData.s) {
-		const heroLookup = new Map<string, w.ObjectSnapshot>();
+		const heroLookup = new Map<number, w.ObjectSnapshot>();
 		tickData.s.o.forEach(snapshot => {
 			heroLookup.set(snapshot.id, {
 				health: snapshot.h,

@@ -14,7 +14,7 @@ interface Props {
     silenced: Set<string>;
     items: s.MessageItem[];
     sounds: Sounds;
-    myHeroId: string;
+    myHeroId: number;
 }
 interface State {
 }

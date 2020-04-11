@@ -678,7 +678,7 @@ function onSyncMsg(socket: SocketIO.Socket, data: m.SyncMsgPacket) {
 			&& required(data.s.o, "object") && data.s.o instanceof Array
 			&& data.s.o.every(snapshot => 
 				required(snapshot, "object")
-				&& required(snapshot.id, "string")
+				&& required(snapshot.id, "number")
 				&& required(snapshot.h, "number")
 				&& required(snapshot.x, "number")
 				&& required(snapshot.y, "number"))

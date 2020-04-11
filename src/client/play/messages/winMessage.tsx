@@ -13,7 +13,7 @@ interface OwnProps {
     message: s.WinMessage;
 }
 interface Props extends OwnProps {
-    myHeroId: string;
+    myHeroId: number;
     score: w.HeroScore;
 }
 interface State {

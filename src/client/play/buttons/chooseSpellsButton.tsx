@@ -12,7 +12,7 @@ import { sendKeyBindingsXX } from '../../core/ticker';
 
 interface Props {
     gameId: string;
-    heroId: string;
+    heroId: number;
     allowSpellChoosing: boolean;
     config: KeyBindings;
     settings: AcolyteFightSettings;

@@ -244,7 +244,7 @@ function sendSnapshot(world: w.World) {
 	sockets.getSocket().emit('sync', packet);
 }
 
-export function sendActionXX(gameId: string, heroId: string, action: w.Action, controlKey?: number) {
+export function sendActionXX(gameId: string, heroId: number, action: w.Action, controlKey?: number) {
 	const Precision = 1.0 / 1024;
 
 	if (!(gameId && heroId)) {
@@ -270,7 +270,7 @@ export function sendActionXX(gameId: string, heroId: string, action: w.Action, c
 	send(gameId, heroId, actionMsg);
 }
 
-export function sendKeyBindingsXX(gameId: string, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
+export function sendKeyBindingsXX(gameId: string, heroId: number, keyBindings: KeyBindings, controlKey?: number) {
 	if (!(gameId && heroId)) {
 		return;
 	}
@@ -286,7 +286,7 @@ export function sendKeyBindingsXX(gameId: string, heroId: string, keyBindings: K
 	send(gameId, heroId, actionMsg);
 }
 
-function send(gameId: string, heroId: string, actionMsg: m.ActionMsg) {
+function send(gameId: string, heroId: number, actionMsg: m.ActionMsg) {
 	const state = StoreProvider.getState();
 	const world = state.world;
 	if (!(world.ui.myGameId === gameId && world.objects.has(heroId))) {

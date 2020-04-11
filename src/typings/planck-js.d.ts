@@ -60,7 +60,7 @@ declare module "planck-js" {
         }
 
         interface BodyDef {
-            userData?: string;
+            userData?: any;
             type?: string;
             position?: Vec2;
             angle?: number;

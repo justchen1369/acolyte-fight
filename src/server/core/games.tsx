@@ -92,7 +92,7 @@ export function receiveSync(game: g.Game, data: m.SyncMsg, socketId: string) {
 	queueSyncMessage(game, data);
 }
 
-export function takeBotControl(game: g.Game, heroId: string, socketId: string) {
+export function takeBotControl(game: g.Game, heroId: number, socketId: string) {
 	const controllerId = game.bots.get(heroId);
 	if (controllerId) {
 		return socketId === controllerId;
@@ -117,13 +117,13 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 		partyId,
 		mod: room ? room.mod : {},
 		created: moment(),
-		active: new Map<string, g.Player>(),
-		bots: new Map<string, string>(),
+		active: new Map(),
+		bots: new Map(),
 		observers: new Map(),
 		nextPlayerId: 0,
 		controlKeys: new Map(),
-		reconnectKeys: new Map<string, string>(),
-		isRankedLookup: new Map<string, boolean>(),
+		reconnectKeys: new Map(),
+		isRankedLookup: new Map(),
 		socketIds: new Set<string>(),
 		winTick: null,
 		syncTick: 0,
@@ -387,7 +387,7 @@ function reassignBots(game: g.Game, leftSocketId: string) {
 		return;
 	}
 
-	const botsToReassign = new Array<string>();
+	const botsToReassign = new Array<number>();
 	game.bots.forEach((socketId, heroId) => {
 		if (socketId === leftSocketId) {
 			botsToReassign.push(heroId);
@@ -432,10 +432,10 @@ export function isGameRunning(game: g.Game) {
 }
 
 export function joinGame(game: g.Game, params: g.JoinParameters, userId: string, aco: number): g.JoinResult {
-	let heroId: string = null;
+	let heroId: number = null;
 	if (params.reconnectKey) {
 		const candidate = game.reconnectKeys.get(params.reconnectKey);
-		if (candidate && !game.active.has(candidate)) {
+		if (candidate && !wu(game.active.values()).some(p => p.heroId === candidate)) {
 			// Reconnect
 			heroId = candidate;
 		} else {
@@ -551,7 +551,7 @@ export function replayGame(replay: m.Replay, params: g.JoinParameters) {
 	});
 }
 
-function assignReconnectKey(game: g.Game, heroId: string) {
+function assignReconnectKey(game: g.Game, heroId: number) {
 	// Remove existing keys
 	game.reconnectKeys.forEach((otherHeroId, otherReconnectKey) => {
 		if (otherHeroId === heroId) {
@@ -566,7 +566,7 @@ function assignReconnectKey(game: g.Game, heroId: string) {
 	return reconnectKey;
 }
 
-function acquireControlKey(heroId: string, game: g.Game) {
+function acquireControlKey(heroId: number, game: g.Game) {
 	const controlKey = transientIds.generate();
 	game.controlKeys.set(controlKey, heroId);
 	return controlKey;
@@ -618,7 +618,7 @@ export function removeBot(game: g.Game) {
 	}
 }
 
-function findControlKey(game: g.Game, heroId: string): number {
+function findControlKey(game: g.Game, heroId: number): number {
 	let controlKey: number = undefined;
 	game.controlKeys.forEach((h, c) => {
 		if (h === heroId) {
@@ -628,7 +628,7 @@ function findControlKey(game: g.Game, heroId: string): number {
 	return controlKey;
 }
 
-function generateHeroId(game: g.Game): string {
+function generateHeroId(game: g.Game): number {
 	const numPlayers = game.active.size + game.bots.size;
 	if (numPlayers >= game.matchmaking.MaxPlayers) {
 		return null;

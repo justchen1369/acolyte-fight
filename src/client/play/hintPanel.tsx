@@ -17,7 +17,7 @@ import SpellIcon from '../controls/spellIcon';
 
 interface Props {
     myGameId: string;
-    myHeroId: string;
+    myHeroId: number;
     inTutorial: boolean;
     started: boolean;
     customizingBtn: string;

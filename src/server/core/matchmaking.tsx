@@ -40,7 +40,7 @@ interface SplitCandidate extends CandidateBase {
 
 interface TeamPlayer {
     socketId: string;
-    heroId: string;
+    heroId: number;
     aco: number;
     isBot?: boolean;
 }
@@ -467,7 +467,7 @@ export function forceTeams(game: g.Game, socketTeams: SocketTeam[]) {
     });
 }
 
-function findTeam(game: g.Game, socketTeams: SocketTeam[]) {
+function findTeam(game: g.Game, socketTeams: SocketTeam[]): number[] {
     return socketTeams.map(socketTeam => {
         const player = game.active.get(socketTeam.socketId);
         return player && player.heroId;

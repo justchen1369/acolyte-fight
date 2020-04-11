@@ -16,6 +16,7 @@ import { Alliances, Categories, TicksPerSecond } from './constants';
 
 const NeverTicks = 1e6;
 const Precision = 0.0001;
+
 const BotsExitAfterTicks = 2 * TicksPerSecond;
 const vectorZero = vector.zero();
 const vectorCenter = pl.Vec2(0.5, 0.5);
@@ -23,13 +24,13 @@ const vectorCenter = pl.Vec2(0.5, 0.5);
 const DefaultAttractable: AttractableParameters = {};
 
 interface BuffContext {
-	fromHeroId?: string;
+	fromHeroId?: number;
 	spellId?: string;
 	durationMultiplier?: number;
 }
 
 interface ProjectileConfig {
-	owner?: string;
+	owner?: number;
 	initialFilterGroupIndex?: number;
 	filterGroupIndex?: number;
 	direction?: pl.Vec2;
@@ -41,7 +42,7 @@ interface DetonateConfig {
 	radiusMultiplier?: number;
 	impulseMultiplier?: number;
 
-	sourceId: string;
+	sourceId: number;
 	color?: string;
 	defaultSound?: string;
 	buffDurationMultiplier?: number;
@@ -101,13 +102,13 @@ export function initialWorld(mod: Object): w.World {
 		snapshots: [],
 		syncs: [],
 
-		activePlayers: Immutable.Set<string>(), // hero IDs
-		players: Immutable.Map<string, w.Player>(), // hero ID -> player
+		activePlayers: Immutable.Set(), // hero IDs
+		players: Immutable.Map(), // hero ID -> player
 		controlKeysXX: new Map(),
 		spellRecords: new Map(),
-		teams: Immutable.Map<string, w.Team>(), // hero ID -> team
-		teamAssignments: Immutable.Map<string, string>(), // hero ID -> team ID
-		scores: Immutable.Map<string, w.HeroScore>(), // hero ID -> score
+		teams: Immutable.Map(), // hero ID -> team
+		teamAssignments: Immutable.Map(), // hero ID -> team ID
+		scores: Immutable.Map(), // hero ID -> score
 		winner: null,
 		winners: null,
 
@@ -213,7 +214,7 @@ export function isGameStarting(world: w.World) {
 	return world.startTick < constants.Matchmaking.MaxHistoryLength;
 }
 
-export function isDead(heroId: string, world: w.World) {
+export function isDead(heroId: number, world: w.World) {
 	// Use player.dead rather than check for hero in world.objects because the hero object may take a while to appear while their user ID is retrieved from the database
 	const player = world.players.get(heroId);
 	return player && player.dead;
@@ -231,7 +232,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 	const Obstacle = world.settings.Obstacle;
 	const template = world.settings.ObstacleTemplates[layout.type || "default"];
 
-	const obstacleId = "obstacle" + (world.nextObjectId++);
+	const obstacleId = n.Ids.ObstacleShard | world.nextObjectId++;
 	const body = world.physics.createBody({
 		userData: obstacleId,
 		type: template.static ? 'static' : 'dynamic',
@@ -291,7 +292,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		conveyor: template.conveyor,
 
 		hitInterval: template.hitInterval || 1,
-		hitTickLookup: new Map<string, number>(),
+		hitTickLookup: new Map(),
 	};
 
 	// Obstacles start immovable
@@ -319,7 +320,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 }
 
 function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
-	const shieldId = "shield" + (world.nextObjectId++);
+	const shieldId = n.Ids.ShieldShard | (world.nextObjectId++);
 
 	const body = world.physics.createBody({
 		userData: shieldId,
@@ -387,7 +388,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 }
 
 function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Vec2, angle: number, points: pl.Vec2[], extent: number) {
-	const shieldId = "shield" + (world.nextObjectId++);
+	const shieldId = n.Ids.ShieldShard | (world.nextObjectId++);
 
 	const body = world.physics.createBody({
 		userData: shieldId,
@@ -441,7 +442,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 }
 
 function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: number) {
-	const shieldId = "shield" + (world.nextObjectId++);
+	const shieldId = n.Ids.ShieldShard | (world.nextObjectId++);
 
 	const heroAngle = hero.target ? vector.angleDiff(hero.target, hero.body.getPosition()) : hero.body.getAngle();
 	const angle = heroAngle + angleOffset;
@@ -518,7 +519,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 	return shield;
 }
 
-function addHero(world: w.World, heroId: string) {
+function addHero(world: w.World, heroId: number) {
 	const Matchmaking = world.settings.Matchmaking;
 	const Hero = world.settings.Hero;
 	const World = world.settings.World;
@@ -573,7 +574,7 @@ function addHero(world: w.World, heroId: string) {
 		linearDamping: Hero.Damping,
 		armorProportion: 0,
 		armorModifiers: new Map(),
-		damageSources: new Map<string, number>(),
+		damageSources: new Map(),
 		damageSourceHistory: [],
 		moveSpeedPerSecond: Hero.MoveSpeedPerSecond,
 		maxSpeed: Hero.MaxSpeed,
@@ -586,10 +587,10 @@ function addHero(world: w.World, heroId: string) {
 		keysToSpells: new Map<string, string>(),
 		spellsToKeys: new Map<string, string>(),
 		spellChangedTick: new Map<string, number>(),
-		shieldIds: new Set<string>(),
-		horcruxIds: new Set<string>(),
-		focusIds: new Map<string, string>(),
-		buffs: new Map<string, w.Buff>(),
+		shieldIds: new Set(),
+		horcruxIds: new Set(),
+		focusIds: new Map(),
+		buffs: new Map(),
 		uiHealth: Hero.MaxHealth,
 		uiDestroyedBuffs: [],
 	};
@@ -622,8 +623,8 @@ function generateHeroIndex(world: w.World) {
 	return usedIndexes.size;
 }
 
-export function formatHeroId(index: number): string {
-	return "hero" + index;
+export function formatHeroId(index: number): number {
+	return n.Ids.HeroShard | index;
 }
 
 function applyPosDelta(obj: w.WorldObject, delta: pl.Vec2) {
@@ -725,7 +726,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	const World = world.settings.World;
 
 	const index = world.nextObjectId++;
-	const id = type + index;
+	const id = n.Ids.ProjectileShard | index;
 	const velocity = vector.fromAngle(angle).mul(projectileTemplate.speed);
 	const diff = vector.diff(target, position);
 
@@ -808,7 +809,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 			pos: target,
 			releasePos: config.releaseTarget || target,
 		},
-		hitTickLookup: new Map<string, number>(),
+		hitTickLookup: new Map(),
 		hitInterval: projectileTemplate.hitInterval,
 
 		damageTemplate: {
@@ -894,7 +895,7 @@ function parseAttractable(attractable: AttractableTemplate): AttractableParamete
 	}
 }
 
-export function calculateScaling(heroId: string, world: w.World, scaling: boolean = false) {
+export function calculateScaling(heroId: number, world: w.World, scaling: boolean = false) {
 	if (!scaling) {
 		return 1;
 	}
@@ -1657,7 +1658,7 @@ function instantiateShape(layout: ObstacleShapeTemplate): shapes.Shape {
 	}
 }
 
-export function allowSpellChoosing(world: w.World, heroId: string) {
+export function allowSpellChoosing(world: w.World, heroId: number) {
 	if (heroId) {
 		// Only allow spells to be changed before game starts or if hero has died
 		return world.tick < world.startTick || !!world.winner || !world.objects.has(heroId);
@@ -1724,7 +1725,7 @@ function dequeueSnapshot(tick: number, world: w.World) {
 	return null;
 }
 
-function handleSpellChoosing(ev: n.SpellsMsg, heroId: string, world: w.World) {
+function handleSpellChoosing(ev: n.SpellsMsg, heroId: number, world: w.World) {
 	if (!allowSpellChoosing(world, heroId)) {
 		return true;
 	}
@@ -1809,7 +1810,7 @@ function handleTeams(ev: n.TeamsMsg, world: w.World) {
 	return true;
 }
 
-function assignTeams(teams: string[][], world: w.World) {
+function assignTeams(teams: number[][], world: w.World) {
 	const Visuals = world.settings.Visuals;
 
 	for (let i = 0; i < teams.length; ++i) {
@@ -1841,7 +1842,7 @@ function assignTeams(teams: string[][], world: w.World) {
 	});
 }
 
-function isPresentOrPastSelf(heroId: string, world: w.World) {
+function isPresentOrPastSelf(heroId: number, world: w.World) {
 	if (heroId === world.ui.myHeroId) {
 		return true;
 	}
@@ -1936,7 +1937,7 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 	return true;
 }
 
-function choosePlayerColor(heroId: string, userHash: string, baseColor: string, world: w.World) {
+function choosePlayerColor(heroId: number, userHash: string, baseColor: string, world: w.World) {
 	const Visuals = world.settings.Visuals;
 	
 	if (heroId === world.ui.myHeroId || userHash === world.ui.myUserHash) {
@@ -2065,7 +2066,7 @@ function removeBots(world: w.World) {
 	world.players = newPlayers;
 }
 
-function getActionQueue(world: w.World, heroId: string) {
+function getActionQueue(world: w.World, heroId: number) {
 	let actionQueue = world.actions.get(heroId);
 	if (!actionQueue) {
 		actionQueue = [];
@@ -2233,7 +2234,7 @@ function removeUnknownProjectilesFromHero(hero: w.Hero, world: w.World) {
 	});
 }
 
-function removeProjectilesForHero(heroId: string, world: w.World) {
+function removeProjectilesForHero(heroId: number, world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "projectile" && obj.owner === heroId) {
 			obj.expireTick = world.tick;
@@ -2925,7 +2926,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 	}
 }
 
-function swapOwnership(projectile: w.Projectile, newOwner: string, world: w.World) {
+function swapOwnership(projectile: w.Projectile, newOwner: number, world: w.World) {
 	projectile.target.heroId = projectile.owner;
 	projectile.owner = newOwner;
 
@@ -3029,7 +3030,7 @@ function emitPushFromProjectile(projectile: w.Projectile, toHero: w.Hero, world:
 	emitPush(projectile.owner, direction, projectile.color, toHero.id, world);
 }
 
-function emitPush(fromHeroId: string, direction: pl.Vec2, color: string, toObjectId: string, world: w.World) {
+function emitPush(fromHeroId: number, direction: pl.Vec2, color: string, toObjectId: number, world: w.World) {
 	const push: w.PushEvent = {
 		type: "push",
 		tick: world.tick,
@@ -3077,7 +3078,7 @@ function scaleForPartialDamage(world: w.World, projectile: w.Projectile, packet:
 	}
 }
 
-function takeHit(projectile: w.HitSource, hitId: string, world: w.World) {
+function takeHit(projectile: w.HitSource, hitId: number, world: w.World) {
 	const hitTick = projectile.hitTickLookup.get(hitId);
 	if (hitTick) {
 		if (projectile.hitInterval) {
@@ -3140,7 +3141,7 @@ function expireOn(world: w.World, projectile: w.Projectile, other: w.WorldObject
 	return true;
 }
 
-export function calculateAlliance(fromHeroId: string, toHeroId: string, world: w.World) {
+export function calculateAlliance(fromHeroId: number, toHeroId: number, world: w.World) {
 	if (!(fromHeroId && toHeroId)) {
 		return Alliances.Neutral;
 	} else if (fromHeroId === toHeroId) {
@@ -3154,11 +3155,11 @@ export function calculateAlliance(fromHeroId: string, toHeroId: string, world: w
 	}
 }
 
-export function getTeam(heroId: string, world: w.World) {
-	return world.teamAssignments.get(heroId) || heroId;
+export function getTeam(heroId: number, world: w.World): string {
+	return world.teamAssignments.get(heroId) || `${heroId}`;
 }
 
-function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {
+function findNearest(objects: Map<number, w.WorldObject>, target: pl.Vec2, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {
 	let nearestDistance = Infinity;
 	let nearest: w.WorldObject = null;
 	objects.forEach(obj => {
@@ -3212,7 +3213,7 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 	}
 }
 
-function applySwapAt(epicenter: pl.Vec2, ownerId: string, targets: w.WorldObject[], sound: string, world: w.World) {
+function applySwapAt(epicenter: pl.Vec2, ownerId: number, targets: w.WorldObject[], sound: string, world: w.World) {
 	const owner = world.objects.get(ownerId);
 	if (!(owner && owner.category === "hero")) {
 		return;
@@ -3276,7 +3277,7 @@ function applyBuffsFromProjectile(projectile: w.Projectile, target: w.WorldObjec
 	});
 }
 
-function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.WorldObject, world: w.World, config: BuffContext = {}) {
+function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: number, target: w.WorldObject, world: w.World, config: BuffContext = {}) {
 	if (!(buffs && buffs.length > 0 && target)) {
 		return;
 	}
@@ -3346,7 +3347,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 	}
 
 	owner.link = {
-		id: `link${world.nextObjectId++}`,
+		id: n.Ids.BuffShard | world.nextObjectId++,
 
 		spellId: projectile.type,
 		targetId: target.id,
@@ -3376,7 +3377,7 @@ function bounceToNext(projectile: w.Projectile, hit: w.Hero, world: w.World) {
 	}
 
 	// Always bounce between owner and another target
-	let nextTargetId: string;
+	let nextTargetId: number;
 
 	if (hit.id === projectile.owner) {
 		nextTargetId = projectile.target.heroId;
@@ -3934,14 +3935,14 @@ function detonateObstacle(obstacle: w.Obstacle, world: w.World) {
 
 	const detonate = instantiateDetonate(obstacle.detonate, null, world);
 
-	const owner: string = null;
+	const owner: number = null;
 	detonateAt(obstacle.body.getPosition(), owner, detonate, world, { sourceId: obstacle.id });
 
 	// Don't allow for repeats
 	obstacle.detonate = null;
 }
 
-function instantiateDetonate(template: DetonateParametersTemplate, fromHeroId: string, world: w.World): w.DetonateParameters {
+function instantiateDetonate(template: DetonateParametersTemplate, fromHeroId: number, world: w.World): w.DetonateParameters {
 	const damagePacket = instantiateDamage(template, fromHeroId, world);
 	const knockbackScaling = calculateScaling(fromHeroId, world, template.knockbackScaling);
 
@@ -3953,10 +3954,10 @@ function instantiateDetonate(template: DetonateParametersTemplate, fromHeroId: s
 	};
 }
 
-function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParameters, world: w.World, config: DetonateConfig) {
+function detonateAt(epicenter: pl.Vec2, owner: number, detonate: w.DetonateParameters, world: w.World, config: DetonateConfig) {
 	const sound = detonate.sound || config.defaultSound;
 
-	const seen = new Set<string>(); // queryExtent not guaranteed to hit once
+	const seen = new Set<number>(); // queryExtent not guaranteed to hit once
 	const swapTargets = new Array<w.WorldObject>();
 	queryExtent(world, epicenter, detonate.radius + world.settings.World.SlopRadius, other => {
 		if (seen.has(other.id)) {
@@ -4031,7 +4032,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 	});
 }
 
-function destructibleBy(projectile: w.Projectile, detonatorHeroId: string, world: w.World) {
+function destructibleBy(projectile: w.Projectile, detonatorHeroId: number, world: w.World) {
 	if (projectile.destructible) {
 		return (calculateAlliance(projectile.owner, detonatorHeroId, world) & projectile.destructible.against) > 0;
 	} else {
@@ -4086,7 +4087,7 @@ function applyLavaDamage(world: w.World) {
 	});
 }
 
-function calculateKnockbackFromId(hero: w.Hero, world: w.World) {
+function calculateKnockbackFromId(hero: w.Hero, world: w.World): number {
 	if (hero.knockbackHeroId && (calculateAlliance(hero.id, hero.knockbackHeroId, world) & Alliances.Enemy) > 0) {
 		return hero.knockbackHeroId;
 	} else {
@@ -4188,7 +4189,7 @@ function captureSnapshot(world: w.World) {
 
 	const snapshot: w.Snapshot = {
 		tick: world.tick,
-		objectLookup: new Map<string, w.ObjectSnapshot>(),
+		objectLookup: new Map(),
 	};
 	world.objects.forEach(obj => {
 		if (obj.category === "hero" || (obstacles && obj.category === "obstacle" && !obj.static)) {
@@ -4706,7 +4707,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 			damageTemplate: spell.damageTemplate,
 			ticks,
 			nullified: false,
-			alreadyHit: new Set<string>(),
+			alreadyHit: new Set(),
 		};
 
 		hero.thrust = thrust;
@@ -5367,7 +5368,7 @@ function attachBump(template: BumpTemplate, hero: w.Hero, world: w.World, config
 	});
 }
 
-function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, world: w.World): w.DamagePacket {
+function instantiateDamage(template: DamagePacketTemplate, fromHeroId: number, world: w.World): w.DamagePacket {
 	const Hero = world.settings.Hero;
 
 	if (!template) {
@@ -5529,7 +5530,7 @@ function updateArmor(hero: w.Hero) {
 	});
 }
 
-function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, world: w.World): number {
+function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: number, world: w.World): number {
 	if (damage <= 0) {
 		return damage;
 	}
@@ -5596,7 +5597,7 @@ function getMinExtent(obj: w.WorldObject): number {
 	}
 }
 
-export function initScore(heroId: string): w.HeroScore {
+export function initScore(heroId: number): w.HeroScore {
 	return {
 		heroId,
 		kills: 0,

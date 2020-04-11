@@ -16,7 +16,7 @@ import Button from '../../controls/button';
 interface OwnProps {
 }
 interface Props extends OwnProps {
-    myHeroId: string;
+    myHeroId: number;
     isWaiting: boolean;
     segment: string;
     locked: string;

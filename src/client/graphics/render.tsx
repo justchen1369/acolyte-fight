@@ -43,7 +43,7 @@ const EaseDecay = 0.9;
 interface SwirlContext {
 	color?: string;
 	baseVelocity?: pl.Vec2;
-	tag?: string;
+	tag?: number;
 	multiplier?: number;
 }
 
@@ -524,7 +524,7 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 function playSpellSounds(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
 	if (obj.sound) {
 		ctxStack.sounds.push({
-			id: obj.id,
+			id: `${obj.id}`,
 			sound: obj.sound,
 			pos: obj.body.getPosition().clone(),
 		});
@@ -1256,7 +1256,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, opti
 	playHeroSounds(ctxStack, hero, pos, world);
 }
 
-function visibleToMe(heroId: string, world: w.World) {
+function visibleToMe(heroId: number, world: w.World) {
 	const visible = world.ui.myHeroId ? (engine.calculateAlliance(world.ui.myHeroId, heroId, world) & Alliances.Friendly) > 0  : true;
 	return visible;
 }
@@ -1671,11 +1671,11 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 	];
 }
 
-function heroBodyTextureId(heroId: string) {
+function heroBodyTextureId(heroId: number) {
 	return `${heroId}-body`;
 }
 
-function heroGlyphTextureId(heroId: string) {
+function heroGlyphTextureId(heroId: number) {
 	return `${heroId}-glyph`;
 }
 
@@ -1871,7 +1871,7 @@ function heroNameInstruction(ctxStack: CanvasCtxStack, player: w.Player, world: 
 	};
 }
 
-function heroNameTextureId(heroId: string) {
+function heroNameTextureId(heroId: number) {
 	return `${heroId}-name`;
 }
 
@@ -2070,7 +2070,7 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, scale: numbe
 		const intensity = Math.min(1, 10 * Math.abs(vector.angleDelta(previousAngle, newAngle)) / (2 * Math.PI));
 		const tip = vector.fromAngle(newAngle).mul(saber.length);
 		ctxStack.sounds.push({
-			id: saber.id,
+			id: `${saber.id}`,
 			sound: saber.sound,
 			pos: tip,
 			intensity,
@@ -2081,7 +2081,7 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, scale: numbe
 function playShieldSounds(ctxStack: CanvasCtxStack, obj: w.Shield, world: w.World) {
 	if (obj.sound) {
 		ctxStack.sounds.push({
-			id: obj.id,
+			id: `${obj.id}`,
 			sound: obj.sound,
 			pos: obj.body.getPosition().clone(),
 		});
@@ -2096,7 +2096,7 @@ function playShieldSounds(ctxStack: CanvasCtxStack, obj: w.Shield, world: w.Worl
 	}
 }
 
-export function heroColor(heroId: string, world: w.World) {
+export function heroColor(heroId: number, world: w.World) {
 	const Visuals = world.settings.Visuals;
 
 	const player = world.players.get(heroId);

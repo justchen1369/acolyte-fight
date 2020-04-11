@@ -14,7 +14,7 @@ import { sendKeyBindingsXX } from '../../core/ticker';
 
 interface Props {
     gameId: string;
-    heroId: string;
+    heroId: number;
     allowSpellChoosing: boolean;
     config: KeyBindings;
     loadouts: m.Loadout[];
