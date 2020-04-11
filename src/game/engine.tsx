@@ -25,7 +25,8 @@ const DefaultAttractable: AttractableParameters = {};
 
 interface BuffContext {
 	fromHeroId?: number;
-	spellId?: string;
+	spellId?: string; // If the buff is channelling or passive, only keep active as long as this spell continues to be channelled/passive
+	projectileId?: number; // Only apply the buff as long as this projectile exists
 	durationMultiplier?: number;
 }
 
@@ -880,6 +881,16 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		const hero = world.objects.get(config.owner);
 		if (hero && hero.category === "hero") {
 			hero.horcruxIds.add(projectile.id);
+		}
+	}
+
+	if (projectileTemplate.projectileBuffs) {
+		const hero = world.objects.get(config.owner);
+		if (hero && hero.category === "hero") {
+			applyBuffsFrom(projectileTemplate.projectileBuffs, config.owner, hero, world, {
+				spellId: type,
+				projectileId: projectile.id,
+			});
 		}
 	}
 
@@ -3829,6 +3840,8 @@ function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 		return true;
 	} else if (buff.channellingSpellId && (!hero.casting || hero.casting.action.type !== buff.channellingSpellId)) {
 		return true;
+	} else if (buff.projectileId && !world.objects.has(buff.projectileId)) {
+		return true;
 	} else if (buff.cancelOnBump && buff.initialTick < hero.bumpTick) {
 		return true;
 	} else 
@@ -5043,6 +5056,7 @@ function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.Worl
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
 		channellingSpellId: template.channelling && config.spellId,
 		passiveSpellId: template.passive && config.spellId,
+		projectileId: config.projectileId,
 		resetOnGameStart: template.resetOnGameStart,
 		cancelOnBump: template.cancelOnBump,
 		numStacks: 1,

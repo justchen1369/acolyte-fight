@@ -2293,7 +2293,7 @@ const horcrux: Spell = {
     icon: "burningEye",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 6 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -2313,9 +2313,17 @@ const horcrux: Spell = {
         conveyable: true,
         bumpable: true,
 
-        horcrux: {},
-
         shieldTakesOwnership: false,
+
+        horcrux: {},
+        projectileBuffs: [
+            { // Normally attacks can make your life go negative, which makes it hard to recover from. With Horcrux any lifesteal should save you.
+                type: "armor",
+                maxTicks: 2 * TicksPerSecond,
+                proportion: 1,
+                minHealth: 0,
+            },
+        ],
 
         behaviours: [
             {

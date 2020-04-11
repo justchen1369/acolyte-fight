@@ -617,6 +617,7 @@ export interface BuffValues {
 	expireTick: number;
 	channellingSpellId?: string; // If the hero stops casting this spell, remove the buff
 	passiveSpellId?: string; // If the hero stops choosing this spell, remove the buff
+	projectileId?: number; // If this projectile stops existing, remove the buff
 	resetOnGameStart?: boolean;
 	link?: LinkChannellingBuffParams;
 	cancelOnBump?: boolean;
