@@ -213,6 +213,8 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 
 	playSounds(ctxStack, world, options);
 
+	decayEase(world);
+
 	world.ui.destroyed = [];
 	world.ui.events = [];
 
@@ -237,6 +239,14 @@ function invalidRenderState(world: w.World, rect: ClientRect, options: RenderOpt
 		}
 	}
 	return false;
+}
+
+function decayEase(world: w.World) {
+	world.objects.forEach(obj => {
+		if ((obj.category === "obstacle" || obj.category === "hero") && obj.uiEase) {
+			obj.uiEase.mul(EaseDecay);
+		}
+	});
 }
 
 function renderAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
@@ -864,7 +874,6 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	const pos = obstacle.body.getPosition().clone();
 	if (obstacle.uiEase) {
 		pos.add(obstacle.uiEase);
-		obstacle.uiEase.mul(EaseDecay);
 	}
 
 	const params: RenderObstacleContext = {
@@ -1223,7 +1232,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, opti
 
 	if (hero.uiEase) {
 		pos.add(hero.uiEase);
-		hero.uiEase.mul(EaseDecay);
 	}
 
 	renderRangeIndicator(ctxStack, hero, pos, world);
@@ -1918,7 +1926,10 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		if (!hero) {
 			return;
 		}
-		const pos = hero.body.getPosition();
+		const pos = hero.body.getPosition().clone();
+		if (hero.uiEase) {
+			pos.add(hero.uiEase);
+		}
 
 		const stroke = color.clone().lighten(shield.shine || 0);
 		const minRadius = shield.minRadius * scale;
@@ -1991,8 +2002,11 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		if (!(hero && hero.category === "hero")) {
 			return;
 		}
-		const pos = hero.body.getPosition();
 		const angle = shield.body.getAngle();
+		const pos = hero.body.getPosition().clone();
+		if (hero.uiEase) {
+			pos.add(hero.uiEase);
+		}
 
 		// Draw the saber
 		const handle = vector.fromAngle(angle).mul(hero.radius).add(pos);
