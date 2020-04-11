@@ -576,6 +576,7 @@ function addHero(world: w.World, heroId: number) {
 		armorModifiers: new Map(),
 		damageSources: new Map(),
 		damageSourceHistory: [],
+		activeTickPerOpponent: new Map(),
 		moveSpeedPerSecond: Hero.MoveSpeedPerSecond,
 		maxSpeed: Hero.MaxSpeed,
 		revolutionsPerTick: Hero.RevolutionsPerTick,
@@ -669,6 +670,9 @@ function cooldown(behaviour: w.CooldownBehaviour, world: w.World) {
 		return false;
 	}
 
+	const extraOpponents = calculateExtraOpponents(hero, world);
+	const mitigationMultiplier = Math.pow(1 + world.settings.Hero.CooldownMitigationPerOpponent, extraOpponents);
+
 	for (const spellId in hero.cooldowns) {
 		let cooldown = cooldownRemaining(world, hero, spellId);
 
@@ -676,6 +680,7 @@ function cooldown(behaviour: w.CooldownBehaviour, world: w.World) {
 		if (typeof cooldownRate !== 'number') {
 			cooldownRate = 1;
 		}
+		cooldownRate *= mitigationMultiplier;
 
 		cooldown = Math.max(0, cooldown - cooldownRate);
 		setCooldown(world, hero, spellId, cooldown);
@@ -1273,7 +1278,6 @@ function triggerOnExpiry(behaviour: w.TriggerOnExpiryBehaviour, world: w.World) 
 	if (world.objects.has(obj.id)) {
 		return true;
 	} else {
-		console.log(`Expiry: ${obj.id}`);
 		world.behaviours.push(behaviour.delayed);
 		return false;
 	}
@@ -3761,6 +3765,8 @@ function updateGroupIndex(fixture: pl.Fixture, newGroupIndex: number) {
 }
 
 function decayMitigation(behaviour: w.DecayMitigationBehaviour, world: w.World) {
+	const World = world.settings.Hero;
+
 	const hero = world.objects.get(behaviour.heroId);
 	if (!(hero && hero.category === "hero")) {
 		return false;
@@ -3783,6 +3789,14 @@ function decayMitigation(behaviour: w.DecayMitigationBehaviour, world: w.World) 
 		});
 		hero.damageSourceHistory = newHistory;
 	}
+
+	hero.activeTickPerOpponent.forEach((activeTick, opponentId) => {
+		const isActive = world.tick - activeTick < World.DamageMitigationTicks;
+		if (!isActive) {
+			hero.activeTickPerOpponent.delete(opponentId);
+		}
+	});
+
 	return true;
 }
 
@@ -5410,17 +5424,32 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: number, w
 				}
 			}
 		});
+
+		lifeSteal += world.settings.Hero.LifeStealMitigationPerOpponent * calculateExtraOpponents(fromHero, world);
+	}
+
+	if (lifeSteal > 0) {
+		lifeSteal = Math.min(world.settings.World.MaxLifeSteal, lifeSteal);
 	}
 
 	return {
 		damage,
-		lifeSteal: Math.min(world.settings.World.MaxLifeSteal, lifeSteal),
+		lifeSteal,
 		fromHeroId,
 		noHit: template.noHit,
 		noKnockback: template.noKnockback,
 		minHealth,
 		source: template.source,
 	};
+}
+
+function calculateExtraOpponents(hero: w.Hero, world: w.World) {
+	const numOpponents = hero.activeTickPerOpponent.size;
+
+	let extraOpponents = Math.max(0, numOpponents - 1); // Only kick in when 2+ opponents
+	extraOpponents = Math.min(world.settings.Hero.MaxMitigationBonuses, extraOpponents);
+
+	return extraOpponents;
 }
 
 function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
@@ -5441,6 +5470,11 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 		toHero.hitTick = world.tick;
 		if (!packet.isLava) {
 			toHero.strikeTick = world.tick;
+
+			if (fromHeroId) {
+				// Mark that opponent as active
+				toHero.activeTickPerOpponent.set(fromHeroId, world.tick);
+			}
 		}
 	}
 

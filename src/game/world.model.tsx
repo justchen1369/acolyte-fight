@@ -403,8 +403,11 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 
 	armorProportion: number;
 	armorModifiers: Map<string, number>; // source -> modifier
+
 	damageSources: Map<number, number>; // heroId -> damage
 	damageSourceHistory: DamageSourceHistoryItem[];
+
+	activeTickPerOpponent: Map<number, number>; // heroId -> tick
 
 	moveTo?: pl.Vec2;
 	target?: pl.Vec2;

@@ -41,6 +41,10 @@ const Hero: HeroSettings = {
     Damping: 3,
 
     DamageMitigationTicks: 5 * TicksPerSecond,
+    LifeStealMitigationPerOpponent: 0.3,
+    CooldownMitigationPerOpponent: 0.3,
+    MaxMitigationBonuses: 3,
+
     MaxCooldownWaitTicks: 1,
     ThrottleTicks: 0,
 

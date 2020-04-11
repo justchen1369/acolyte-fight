@@ -80,6 +80,9 @@ declare interface HeroSettings {
 	Damping: number; // How quickly knockback decayed. Higher number, faster decay.
 	
 	DamageMitigationTicks: number; // Within these many ticks, damage does not stack between multiple players
+	LifeStealMitigationPerOpponent: number; // If 2+ people have hit me recently, increase my lifesteal by this amount per opponent
+	CooldownMitigationPerOpponent: number; // If 2+ people have hit me recently, speed up my cooldown by this amount per opponent
+	MaxMitigationBonuses: number; // Maximum number of mitigation bonuses to apply
 
 	MaxCooldownWaitTicks: number; // If cast a spell and it is almost finished cooling down within this time, just wait to cast it
 	ThrottleTicks: number; // Within these many ticks, disallow multiple spells to be cast by the same hero
