@@ -147,7 +147,7 @@ export const slow: ObstacleTemplate = {
             "ticks": 15,
             "interval": 4,
             "speed": 0.05,
-            light: 0.5,
+            light: 1,
         }
     ],
 
@@ -205,7 +205,7 @@ export const fast: ObstacleTemplate = {
             "ticks": 15,
             "interval": 4,
             "speed": 0.05,
-            light: 0.5,
+            light: 1,
         }
     ],
 
