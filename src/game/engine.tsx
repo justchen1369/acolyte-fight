@@ -1413,7 +1413,7 @@ function updateHeroMass(hero: w.Hero) {
 	let restrictCollideWith = Categories.All;
 	let appendCollideWith = Categories.None;
 	hero.buffs.forEach(b => {
-		if (b.type === "mass" && b.numStacks >= b.minStacks) {
+		if (b.type === "mass") {
 			radius = Math.max(radius, b.radius);
 			if (_.isNumber(b.restrictCollideWith)) {
 				restrictCollideWith &= b.restrictCollideWith;
@@ -2759,7 +2759,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 
 		let bumper = false;
 		hero.buffs.forEach(bump => {
-			if (bump.type === "bump" && bump.numStacks >= bump.minStacks) {
+			if (bump.type === "bump") {
 				if (takeHit(bump, other.id, world) && (calculateAlliance(hero.id, other.id, world) & Alliances.Enemy) > 0) {
 					magnitude += bump.impulse;
 					bumper = true;
@@ -3702,7 +3702,7 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 function updateHeroDamping(hero: w.Hero) {
 	let damping = hero.linearDamping;
 	hero.buffs.forEach(buff => {
-		if (buff.type === "glide" && buff.numStacks >= buff.minStacks) {
+		if (buff.type === "glide") {
 			damping *= buff.linearDampingMultiplier;
 		}
 	});
@@ -4064,7 +4064,7 @@ function applyLavaDamage(world: w.World) {
 
 				let damageMultiplier = 1.0;
 				obj.buffs.forEach(buff => {
-					if (buff.type === "lavaImmunity" && buff.numStacks >= buff.minStacks) {
+					if (buff.type === "lavaImmunity") {
 						hasLavaImmunity = true;
 						damageMultiplier *= buff.damageProportion;
 					}
@@ -4377,7 +4377,7 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 	}
 
 	hero.buffs.forEach(buff => {
-		if (buff.type === "movement" && buff.numStacks >= buff.minStacks) {
+		if (buff.type === "movement") {
 			let movementProportion = buff.movementProportion;
 
 			if (buff.decay) {
@@ -5014,8 +5014,7 @@ function detachBuff(buff: w.Buff, hero: w.Hero, world: w.World) {
 
 function calculateBuffId(template: BuffTemplate, world: w.World, config: BuffContext) {
 	if (template.stack) {
-		const from = template.global ? "global" : (config.fromHeroId || "environment");
-		return `${from}/${template.type}/${template.stack}`;
+		return `${config.fromHeroId || "environment"}/${template.type}/${template.stack}`;
 	} else {
 		return `${template.type}${world.nextBuffId++}`;
 	}
@@ -5039,7 +5038,6 @@ function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.Worl
 		resetOnGameStart: template.resetOnGameStart,
 		cancelOnBump: template.cancelOnBump,
 		numStacks: 1,
-		minStacks: template.minStacks || 0,
 	};
 
 	if (template.linkOwner) {
@@ -5102,7 +5100,7 @@ function detachCleanse(buff: w.CleanseBuff, hero: w.Hero, world: w.World) {
 function updateCleanse(hero: w.Hero) {
 	let cleanseTick = 0;
 	hero.buffs.forEach(b => {
-		if (b.type === "cleanse" && b.numStacks >= b.minStacks) {
+		if (b.type === "cleanse") {
 			cleanseTick = Math.max(cleanseTick, b.expireTick);
 		}
 	});
@@ -5217,7 +5215,7 @@ function burn(burn: w.BurnBehaviour, world: w.World) {
 	}
 
 	hero.buffs.forEach(buff => {
-		if (buff.type === "burn" && world.tick % buff.hitInterval === 0 && buff.numStacks >= buff.minStacks) {
+		if (buff.type === "burn" && world.tick % buff.hitInterval === 0) {
 			const packet = instantiateDamage(buff.packet, buff.fromHeroId, world);
 			applyDamage(hero, packet, world);
 		}
@@ -5296,7 +5294,6 @@ function updateSilence(hero: w.Hero) {
 		let cooldownRate = 1;
 		hero.buffs.forEach(buff => {
 			if (buff.type === "cooldown"
-				&& buff.numStacks >= buff.minStacks
 				&& (!buff.spellIds || buff.spellIds.has(spellId))
 				&& (!buff.notSpellIds || !buff.notSpellIds.has(spellId))) {
 
@@ -5396,7 +5393,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: number, w
 	const fromHero = world.objects.get(fromHeroId);
 	if (fromHero && fromHero.category === "hero") {
 		fromHero.buffs.forEach(buff => {
-			if (buff.type === "lifeSteal" && (!buff.source || buff.source === template.source) && buff.numStacks >= buff.minStacks) {
+			if (buff.type === "lifeSteal" && (!buff.source || buff.source === template.source)) {
 				let proportion = 1;
 				if (buff.decay) {
 					proportion = Math.max(0, (buff.expireTick - world.tick) / buff.maxTicks);
@@ -5533,7 +5530,7 @@ function updateArmor(hero: w.Hero) {
 	hero.armorProportion = 0;
 
 	hero.buffs.forEach(buff => {
-		if (buff.type === "armor" && buff.numStacks >= buff.minStacks) {
+		if (buff.type === "armor") {
 			if (buff.source) {
 				const current = hero.armorModifiers.get(buff.source) || 0;
 				hero.armorModifiers.set(buff.source, current + buff.proportion);

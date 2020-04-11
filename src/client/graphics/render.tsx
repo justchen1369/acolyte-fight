@@ -1345,10 +1345,6 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 	const isVisibleToMe = visibleToMe(hero.id, world);
 
 	hero.buffs.forEach(buff => {
-		if (buff.numStacks < buff.minStacks) {
-			return;
-		}
-
 		if (buff.renderStart && !buff.uiStartRendered) {
 			buff.uiStartRendered = true;
 			renderBuffSmoke(ctxStack, buff.renderStart, buff, hero, pos, world);
