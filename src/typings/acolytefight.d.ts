@@ -98,7 +98,7 @@ declare interface WorldSettings {
 	LavaLifestealProportion: number; // 0 for no lifesteal, 1 for 100% lifesteal
 	LavaDamagePerSecond: number;
 	LavaDamageInterval: number; // Ticks between applying lava damage
-	LavaBuffs: BuffTemplate[];
+	LavaBuffs: BuffTemplate[]; // Apply these buffs whenever an acolyte touches the void
 
 	SecondsToShrink: number;
 	ShrinkPowerMinPlayers: number; // Make the shrinking non-linear. Higher values mean faster shrinking at the start of the game.

@@ -4410,7 +4410,7 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 		}
 	});
 
-	const movementProportion = 1.0 + buffIncrease - buffDecrease;
+	const movementProportion = buffIncrease * buffDecrease; // Must be multiplication because some spells set buffDecrease to 0 which should stop the hero entirely
 	return movementProportion;
 }
 
