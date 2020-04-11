@@ -1909,7 +1909,7 @@ const whirlwind: Spell = {
             {
                 type: "swirl",
 
-                color: "rgba(64, 255, 255, 0.25)",
+                color: "#4ff4",
                 radius: 0.01,
                 ticks: 20,
 
@@ -1922,7 +1922,7 @@ const whirlwind: Spell = {
                 glow: 0.7,
                 shine: 0.2,
                 smoke: 1.3,
-                fade: "#144",
+                fade: "#1440",
                 vanish: 1,
             },
             { type: "strike", ticks: 20, flash: true, growth: 0.1 },
@@ -2274,10 +2274,10 @@ const iceBomb: Spell = {
         shieldTakesOwnership: false,
 
         sound: "iceBomb",
-        color: '#44ffff',
+        color: '#4ff',
         renderers: [
             { type: "bloom", radius: 0.01 },
-            { type: "projectile", ticks: 30, color: "rgba(64, 255, 255, 0.25)", light: null, shine: 0.4, glow: 0.7, smoke: 0.6, vanish: 1 },
+            { type: "projectile", ticks: 30, color: "#4ff4", fade: "#1440", light: null, shine: 0.4, glow: 0.7, smoke: 0.6, vanish: 1 },
             { type: "strike", ticks: 10, flash: true, growth: 0.1 },
         ],
     },
