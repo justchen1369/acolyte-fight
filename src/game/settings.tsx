@@ -180,8 +180,8 @@ const Visuals: VisualSettings = {
     HeroShadowOpacity: 0.5,
 
 	NameMargin: Pixel * 2,
-	NameFontPixels: 9,
-	NameHeightPixels: 11,
+	NameFontPixels: 10,
+	NameHeightPixels: 12,
     NameWidthPixels: 100,
 
 	HealthBarHeroRadiusFraction: 0.95,
