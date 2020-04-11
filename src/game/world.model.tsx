@@ -46,7 +46,7 @@ export interface World {
 	players: Immutable.Map<number, Player>; // heroId -> Player
 	controlKeysXX: Map<number, number>; // controlKey -> heroId
 	scores: Immutable.Map<number, HeroScore>; // heroId -> HeroScore
-	spellRecords: Map<number, string[]>; // heroId -> spellId[]
+	spellRecords: Immutable.Map<number, string[]>; // heroId -> spellId[]
 	teamAssignments: Immutable.Map<number, string>; // heroId -> teamId
 	teams: Immutable.Map<string, Team>; // teamId -> Team
 	winner: number | null; // heroId
@@ -241,6 +241,7 @@ export type Notification =
 	| KillNotification 
 	| TeamsNotification
 	| CloseGameNotification
+	| SpellsRecorded
 	| WinNotification
 
 export interface JoinNotification {
@@ -270,6 +271,12 @@ export interface CloseGameNotification {
 	type: "closing";
 	ticksUntilClose: number;
 	message: string;
+}
+
+export interface SpellsRecorded {
+	type: "spells";
+	heroId: number;
+	spellIds: string[];
 }
 
 export interface TeamsNotification {

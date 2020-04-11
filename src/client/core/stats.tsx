@@ -181,7 +181,7 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
             if (player.userHash && !player.left) {
                 ++numHumans;
                 const teamId = engine.getTeam(player.heroId, world);
-                players.push(playerStatsFromScore(player, teamId, score, world.spellRecords.get(player.heroId)));
+                players.push(playerStatsFromScore(player, teamId, score, world.spellRecords.get(player.heroId) || []));
             } else {
                 ++numAI;
             }

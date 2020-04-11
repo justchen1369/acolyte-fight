@@ -105,7 +105,7 @@ export function initialWorld(mod: Object): w.World {
 		activePlayers: Immutable.Set(), // hero IDs
 		players: Immutable.Map(), // hero ID -> player
 		controlKeysXX: new Map(),
-		spellRecords: new Map(),
+		spellRecords: Immutable.Map(),
 		teams: Immutable.Map(), // hero ID -> team
 		teamAssignments: Immutable.Map(), // hero ID -> team ID
 		scores: Immutable.Map(), // hero ID -> score
@@ -1660,8 +1660,8 @@ function instantiateShape(layout: ObstacleShapeTemplate): shapes.Shape {
 
 export function allowSpellChoosing(world: w.World, heroId: number) {
 	if (heroId) {
-		// Only allow spells to be changed before game starts or if hero has died
-		return world.tick < world.startTick || !!world.winner || !world.objects.has(heroId);
+		// Only allow spells to be changed before game starts or if hero has died, or if the hero has not cast a spell yet during the game
+		return world.tick < world.startTick || !world.spellRecords.has(heroId) || !!world.winner || !world.objects.has(heroId);
 	} else {
 		// Cannot choose spells if observing
 		return false;
@@ -2165,6 +2165,34 @@ function act(world: w.World) {
 			// Turn towards target if not moving
 			turnTowards(hero, hero.target);
 		}
+
+		recordSpellChoices(hero, world, action);
+	});
+}
+
+function recordSpellChoices(hero: w.Hero, world: w.World, firstAction: w.Action) {
+	if (world.tick < world.startTick) {
+		// Don't lock spells before game starts
+		return;
+	}
+
+	if (world.spellRecords.has(hero.id)) {
+		// Already recorded spells
+		return;
+	}
+
+	if (!(firstAction && w.Actions.NonGameStarters.indexOf(firstAction.type) === -1)) {
+		// This action will not lock the spell choices
+		return;
+	}
+
+	const spellIds = wu(hero.keysToSpells.values()).toArray();
+	world.spellRecords = world.spellRecords.set(hero.id, spellIds);
+
+	world.ui.notifications.push({
+		type: "spells",
+		heroId: hero.id,
+		spellIds,
 	});
 }
 
@@ -2182,11 +2210,6 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 		hero.spellChangedTick.set(spellId, world.tick);
 		attachSpell(spellId, hero, world);
 	});
-
-	if (world.tick < world.startTick) {
-		// Record which spells were used for stats later
-		world.spellRecords.set(hero.id, newSpellIds);
-	}
 }
 
 function attachSpell(spellId: string, hero: w.Hero, world: w.World) {

@@ -19,7 +19,7 @@ interface Props {
     myGameId: string;
     myHeroId: number;
     inTutorial: boolean;
-    started: boolean;
+    won: boolean;
     customizingBtn: string;
     customizingMode: boolean;
     allowSpellChoosing: boolean;
@@ -43,7 +43,7 @@ function stateToProps(state: s.State): Props {
         myGameId: world.ui.myGameId,
         myHeroId,
         inTutorial: !!state.tutorialLevel,
-        started: !!world.startTick && world.tick >= world.startTick,
+        won: !!world.winners && !!myHeroId && world.winners.indexOf(myHeroId) !== -1,
         customizingBtn: state.customizingBtn,
         customizingMode: state.customizing,
         allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
@@ -133,7 +133,7 @@ class HintPanel extends React.PureComponent<Props, State> {
             } else {
                 if (this.props.toolbar.hoverBtn) {
                     return this.renderDesktopHint();
-                } else if (this.props.myHeroId && !this.props.inTutorial && this.props.started) {
+                } else if (this.props.myHeroId && !this.props.inTutorial && this.props.won) {
                     return this.renderAlternativeHint();
                 } else {
                     return this.renderChangeSpellHint();
