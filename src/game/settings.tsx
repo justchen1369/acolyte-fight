@@ -2421,7 +2421,7 @@ const saber: Spell = {
     interruptibleAfterTicks: 20,
     expireAfterHitHeroTicks: 15,
 
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 9 * TicksPerSecond,
     throttle: false,
 
     icon: "waveStrike",
@@ -2484,7 +2484,7 @@ const dualSaber: Spell = {
     interruptibleAfterTicks: 20,
     expireAfterHitHeroTicks: 15,
 
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 9 * TicksPerSecond,
     throttle: false,
 
     icon: "waveStrike",
