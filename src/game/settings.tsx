@@ -2400,11 +2400,6 @@ const saber: Spell = {
             title: "Detach",
             text: "Lightsaber cuts through any Links or Grapples.",
         },
-        {
-            icon: "fas fa-snowflake",
-            title: "Slow",
-            text: "Your movement speed is reduced 50% when casting Lightsaber.",
-        }
     ],
     untargeted: true,
 
