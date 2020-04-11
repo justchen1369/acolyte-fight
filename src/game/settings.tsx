@@ -1903,7 +1903,7 @@ const whirlwind: Spell = {
         ],
 
         sound: "whirlwind",
-        color: "#44ffff",
+        color: "#4ff",
         renderers: [
             { type: "bloom", radius: 0.05, light: 0.5 },
             {
