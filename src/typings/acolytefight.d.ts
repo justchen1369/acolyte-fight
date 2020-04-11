@@ -349,7 +349,7 @@ declare interface SpellBase {
 	voidCooldownMultiplier?: number; // Cooldown ticks at this rate while in the void
 	interruptibleAfterTicks?: number; // Cannot interrupt a spell until it has been channeling for at least this length
 	interruptCancel?: SpellCancelParams; // If the spell is cancelled by the caster, apply this cooldown
-	strikeCancel?: SpellCancelParams; // If this spell is being channelled, whether being hit by something cancels it.
+	strikeCancel?: StrikeCancelParams; // If this spell is being channelled, whether being hit by something cancels it.
 	
 	chargeBuffs?: BuffTemplate[]; // Apply these buffs at the start of charging the spell
 	buffs?: BuffTemplate[]; // Apply these buffs at the start of channelling the spell
@@ -375,6 +375,9 @@ declare interface ReleaseParams {
 declare interface SpellCancelParams {
 	cooldownTicks?: number; // If cancelled by knockback, set cooldown to this value. This can be used to allow the spell to be re-cast quickly if interrupted.
 	maxChannelingTicks?: number; // Only apply the cooldown reset if have been channelling for less than this time.
+}
+
+declare interface StrikeCancelParams extends SpellCancelParams, ColliderTemplate {
 }
 
 declare interface MoveSpell extends SpellBase {
@@ -559,15 +562,24 @@ declare interface BehaviourTemplateBase {
 	trigger?: BehaviourTrigger;
 }
 
-declare interface BehaviourTrigger {
+declare interface BehaviourTrigger extends ColliderTemplate {
 	afterTicks?: number; // After this many ticks
 	atCursor?: boolean; // When projectile reaches cursor
 	minTicks?: number; // Don't trigger at cursor until this many ticks have passed
 
+	expire?: boolean; // Trigger on projectile expiry
+}
+
+declare interface ColliderTemplate {
+	afterTicks?: number; // Trigger collider after this many ticks
 	collideWith?: number; // Collision flags. Trigger behaviour when projectile collides with these objects.
 	against?: number; // Only consider collisions against these alliance flags.
 
-	expire?: boolean; // Trigger on projectile expiry
+	collideTypes?: string[]; // Limit to collisions with these projectile spell ids, obstacle types or shield types
+	notCollideTypes?: string[]; // Don't trigger when colliding with these types
+
+	notMirror?: boolean; // Don't trigger on mirrors
+	notLinked?: boolean; // Don't trigger if I own a link connected to the object I just hit
 }
 
 declare interface SpawnTemplate extends BehaviourTemplateBase {

@@ -968,14 +968,11 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 				delayed: behaviour,
 			};
 		} else if (trigger.collideWith) {
-			const collider: w.Collider = {
-				collideWith: trigger.collideWith,
-				against: trigger.against !== undefined ? trigger.against: Alliances.All,
-				afterTicks: trigger.afterTicks || 0,
-				delayed: behaviour,
-			};
-			addCollider(projectile, collider);
+			const collider: w.Collider = instantiateCollider(trigger);
+			collider.delayed = behaviour;
 			behaviour = null;
+
+			addCollider(projectile, collider);
 		} else if (trigger.expire) {
 			behaviour = {
 				type: "triggerOnExpiry",
@@ -996,6 +993,18 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			world.behaviours.push(behaviour);
 		}
 	});
+}
+
+function instantiateCollider(template: ColliderTemplate): w.Collider {
+	return {
+		collideWith: template.collideWith || Categories.All,
+		against: template.against !== undefined ? template.against : Alliances.All,
+		afterTicks: template.afterTicks || 0,
+		collideTypes: template.collideTypes,
+		notCollideTypes: template.notCollideTypes,
+		notMirror: template.notMirror,
+		notLinked: template.notLinked,
+	};
 }
 
 function addCollider(obj: w.WorldObject, collider: w.Collider) {
@@ -1268,19 +1277,28 @@ function handleCollider(collider: w.Collider, world: w.World) {
 
 	if (collider.collideTick) {
 		if (world.tick >= collider.collideTick + collider.afterTicks) {
-			if (_.isArray(collider.delayed)) {
-				world.behaviours.push(...collider.delayed);
-			} else {
-				world.behaviours.push(collider.delayed);
-			}
-
 			collider.done = true;
+			triggerCollider(collider, world);
 			return false;
 		} else {
 			return true;
 		}
 	} else {
 		return true;
+	}
+}
+
+function triggerCollider(collider: w.Collider, world: w.World) {
+	if (collider.delayed) {
+		if (_.isArray(collider.delayed)) {
+			world.behaviours.push(...collider.delayed);
+		} else {
+			world.behaviours.push(collider.delayed);
+		}
+	}
+
+	if (collider.token) {
+		collider.token.collideTick = world.tick;
 	}
 }
 
@@ -2294,6 +2312,16 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			initialAngle: vector.angleDiff(action.target, hero.body.getPosition()),
 		};
 
+		if (spell.strikeCancel) {
+			const strikeToken: w.CollideToken = { collideTick: null };
+
+			const collider = instantiateCollider(spell.strikeCancel);
+			collider.token = strikeToken;
+			hero.casting.strikeCancelToken = strikeToken;
+
+			addCollider(hero, collider);
+		}
+
 		if (!w.Actions.NonGameStarters.some(x => x === spell.id)) {
 			const player = world.players.get(hero.id);
 			if (player) {
@@ -2362,7 +2390,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		++hero.casting.stage;
 	}
 
-	if (spell.strikeCancel && hero.strikeTick && hero.strikeTick >= hero.casting.castStartTick) {
+	if (hero.casting.strikeCancelToken?.collideTick) {
 		// Spell cancelled by getting struck
 		cancelCooldown(hero, spell.id, spell.strikeCancel, world);
 		hero.casting.stage = w.CastStage.Complete;
@@ -2640,7 +2668,7 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 		return;
 	}
 
-	if (!obstacle.mirror) {
+	if (!obstacle.mirror && !obstacle.sensor) {
 		registerCollision(hit, obstacle, world);
 	}
 
@@ -2986,7 +3014,7 @@ function registerCollision(hit: w.WorldObject, other: w.WorldObject, world: w.Wo
 	}
 
 	hit.colliders.forEach(collider => {
-		if (collider.collideTick) {
+		if (collider.done || collider.collideTick) {
 			// Already activated
 			removeCollider(hit, collider);
 			return;
@@ -2998,6 +3026,29 @@ function registerCollision(hit: w.WorldObject, other: w.WorldObject, world: w.Wo
 
 		if (!(collider.against === Alliances.All || !!(collider.against & calculateAlliance(hit.owner, other.owner, world)))) {
 			return;
+		}
+
+		if ((collider.collideTypes || collider.notCollideTypes) && (other.category === "projectile" || other.category === "obstacle" || other.category === "shield")) {
+			const type = other.type;
+			if (collider.collideTypes && collider.collideTypes.indexOf(type) === -1) {
+				return;
+			}
+			if (collider.notCollideTypes && collider.notCollideTypes.indexOf(type) !== -1) {
+				return;
+			}
+		}
+
+		if (collider.notMirror && other.category === "obstacle") {
+			if (other.mirror) {
+				return;
+			}
+		}
+
+		if (collider.notLinked) {
+			const hero = world.objects.get(hit.owner);
+			if (hero && hero.category === "hero" && hero.link && hero.link.targetId === other.id) {
+				return;
+			}
 		}
 
 		collider.collideTick = world.tick;
@@ -5466,8 +5517,6 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	if (!packet.noHit) {
 		toHero.hitTick = world.tick;
 		if (!packet.isLava) {
-			toHero.strikeTick = world.tick;
-
 			if (fromHeroId) {
 				// Mark that opponent as active
 				toHero.activeTickPerOpponent.set(fromHeroId, world.tick);

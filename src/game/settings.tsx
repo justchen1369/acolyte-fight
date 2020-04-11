@@ -1468,6 +1468,9 @@ const grapple: Spell = {
     unlink: true,
 
     strikeCancel: {
+        collideWith: Categories.Hero | Categories.Projectile,
+        notCollideTypes: ["meteor", "meteorite"],
+        notLinked: true,
     },
     release: {
         interrupt: true,
@@ -1491,7 +1494,7 @@ const grapple: Spell = {
 
         link: {
             linkWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
-            selfFactor: 1,
+            selfFactor: 0.25,
             targetFactor: 0.25,
             impulsePerTick: 0.00002,
             sidewaysImpulsePerTick: 0.00002,

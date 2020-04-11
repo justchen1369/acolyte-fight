@@ -396,7 +396,6 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 
 	createTick: number;
 	hitTick?: number; // hit by anything (lava or non-lava)
-	strikeTick?: number; // hit by something (not lava)
 	bumpTick?: number; // bumped another hero
 	cleanseTick?: number;
 	exitTick?: number;
@@ -539,6 +538,8 @@ export interface CastState {
 	chargeStartTick?: number;
 	channellingStartTick?: number;
 	releaseTick?: number;
+
+	strikeCancelToken?: CollideToken;
 
 	proportion?: number;
 	color?: string;
@@ -830,7 +831,8 @@ export namespace HomingTargets {
 }
 
 export interface Collider {
-	delayed: Behaviour | Behaviour[];
+	delayed?: Behaviour | Behaviour[];
+	token?: CollideToken;
 
 	collideWith: number;
 	against: number;
@@ -838,7 +840,17 @@ export interface Collider {
 	afterTicks: number;
 	collideTick?: number;
 
+	collideTypes?: string[];
+	notCollideTypes?: string[];
+
+	notMirror?: boolean;
+	notLinked?: boolean;
+
 	done?: boolean;
+}
+
+export interface CollideToken {
+	collideTick: number;
 }
 
 export type Behaviour =
