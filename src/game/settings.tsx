@@ -1670,7 +1670,7 @@ const repeater: Spell = {
                     "bloom": 0.02,
                     "bloomLow": 0.02,
                     "decay": true,
-                    light: 0.5,
+                    light: null,
                 },
             },
         ],
