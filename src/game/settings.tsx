@@ -2420,7 +2420,7 @@ const saber: Spell = {
     interruptibleAfterTicks: 20,
     expireAfterHitHeroTicks: 15,
 
-    cooldown: 9 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: false,
 
     icon: "waveStrike",
@@ -2483,7 +2483,7 @@ const dualSaber: Spell = {
     interruptibleAfterTicks: 20,
     expireAfterHitHeroTicks: 15,
 
-    cooldown: 9 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: false,
 
     icon: "waveStrike",
@@ -2595,7 +2595,7 @@ const shield: Spell = {
     name: 'Reflect',
     description: "Reflect away projectile attacks. Ineffective against area-of-effect spells.",
 
-    maxTicks: 2 * TicksPerSecond,
+    maxTicks: 1.5 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     categories: Categories.Shield | Categories.Obstacle,
     throttle: false,
