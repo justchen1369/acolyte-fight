@@ -578,6 +578,7 @@ declare interface ColliderTemplate {
 	collideTypes?: string[]; // Limit to collisions with these projectile spell ids, obstacle types or shield types
 	notCollideTypes?: string[]; // Don't trigger when colliding with these types
 
+	detonate?: boolean; // Trigger if caught in a detonation, defaults to true
 	notMirror?: boolean; // Don't trigger on mirrors
 	notLinked?: boolean; // Don't trigger if I own a link connected to the object I just hit
 }

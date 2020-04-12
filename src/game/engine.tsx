@@ -49,6 +49,10 @@ interface DetonateConfig {
 	buffDurationMultiplier?: number;
 }
 
+interface CollisionConfig {
+	detonate?: boolean;
+}
+
 export interface ResolvedKeyBindings {
 	keysToSpells: Map<string, string>;
 	spellsToKeys: Map<string, string>;
@@ -1004,6 +1008,7 @@ function instantiateCollider(template: ColliderTemplate): w.Collider {
 		notCollideTypes: template.notCollideTypes,
 		notMirror: template.notMirror,
 		notLinked: template.notLinked,
+		detonate: template.detonate !== undefined ? template.detonate : true,
 	};
 }
 
@@ -3008,7 +3013,7 @@ function reduceDamage(projectile: w.Projectile, multiplier: number) {
 	}
 }
 
-function registerCollision(hit: w.WorldObject, other: w.WorldObject, world: w.World) {
+function registerCollision(hit: w.WorldObject, other: w.WorldObject, world: w.World, config?: CollisionConfig) {
 	if (!hit.colliders) {
 		return;
 	}
@@ -3017,6 +3022,10 @@ function registerCollision(hit: w.WorldObject, other: w.WorldObject, world: w.Wo
 		if (collider.done || collider.collideTick) {
 			// Already activated
 			removeCollider(hit, collider);
+			return;
+		}
+
+		if (config?.detonate && !collider.detonate) {
 			return;
 		}
 
@@ -4002,7 +4011,7 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 		buffDurationMultiplier = calculatePartialDamageMultiplier(world, projectile, projectile.partialBuffDuration);
 	}
 
-	detonateAt(projectile.body.getPosition(), projectile.owner, detonate, world, {
+	detonateAt(projectile.body.getPosition(), projectile, detonate, world, {
 		sourceId: projectile.id,
 		color: projectile.color, 
 		defaultSound: projectile.sound,
@@ -4021,7 +4030,7 @@ function detonateObstacle(obstacle: w.Obstacle, world: w.World) {
 	const detonate = instantiateDetonate(obstacle.detonate, null, world);
 
 	const owner: number = null;
-	detonateAt(obstacle.body.getPosition(), owner, detonate, world, { sourceId: obstacle.id });
+	detonateAt(obstacle.body.getPosition(), obstacle, detonate, world, { sourceId: obstacle.id });
 
 	// Don't allow for repeats
 	obstacle.detonate = null;
@@ -4038,16 +4047,16 @@ function instantiateDetonate(template: DetonateParametersTemplate, fromHeroId: n
 	};
 }
 
-function detonateAt(epicenter: pl.Vec2, owner: number, detonate: w.DetonateParameters, world: w.World, config: DetonateConfig) {
+function detonateAt(epicenter: pl.Vec2, from: w.WorldObject, detonate: w.DetonateParameters, world: w.World, config: DetonateConfig) {
 	const sound = detonate.sound || config.defaultSound;
 
-	const seen = new Set<number>(); // queryExtent not guaranteed to hit once
-	const swapTargets = new Array<w.WorldObject>();
+	const owner = from.owner;
+	const seen = new Map<number, w.WorldObject>(); // queryExtent not guaranteed to hit once
 	queryExtent(world, epicenter, detonate.radius + world.settings.World.SlopRadius, other => {
 		if (seen.has(other.id)) {
 			return;
 		} else {
-			seen.add(other.id);
+			seen.set(other.id, other);
 		}
 
 		if ((other.category === "hero" && other.collideWith > 0) || other.category === "projectile" || other.category === "obstacle") {
@@ -4089,10 +4098,6 @@ function detonateAt(epicenter: pl.Vec2, owner: number, detonate: w.DetonateParam
 				}
 			}
 
-			if (detonate.swapWith > 0 && (other.categories & detonate.swapWith) > 0 && other.swappable) {
-				swapTargets.push(other);
-			}
-
 			if (applyKnockback && detonate.maxImpulse) {
 				const magnitude = (detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse));
 				const direction = vector.relengthen(diff, magnitude);
@@ -4102,7 +4107,19 @@ function detonateAt(epicenter: pl.Vec2, owner: number, detonate: w.DetonateParam
 	});
 
 	if (detonate.swapWith > 0) {
+		const swapTargets =
+			wu(seen.values())
+			.filter(other => (other.categories & detonate.swapWith) > 0 && other.swappable)
+			.toArray();
 		applySwapAt(epicenter, owner, swapTargets, sound, world);
+	}
+
+	// Register collisions
+	{
+		const collisonConfig: CollisionConfig = { detonate: true };
+		wu(seen.values()).forEach(obj => {
+			registerCollision(obj, from, world, collisonConfig);
+		});
 	}
 
 	world.ui.events.push({
@@ -4992,7 +5009,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 	applyDamage(hero, selfPacket, world);
 
 	const detonate = instantiateDetonate(spell.detonate, hero.id, world);
-	detonateAt(hero.body.getPosition(), hero.id, detonate, world, {
+	detonateAt(hero.body.getPosition(), hero, detonate, world, {
 		sourceId: hero.id,
 		color: spell.color,
 		defaultSound: spell.sound,

@@ -843,6 +843,7 @@ export interface Collider {
 	collideTypes?: string[];
 	notCollideTypes?: string[];
 
+	detonate?: boolean;
 	notMirror?: boolean;
 	notLinked?: boolean;
 
