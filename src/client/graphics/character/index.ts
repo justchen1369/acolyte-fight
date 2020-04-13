@@ -118,7 +118,7 @@ function applyTriangle(ctx: CanvasRenderingContext2D, shape: h.Triangle) {
     ctx.lineTo(-1, 1); // Base right corner
 
     ctx.lineTo(-1, shape.indentSpan); // Indent right
-    ctx.lineTo(-1 + shape.indentRise * 2, 0); // Indent peak
+    ctx.lineTo(-1 + shape.indentRise, 0); // Indent peak
     ctx.lineTo(-1, -shape.indentSpan); // Indent left
 
     ctx.closePath(); // Back to the base left corner

@@ -1651,7 +1651,7 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 							type: "triangle",
 							peakSpan: 0,
 							indentSpan: 1 / 3.0,
-							indentRise: 2 / 3.0,
+							indentRise: 4 / 3.0,
 						},
 						transform: {
 							height: 0.75,
