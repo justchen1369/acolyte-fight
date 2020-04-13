@@ -406,4 +406,5 @@ export interface AtlasHeroInstruction extends AtlasInstructionBase {
 
 	body?: boolean;
 	glyph?: boolean;
+	config?: h.CharacterConfig;
 }

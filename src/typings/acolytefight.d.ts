@@ -1289,8 +1289,8 @@ interface VisualSettings {
 	Damage: RenderStrikeParams;
 
 	// Hero
-	HeroOutlineProportion: number;
-	HeroOutlineColor: string;
+	HeroOutlineProportion: number; // Width of the outline around the acolyte
+	HeroOutlineColor: string; // Color of the outline around the acolyte
 	HeroGradientDarken: number; // How much to shade the acolyte, between 0 and 1
 	HeroGlyphLighten: number;
 	HeroGlyphOpacity: number;

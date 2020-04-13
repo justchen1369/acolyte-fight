@@ -140,10 +140,10 @@ function renderHero(ctxStack: CanvasCtxStack, instruction: r.AtlasHeroInstructio
     const center = pl.Vec2(instruction.width / 2, instruction.height / 2);
 
     if (instruction.body) {
-        character.renderBody(ctx, center, instruction.radius, instruction.skin);
+        character.renderBodies(ctx, center, instruction.radius, instruction.skin, instruction.config);
     }
     if (instruction.glyph) {
-        character.renderGlyph(ctx, center, instruction.radius, instruction.skin);
+        character.renderGlyphs(ctx, center, instruction.radius, instruction.skin, instruction.config);
     }
 
     return instruction;

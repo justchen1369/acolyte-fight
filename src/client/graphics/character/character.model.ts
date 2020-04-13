@@ -1,24 +1,55 @@
+export interface CharacterConfig {
+    strokeWidth: number;
+    strokeStyle: string;
+}
+
 export interface Skin {
-    body: Body;
-    glyph: Glyph;
+    layers: Layer[];
 }
 
-export interface Glyph extends Style {
-    rise: number; // how far forward the tip arrowhead should go
-    inflect: number; // how far forward the inside of tip of the arrowhead should go
-
-    attack: number; // how far back the front of the wings of the arrowhead should go
-    fall: number; // how far back the wings of the arrowhead should go
-    span: number; // how far to either side the wings of the arrowhead should go
+export interface Layer {
+    body: LayerBody;
+    glyphs: LayerGlyph[];
 }
 
-export interface Body extends Style {
-    numPoints: number;
-    bend: number; // 0-1 means inwards, 1+ means outwards
+export interface LayerBody {
+    shape: Shape;
+    transform?: Transform;
+    // color: LayerColor;
 }
 
-export interface Style {
-    fillMask?: string;
-    strokeMask?: string;
-    stroke?: number;
+export interface LayerColor {
+    h: number;
+    s: number;
+    l: number;
+}
+
+export type Shape =
+    Circle
+    | Triangle
+
+export interface Circle {
+    type: "circle";
+}
+
+export interface Triangle {
+    type: "triangle";
+
+    peakSpan: number;
+    peakBend?: number;
+
+    indentRise: number;
+    indentSpan: number;
+    indentBend?: number;
+}
+
+export interface Transform {
+    height?: number;
+    width?: number;
+    rise?: number;
+}
+
+export interface LayerGlyph {
+    shape: Shape;
+    transform?: Transform;
 }

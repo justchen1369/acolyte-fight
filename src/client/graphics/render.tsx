@@ -1639,35 +1639,48 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 	const atlasPixels = Math.ceil(2 * HeroAtlasSizeMultiplier * Hero.Radius / ctxStack.subpixel);
 	const radiusPixels = atlasPixels / atlasSizeMultiplier;
 
+	const skin: r.Skin = {
+		layers: [
+			{
+				body: {
+					shape: { type: "circle" },
+				},
+				glyphs: [
+					{
+						shape: {
+							type: "triangle",
+							peakSpan: 0,
+							indentSpan: 1 / 3.0,
+							indentRise: 2 / 3.0,
+						},
+						transform: {
+							height: 0.75,
+							width: 3,
+							rise: -0.25,
+						},
+					},
+				],
+			},
+		],
+	};
+
 	const template: r.AtlasHeroInstruction = {
 		id: null,
 		type: "hero",
 		radius: radiusPixels,
-		skin: {
-			body: {
-				numPoints: 0,
-				bend: 1,
-
-				stroke: Visuals.HeroOutlineProportion,
-				strokeMask: Visuals.HeroOutlineColor,
-			},
-			glyph: {
-				rise: 0.5,
-				inflect: 0,
-
-				attack: 0,
-				fall: 1,
-
-				span: 1,
-			},
-		},
+		skin,
 		height: atlasPixels,
 		width: atlasPixels,
 	};
 
+	const config: r.CharacterConfig = {
+		strokeStyle: Visuals.HeroOutlineColor,
+		strokeWidth: Visuals.HeroOutlineProportion,
+	};
+
 	return [
-		{...template, id: heroBodyTextureId(heroId), body: true },
-		{...template, id: heroGlyphTextureId(heroId), glyph: true },
+		{...template, id: heroBodyTextureId(heroId), body: true, config },
+		{...template, id: heroGlyphTextureId(heroId), glyph: true, config },
 	];
 }
 
