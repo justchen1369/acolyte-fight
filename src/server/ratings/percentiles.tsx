@@ -73,7 +73,7 @@ export class PercentilesAccumulator {
 
     private formatLeague(name: string, percentile: number, cache: PercentilesCache) {
         const exposure = estimateRatingAtPercentile(percentile, cache).exposure;
-        return `WinRateDistribution: category=${this.category} league=${name} percentile=${percentile} exposure=${exposure}`;
+        return `League: category=${this.category} league=${name} percentile=${percentile} exposure=${exposure}`;
     }
 }
 
