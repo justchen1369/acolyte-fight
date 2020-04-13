@@ -4051,12 +4051,13 @@ function detonateAt(epicenter: pl.Vec2, from: w.WorldObject, detonate: w.Detonat
 	const sound = detonate.sound || config.defaultSound;
 
 	const owner = from.owner;
-	const seen = new Map<number, w.WorldObject>(); // queryExtent not guaranteed to hit once
+	const seen = new Set<number>(); // queryExtent not guaranteed to hit once
+	const touched = new Array<w.WorldObject>();
 	queryExtent(world, epicenter, detonate.radius + world.settings.World.SlopRadius, other => {
 		if (seen.has(other.id)) {
 			return;
 		} else {
-			seen.set(other.id, other);
+			seen.add(other.id);
 		}
 
 		if ((other.category === "hero" && other.collideWith > 0) || other.category === "projectile" || other.category === "obstacle") {
@@ -4103,21 +4104,20 @@ function detonateAt(epicenter: pl.Vec2, from: w.WorldObject, detonate: w.Detonat
 				const direction = vector.relengthen(diff, magnitude);
 				applyImpulseDelta(other, direction);
 			}
+
+			touched.push(other);
 		}
 	});
 
 	if (detonate.swapWith > 0) {
-		const swapTargets =
-			wu(seen.values())
-			.filter(other => (other.categories & detonate.swapWith) > 0 && other.swappable)
-			.toArray();
+		const swapTargets = touched.filter(other => (other.categories & detonate.swapWith) > 0 && other.swappable)
 		applySwapAt(epicenter, owner, swapTargets, sound, world);
 	}
 
 	// Register collisions
 	{
 		const collisonConfig: CollisionConfig = { detonate: true };
-		wu(seen.values()).forEach(obj => {
+		touched.forEach(obj => {
 			registerCollision(obj, from, world, collisonConfig);
 		});
 	}
