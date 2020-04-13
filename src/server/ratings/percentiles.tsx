@@ -54,26 +54,27 @@ export class PercentilesAccumulator {
             distribution,
         };
 
-        logger.info(`Calculated leagues: ${formatLeagues(cache)}`);
+        this.log(cache);
 
         return cache;
     }
-}
 
-function formatLeagues(cache: PercentilesCache): string {
-    const Placements = constants.Placements;
+    private log(cache: PercentilesCache) {
+        const Placements = constants.Placements;
+        logger.info(this.formatLeague("Grandmaster", Placements.Grandmaster, cache));
+        logger.info(this.formatLeague("Master", Placements.Master, cache));
+        logger.info(this.formatLeague("Diamond", Placements.Diamond, cache));
+        logger.info(this.formatLeague("Platinum", Placements.Platinum, cache));
+        logger.info(this.formatLeague("Gold", Placements.Gold, cache));
+        logger.info(this.formatLeague("Silver", Placements.Silver, cache));
+        logger.info(this.formatLeague("Bronze", Placements.Bronze, cache));
+        logger.info(this.formatLeague("Wood", Placements.Wood, cache));
+    }
 
-    const result = new Array<string>();
-    result.push(`Grandmaster: ${estimateRatingAtPercentile(Placements.Grandmaster, cache).exposure}`);
-    result.push(`Master: ${estimateRatingAtPercentile(Placements.Master, cache).exposure}`);
-    result.push(`Diamond: ${estimateRatingAtPercentile(Placements.Diamond, cache).exposure}`);
-    result.push(`Platinum: ${estimateRatingAtPercentile(Placements.Platinum, cache).exposure}`);
-    result.push(`Gold: ${estimateRatingAtPercentile(Placements.Gold, cache).exposure}`);
-    result.push(`Silver: ${estimateRatingAtPercentile(Placements.Silver, cache).exposure}`);
-    result.push(`Bronze: ${estimateRatingAtPercentile(Placements.Bronze, cache).exposure}`);
-    result.push(`Wood: ${estimateRatingAtPercentile(Placements.Wood, cache).exposure}`);
-
-    return result.join(' ');
+    private formatLeague(name: string, percentile: number, cache: PercentilesCache) {
+        const exposure = estimateRatingAtPercentile(percentile, cache).exposure;
+        return `WinRateDistribution: category=${this.category} league=${name} percentile=${percentile} exposure=${exposure}`;
+    }
 }
 
 // Returns the rating required to reach each percentile

@@ -94,11 +94,8 @@ export class WinRateAccumulator {
     }
 
     log() {
-        logger.info(`Calculated win rate distribution ${this.category}: ${formatBuckets(this.buckets)}`);
+        this.buckets.forEach(b => {
+            logger.info(`WinRateDistribution: category=${this.category} diff=${b.maxDiff} winRate=${(100 * (b.weightedExpected / b.weightedGames)).toFixed(1)}%`);
+        });
     }
-
-}
-
-function formatBuckets(buckets: WinRateBucket[]) {
-    return buckets.map(b => `${b.maxDiff}:${(100 * (b.weightedExpected / b.weightedGames)).toFixed(1)}%`).join(' ');
 }

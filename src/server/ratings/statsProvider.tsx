@@ -19,6 +19,12 @@ import * as winRates from './winRates';
 import { logger } from '../status/logging';
 import { RatingAtPercentile } from './ratings.model';
 
+interface SpellFrequencySpec {
+    category: string;
+    league: string;
+    minAco: number;
+}
+
 const IncrementalUpdateInterval = 60 * 1000;
 const FullUpdateInterval = 24 * 60 * 60 * 1000;
 
@@ -32,9 +38,9 @@ class GameAccumulator {
     private spellFrequencyAccumulators = new Array<spellFrequencies.SpellUsageAccumulator>();
     private winRateAccumulator = new winRates.WinRateAccumulator(m.GameCategory.PvP);
 
-    constructor(minAcos: number[]) {
-        minAcos.forEach(minAco => {
-            this.spellFrequencyAccumulators.push(new spellFrequencies.SpellUsageAccumulator(m.GameCategory.PvP, minAco));
+    constructor(spellFrequencySpecs: SpellFrequencySpec[]) {
+        spellFrequencySpecs.forEach(spec => {
+            this.spellFrequencyAccumulators.push(new spellFrequencies.SpellUsageAccumulator(spec.category, spec.league, spec.minAco));
         });
     }
 
@@ -114,6 +120,9 @@ class UserAccumulator {
         const elapsed = Date.now() - start;
         logger.info(`Processed ${numUsers} users in ${elapsed.toFixed(0)} ms`);
     }
+
+    log() {
+    }
 }
 
 export async function startUpdateLoop() {
@@ -142,13 +151,19 @@ async function update() {
             await newUserAccumulator.update();
             userAccumulator = newUserAccumulator;
 
-            const percentileCache = userAccumulator.percentileCaches.get(m.GameCategory.PvP);
-            const minRatings = constants.SpellFrequencies.MinAcoPercentiles.map(percentile => percentiles.estimateRatingAtPercentile(percentile, percentileCache));
+            const category = m.GameCategory.PvP;
+            const percentileCache = userAccumulator.percentileCaches.get(category);
+            const spellFrequencySpecs: SpellFrequencySpec[] = constants.SpellFrequencies.MinAcoPercentiles.map(percentile => ({
+                category,
+                league: `p${percentile}`,
+                minAco: percentiles.estimateRatingAtPercentile(percentile, percentileCache).aco,
+            }));
 
-            const newGameAccumulator = new GameAccumulator(minRatings.map(rating => rating.aco));
+            const newGameAccumulator = new GameAccumulator(spellFrequencySpecs);
             await newGameAccumulator.update();
             gameAccumulator = newGameAccumulator;
 
+            userAccumulator.log();
             gameAccumulator.log();
         }
     } catch (exception) {

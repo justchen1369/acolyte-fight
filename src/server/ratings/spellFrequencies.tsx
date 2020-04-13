@@ -35,7 +35,7 @@ function accumulateInto(accumulator: Frequency, frequency: Frequency, weight: nu
 export class SpellUsageAccumulator {
     private distribution = new Map<string, SpellFrequency>();
 
-    constructor(public readonly category: string, public readonly minAco: number) {
+    constructor(public readonly category: string, public readonly league: string, public readonly minAco: number) {
     }
 
     accept(game: m.GameStatsMsg, distribution: aco.ActualWinRate[]) {
@@ -98,16 +98,10 @@ export class SpellUsageAccumulator {
     }
 
     log() {
-        logger.info(`Calculated spell distribution (${this.category}, ${this.minAco}): ${formatSpells(this.distribution)}`);
+        this.distribution.forEach(frequency => {
+            const winRate = frequency.wins / frequency.usages;
+            const advantage = frequency.wins / frequency.probability;
+            logger.info(`SpellFrequency: category=${this.category} league=${this.league} spellId=${frequency.spellId} winRate=${(winRate * 100).toFixed(1)}% advantage=${advantage.toPrecision(2)} usages=${frequency.usages}`);
+        });
     }
-}
-
-function formatSpells(distribution: Map<string, SpellFrequency>) {
-    let result = new Array<string>();
-    distribution.forEach(frequency => {
-        const winRate = frequency.wins / frequency.usages;
-        const advantage = frequency.wins / frequency.probability;
-        result.push(`${frequency.spellId}:${(winRate * 100).toFixed(1)}%:${advantage.toPrecision(2)}:${frequency.usages}`);
-    });
-    return result.join(' ');
 }
