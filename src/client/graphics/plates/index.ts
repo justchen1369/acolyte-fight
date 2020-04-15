@@ -3,7 +3,7 @@ import * as r from '../render.model';
 import * as shaders from '../shaders';
 import * as vector from '../../../game/vector';
 import { Float32List } from '../list';
-import ColTuple from '../colorTuple';
+import ColTuple from '../../../game/colorTuple';
 
 const plateFragmentShader = require('./plate.fragment.glsl');
 const plateVertexShader = require('./plate.vertex.glsl');

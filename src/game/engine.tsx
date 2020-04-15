@@ -373,6 +373,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		points,
 		turnRate: (spell.maxTurnRatePerTickInRevs || 1) * vector.Tau,
 		color: spell.color,
+		colorize: spell.colorize,
 		light: spell.light,
 		glow: spell.glow,
 		bloom: spell.bloom,
@@ -437,6 +438,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		glow: spell.glow,
 		bloom: spell.bloom,
 		shine: spell.shine,
+		colorize: spell.colorize,
 		shadow: spell.shadow,
 		strike: spell.strike,
 	};
@@ -500,6 +502,8 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 		points,
 
 		color: spell.color,
+		colorize: spell.colorize,
+		shine: spell.shine,
 		light: spell.light,
 		glow: spell.glow,
 		bloom: spell.bloom,

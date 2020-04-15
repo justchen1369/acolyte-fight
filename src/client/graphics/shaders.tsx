@@ -1,7 +1,7 @@
 import * as pl from 'planck-js';
 import * as r from './render.model';
 import { Float32List } from './list';
-import ColTuple from './colorTuple';
+import ColTuple from '../../game/colorTuple';
 
 export interface CommonUniforms {
 	u_translate: r.UniformInfo;

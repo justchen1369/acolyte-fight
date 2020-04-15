@@ -228,6 +228,7 @@ declare interface SwatchSmoke {
 	particleRadius: number;
 
 	light?: number;
+	colorize?: number;
 	shine?: number;
 	fade?: string;
 	glow?: number;
@@ -729,6 +730,7 @@ declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
 	light?: number; // Render additively
 	glow?: number; // How much alpha to apply to the bloom
 	bloom?: number; // How much radius to give the bloom
+	colorize?: number; // Add a bit of random color (between 0 and 1)
 	shine?: number; // Lighten the trail initially
 	fade?: string; // Fade towards this color
 	vanish?: number; // Fade away the trail until it is transparent - 1 means fade it all away, 0 means do nothing
@@ -747,6 +749,7 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 	smoke?: RenderSmoke;
 	glow?: number;
 	bloom?: number;
+	colorize?: number;
 	shine?: number;
 	shadow?: number;
 	noPartialRadius?: boolean;
@@ -767,6 +770,7 @@ declare interface RenderPolygon extends RenderParamsBase, ProjectileColorParams 
 	smoke?: RenderSmoke;
 	glow?: number;
 	bloom?: number;
+	colorize?: number;
 	shine?: number;
 	shadow?: number;
 	noPartialRadius?: boolean;
@@ -786,6 +790,7 @@ declare interface RenderSwirl extends RenderParamsBase {
 	particleRadius: number;
 
 	light?: number; // Render additively
+	colorize?: number;
 	shine?: number;
 	smoke?: RenderSmoke;
 	fade?: string;
@@ -801,6 +806,7 @@ declare interface RenderLink extends RenderParamsBase, ProjectileColorParams {
 	width: number;
 	light?: boolean; // Render additively
 	toWidth?: number;
+	colorize?: number;
 	shine?: number;
 	glow?: number;
 	bloom?: number;
@@ -815,6 +821,7 @@ declare interface RenderReticule extends RenderParamsBase {
 	shrinkTicks?: number;
 	light?: boolean;
 	grow?: boolean;
+	colorize?: number;
 	shine?: number;
 	fade?: boolean;
 	startingTicks?: number; // Only display for this many ticks since creation of the projectile
@@ -835,6 +842,7 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams, 
 	light?: number; // Render additively
 	numParticles?: number;
 	particleShine?: number;
+	particleColorize?: number;
 	particleGlow?: number;
 	particleBloom?: number;
 	particleVanish?: number;
@@ -852,6 +860,7 @@ declare interface RenderStrikeParams {
 declare interface RenderBloom extends RenderParamsBase, ProjectileColorParams {
 	type: "bloom";
 	light?: number;
+	colorize?: number;
 	shine?: number;
 	glow?: number;
 	radius?: number;
@@ -911,6 +920,7 @@ declare interface RenderBuff {
 	selfColor?: boolean; // If the buff belongs to me, view it in my own color
 	alpha?: number; // Semi-transparent
 	light?: number; // Render additively
+	colorize?: number;
 	shine?: number; // Brighter initially
 	glow?: number; // How much alpha to apply to the bloom
 	bloom?: number; // Bloom radius
@@ -1032,6 +1042,7 @@ declare interface ShieldSpell extends SpellBase {
 	glow?: number;
 	bloom?: number;
 	shine?: number;
+	colorize?: number;
 	shadow?: number;
 }
 
@@ -1101,6 +1112,7 @@ declare interface SaberSpell extends ShieldSpell {
 	hitInterval?: number; // If saber hits multiple times, only apply damage/buffs at this interval
 	hitBuffs?: BuffTemplate[]; // Buffs to apply to whoever we hit
 
+	colorize?: number;
 	shine?: number;
 	bloom?: number;
 	glow?: number;

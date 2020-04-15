@@ -5,7 +5,7 @@ import * as images from './images';
 import * as plates from './plates';
 import * as primitives from './primitives';
 import * as textures from './textures';
-import ColTuple from './colorTuple';
+import ColTuple from '../../game/colorTuple';
 
 export { hero } from './heroes';
 export { image } from './images';

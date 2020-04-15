@@ -1,7 +1,7 @@
 import * as pl from 'planck-js';
 import * as h from './character/character.model';
 import { Float32List } from './list';
-import ColTuple from './colorTuple';
+import ColTuple from '../../game/colorTuple';
 import { GraphicsLevel } from '../../game/constants';
 import { AudioElement } from '../audio/audio.model';
 

@@ -14,7 +14,7 @@ import * as w from '../../game/world.model';
 
 import { Alliances } from '../../game/constants';
 import { CanvasStack, CanvasCtxStack, RenderOptions } from './render.model';
-import ColTuple from './colorTuple';
+import ColTuple from '../../game/colorTuple';
 import { renderIconOnly } from './renderIcon';
 
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
@@ -1130,6 +1130,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 		max: smoke.ticks,
 		fillStyle: smoke.color,
 		light: smoke.light !== undefined ? smoke.light : null,
+		colorize: smoke.colorize,
 		shine: smoke.shine,
 		fade: smoke.fade,
 		glow: smoke.glow,
@@ -1272,6 +1273,7 @@ function renderHeroArrival(ctxStack: CanvasCtxStack, pos: pl.Vec2, outward: pl.V
 		initialTick: world.tick,
 		max: Visuals.EaseTicks,
 		fillStyle: heroColor(hero.id, world),
+		colorize: 0.1,
 		shine: 0.5,
 		glow: 0.05,
 		bloom: DefaultBloomRadius,
@@ -1444,6 +1446,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 			fillStyle: color,
 			light: render.light !== undefined ? render.light : null,
 			glow: render.glow,
+			colorize: render.colorize,
 			shine: render.shine,
 			fade: render.fade,
 			vanish: render.vanish,
@@ -1901,6 +1904,9 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	const highlight = applyHighlight(shield.hitTick, shield, world, shield.strike);
 
 	let color = ColTuple.parse((shield.selfColor && shield.owner === world.ui.myHeroId) ? Visuals.MyHeroColor : shield.color);
+	if (shield.colorize && ctxStack.rtx > r.GraphicsLevel.Low) {
+		color.colorize(ColTuple.hsl(Math.random(), 1.0, 0.5), shield.colorize);
+	}
 	if (highlight && highlight.flash) {
 		color.lighten(highlight.flash);
 	}
@@ -2071,6 +2077,7 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, scale: numbe
 		vanish: 1,
 		light: saber.light ? 1 : null,
 		glow: saber.glow,
+		colorize: saber.colorize,
 		shine: saber.shine,
 		shadow: saber.shadow,
 		highlight: saber.uiHighlight,
@@ -2131,7 +2138,7 @@ export function heroColor(heroId: number, world: w.World) {
 }
 
 function rgColor(proportion: number): ColTuple {
-	return ColTuple.hsl(proportion * 120.0, 100, 50);
+	return ColTuple.hsl(proportion * (1 / 3), 1, 0.5);
 }
 
 function renderSwirl(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, swirl: RenderSwirl) {
@@ -2183,6 +2190,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 			initialTick: world.tick,
 			max: swirl.ticks, 
 			fillStyle,
+			colorize: swirl.colorize,
 			shine: swirl.shine !== undefined ? swirl.shine : DefaultShine,
 			glow: swirl.glow !== undefined ? swirl.glow : DefaultGlow,
 			vanish: swirl.vanish,
@@ -2238,6 +2246,10 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 	const pos = projectile.body.getPosition();
 
 	let color = ColTuple.parse(reticule.color);
+
+	if (reticule.colorize && ctxStack.rtx > r.GraphicsLevel.Low) {
+		color.colorize(ColTuple.hsl(Math.random(), 1.0, 0.5), reticule.colorize);
+	}
 
 	const shine = reticule.shine !== undefined ? reticule.shine : DefaultShine;
 	if (shine) {
@@ -2299,6 +2311,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				fillStyle: projectileColor(strike, projectile, world),
 				vanish: strike.particleVanish,
 				glow: strike.particleGlow !== undefined ? strike.particleGlow : DefaultGlow,
+				colorize: strike.particleColorize,
 				shine: strike.particleShine,
 				bloom: strike.particleBloom !== undefined ? strike.particleBloom : DefaultParticleBloomRadius,
 				light: strike.light,
@@ -2335,8 +2348,12 @@ function renderUnattachedLink(ctxStack: CanvasCtxStack, projectile: w.Projectile
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, world: w.World, render: RenderLink, highlight?: w.TrailHighlight) {
 	const Visuals = world.settings.Visuals;
 
-	let color = ColTuple.parse(target.category === "projectile" ? projectileColor(render, target, world) : render.color);
+	let color = ColTuple.parse(projectileColor(render, owner, world));
 	let scale = 1;
+
+	if (render.colorize && ctxStack.rtx > r.GraphicsLevel.Low) {
+		color.colorize(ColTuple.hsl(Math.random(), 1.0, 0.5), render.colorize);
+	}
 
 	if (highlight) {
 		const highlightProportion = calculateHighlightProportion(highlight, world);
@@ -2399,6 +2416,7 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				to: pos,
 				fillStyle: projectileColor(render, projectile, world),
 				light: render.light,
+				colorize: render.colorize,
 				shine: render.shine !== undefined ? render.shine : DefaultShine,
 				fade: render.fade,
 				vanish: render.vanish,
@@ -2433,6 +2451,7 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 			velocity,
 			fillStyle: projectileColor(render, projectile, world),
 			light: render.light,
+			colorize: render.colorize,
 			shine: render.shine !== undefined ? render.shine : DefaultShine,
 			fade: render.fade,
 			radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
@@ -2468,6 +2487,7 @@ function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		light: render.light,
 		fade: render.fade,
 		extent: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
+		colorize: render.colorize,
 		shine: render.shine !== undefined ? render.shine : DefaultShine,
 		glow: render.glow,
 		bloom: render.bloom,
@@ -2483,6 +2503,9 @@ function renderBloom(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: 
 	}
 
 	let color = ColTuple.parse(projectileColor(render, projectile, world));
+	if (render.colorize && ctxStack.rtx > r.GraphicsLevel.Low) {
+		color.colorize(ColTuple.hsl(Math.random(), 1.0, 0.5), render.colorize);
+	}
 	if (render.shine) {
 		color.lighten(render.shine);
 	}
@@ -2509,18 +2532,26 @@ function projectileRadiusMultiplier(projectile: w.Projectile, world: w.World, re
 	return multiplier;
 }
 
-function projectileColor(render: ProjectileColorParams, projectile: w.Projectile, world: w.World) {
+function projectileColor(render: ProjectileColorParams, obj: w.WorldObject, world: w.World): string {
 	const Visuals = world.settings.Visuals;
 
-	if (render.selfColor && projectile.owner === world.ui.myHeroId) {
+	if (render.selfColor && obj.owner === world.ui.myHeroId) {
 		return Visuals.MyHeroColor;
 	}
 
 	if (render.ownerColor) {
-		return heroColor(projectile.owner, world);
+		return heroColor(obj.owner, world);
 	}
 
-	return render.color || projectile.color;
+	if (render.color) {
+		return render.color;
+	}
+
+	if (obj.category === "projectile") {
+		return obj.color;
+	}
+
+	return "#0000";
 }
 
 function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
@@ -2541,6 +2572,14 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	applyLight(light, color);
 	const layer = light ? r.Layer.Trail : r.Layer.Solid;
 
+	if (trail.colorize > 0 && ctxStack.rtx > r.GraphicsLevel.Low) {
+		let target: ColTuple = trail.colorizeTarget;
+		if (!target) {
+			target = ColTuple.hsl(Math.random(), 1.0, 0.5);
+			trail.colorizeTarget = target;
+		}
+		color.colorize(target, trail.colorize);
+	}
 	if (trail.shine) {
 		let shine = trail.shine;
 		if (light) { shine *= light; }

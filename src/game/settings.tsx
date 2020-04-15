@@ -1325,6 +1325,7 @@ const whip: Spell = {
             {
                 type: "swirl",
                 color: '#fffcb1',
+                colorize: 0.25,
                 ticks: 30,
                 radius: 0.009,
                 particleRadius: 0.001,
@@ -1335,7 +1336,7 @@ const whip: Spell = {
                 glow: 0.05,
             },
             { type: "link", color: '#fffcb1', width: Pixel * 2.5, toWidth: Pixel * 5, glow: 0.3, light: true },
-            { type: "strike", ticks: 30, flash: true, numParticles: 7 },
+            { type: "strike", ticks: 30, flash: true, numParticles: 7, particleColorize: 0.25 },
         ],
     },
 };
@@ -1388,7 +1389,9 @@ const link: Spell = {
 
             render: {
                 type: "link",
+                ownerColor: true,
                 color: '#4444ff',
+                colorize: 0.3,
                 width: 1.5 * Pixel,
                 toWidth: 3 * Pixel,
                 "glow": 0.4,
@@ -1438,11 +1441,13 @@ const link: Spell = {
         sound: "link",
         color: '#4444ff',
         renderers: [
-            { type: "bloom", radius: 0.05 },
-            { type: "polygon", color: '#4444ff', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 23, ticks: 1, light: 1, shadow: 0.5 },
+            { type: "bloom", radius: 0.05, ownerColor: true },
+            { type: "polygon", ownerColor: true, color: '#4444ff', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 23, ticks: 1, light: 1, shadow: 0.5 },
             {
                 type: "link",
+                ownerColor: true,
                 color: '#4444ff',
+                colorize: 0.3,
                 width: 1.5 * Pixel,
                 toWidth: 3 * Pixel,
                 "glow": 0.4,
@@ -1507,6 +1512,7 @@ const grapple: Spell = {
             render: {
                 type: "link",
                 color: '#f06',
+                colorize: 0.3,
                 width: 1.5 * Pixel,
                 toWidth: 3 * Pixel,
                 "glow": 0.3,
@@ -1562,6 +1568,7 @@ const grapple: Spell = {
             {
                 type: "link",
                 color: '#f06',
+                colorize: 0.3,
                 width: 1.5 * Pixel,
                 toWidth: 3 * Pixel,
                 "glow": 0.3,
@@ -1735,6 +1742,7 @@ const renderGravity: RenderSwirl = {
     type: "swirl",
 
     color: '#0ace00cc',
+    colorize: 0.1,
     radius: 0.02,
     ticks: 0.25 * TicksPerSecond,
 
@@ -2189,7 +2197,7 @@ const mines: Spell = {
         color: '#ff009c',
         renderers: [
             { type: "bloom", selfColor: true, radius: 0.015, light: null },
-            { type: "projectile", ticks: 1, light: null, selfColor: true, shine: 0, glow: 0.3, shadow: 0.5, noPartialRadius: true },
+            { type: "projectile", ticks: 1, light: null, selfColor: true, colorize: 0.1, shine: 0, glow: 0.3, shadow: 0.5, noPartialRadius: true },
             { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true, noPartialRadius: true, maxTicks: 6 },
         ],
     },
@@ -2622,6 +2630,7 @@ const shield: Spell = {
     icon: "shieldReflect",
 
     color: '#3366ff',
+    colorize: 0.1,
 
     light: 1,
     glow: 0.3,
@@ -2705,6 +2714,7 @@ const phaseOut: Spell = {
             renderStart: {
                 numParticles: 10,
                 color: "#111",
+                colorize: 1,
                 ticks: 15,
                 particleRadius: Hero.Radius,
                 glow: 0.3,
@@ -2716,6 +2726,7 @@ const phaseOut: Spell = {
             renderFinish: {
                 numParticles: 10,
                 color: "#111",
+                colorize: 1,
                 ticks: 15,
                 particleRadius: Hero.Radius,
                 glow: 0.3,
@@ -2762,6 +2773,7 @@ const icewall: Spell = {
     icon: "woodenFence",
 
     color: '#0088ff',
+    colorize: 0.05,
 
     light: 1,
     glow: 0.3,

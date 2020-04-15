@@ -3,6 +3,7 @@ import pl from 'planck-js';
 import * as Immutable from 'immutable';
 import * as n from './networking.model';
 import * as shapes from './shapes';
+import ColTuple from './colorTuple';
 
 export namespace Actions {
 	export const Move = "move";
@@ -474,6 +475,7 @@ export interface ShieldBase extends WorldObjectBase {
 	light?: number;
 	glow?: number;
 	bloom?: number;
+	colorize?: number;
 	shine?: number;
 	shadow?: number;
 	strike?: RenderStrikeParams;
@@ -1225,6 +1227,9 @@ export interface TrailBase {
 
 	bloom?: number; // Bloom radius
 	glow?: number; // Bloom alpha
+
+	colorize?: number; // Shift towards this color to start with
+	colorizeTarget?: ColTuple;
 
 	highlight?: TrailHighlight;
 	tag?: number; // Normally based on the projectile id or hero id - used to make the projectile glow on hit
