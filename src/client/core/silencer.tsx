@@ -190,6 +190,7 @@ const bannedWords = [
     "pusssy",
     "pussy",
     "pussyy",
+    "puto",
     "rape",
     "raped",
     "raper",
