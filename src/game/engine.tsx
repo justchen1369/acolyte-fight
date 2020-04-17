@@ -2725,12 +2725,12 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 		if (obstacle.impulse > 0 && isBumpable(hit)) {
 			const Hero = world.settings.Hero;
 
-			const impulse = vector.diff(hit.body.getPosition(), obstacle.body.getPosition())
 			const typicalHeroMass = Hero.Density * Math.PI * Hero.Radius * Hero.Radius; // Scale the impulse to the mass so it always looks the same
-			const massNormalizer = hit.body.getMass() / typicalHeroMass;
+			const speedDelta = obstacle.impulse / typicalHeroMass;
 
-			impulse.mul(massNormalizer * obstacle.impulse / impulse.length());
-			applyImpulseDelta(hit, impulse);
+			const delta = vector.diff(hit.body.getPosition(), obstacle.body.getPosition())
+			delta.mul(speedDelta / delta.length());
+			applyVelocityDelta(hit, delta);
 
 			obstacle.activeTick = world.tick;
 		}
