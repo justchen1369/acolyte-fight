@@ -698,7 +698,7 @@ const meteorite: Spell = {
     icon: "fragmentedMeteor",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 6 * TicksPerSecond,
     throttle: true,
 
     projectile: {
