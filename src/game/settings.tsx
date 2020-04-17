@@ -691,7 +691,7 @@ const meteoriteProjectile: ProjectileTemplate = {
 };
 const meteorite: Spell = {
     id: 'meteorite',
-    description: "Send a little meteorite towards your enemies!",
+    description: "Send a little meteorite towards your enemies! Meteorite will split in two if it collides with any other projectiles.",
     action: "projectile",
 
     color: '#ff0066',
@@ -789,14 +789,14 @@ const kamehameha: Spell = {
 const lightning: Spell = {
     id: 'lightning',
     name: 'Repulsor',
-    description: "Huge knockback, if your aim is good enough.",
+    description: "Huge knockback, if your aim is good enough. Beware, the recoil from Repulsor knocks you back too.",
     action: "projectile",
 
     color: '#00ddff',
     icon: "lightningHelix",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 9 * TicksPerSecond,
     throttle: true,
     chargeTicks: 0.1 * TicksPerSecond,
     recoil: 0.5,
