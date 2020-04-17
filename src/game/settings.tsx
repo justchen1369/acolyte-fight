@@ -2402,7 +2402,7 @@ const horcrux: Spell = {
 const saber: Spell = {
     id: 'saber',
     name: 'Lightsaber',
-    description: "For 1 second, swing your lightsaber to deflect projectiles and knockback enemies!",
+    description: "For 1 second, swing your lightsaber to deflect projectiles and knockback enemies! Saber will only last 0.25 seconds after it hits the first enemy Acolyte.",
     effects: [
         {
             icon: "fas fa-unlink",
@@ -2456,6 +2456,7 @@ const saber: Spell = {
         ticks: 6,
         flash: true,
         bloom: 0.03,
+        growth: 0.15,
     },
 
     sound: "saber",
@@ -2465,7 +2466,7 @@ const saber: Spell = {
 const dualSaber: Spell = {
     id: 'dualSaber',
     name: 'Dualsaber',
-    description: "For 1.5 seconds, swing dual lightsabers to deflect projectiles and knockback enemies!",
+    description: "For 1.5 seconds, swing dual lightsabers to deflect projectiles and knockback enemies! Dualsaber is slightly shorter than Lightsaber but lasts longer. Dualsaber will only last 0.25 seconds after it hits the first enemy Acolyte.",
     effects: [
         {
             icon: "fas fa-unlink",
@@ -2519,6 +2520,7 @@ const dualSaber: Spell = {
         ticks: 6,
         flash: true,
         bloom: 0.03,
+        growth: 0.15,
     },
 
     sound: "saber",
