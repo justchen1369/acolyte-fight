@@ -2198,7 +2198,7 @@ const mines: Spell = {
         sound: "mines",
         color: '#ff009c',
         renderers: [
-            { type: "projectile", ticks: 1, light: 1, selfColor: true, colorize: 0.1, bloom: 0.015, shine: 0, glow: 0.3, shadow: 0.5, noPartialRadius: true },
+            { type: "projectile", ticks: 1, light: 1, selfColor: true, colorize: 0.1, bloom: 0.01, shine: 0, glow: 0.4, shadow: 0.3, noPartialRadius: true },
             { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true, noPartialRadius: true, maxTicks: 6 },
         ],
     },
