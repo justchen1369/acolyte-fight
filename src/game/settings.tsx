@@ -753,6 +753,7 @@ const kamehameha: Spell = {
 
     strikeCancel: {
         cooldownTicks: 5 * TicksPerSecond,
+        against: Alliances.All ^ Alliances.Self,
     },
     interruptibleAfterTicks: 0,
     interruptCancel: {
