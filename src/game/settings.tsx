@@ -2413,6 +2413,7 @@ const saber: Spell = {
     untargeted: true,
 
     unlink: true,
+    delink: true,
     takesOwnership: true,
     blocksTeleporters: false,
     shiftMultiplier: 0.5,
@@ -2441,9 +2442,6 @@ const saber: Spell = {
     collidesWith: Categories.Hero | Categories.Projectile,
 
     damageTemplate: { damage: 0 },
-    hitBuffs: [
-        { type: "delink" },
-    ],
 
     trailTicks: 5,
     color: '#00ccff',
@@ -2477,6 +2475,7 @@ const dualSaber: Spell = {
     untargeted: true,
 
     unlink: true,
+    delink: true,
     takesOwnership: true,
     blocksTeleporters: false,
     shiftMultiplier: 0.5,
@@ -2505,9 +2504,6 @@ const dualSaber: Spell = {
     collidesWith: Categories.Hero | Categories.Projectile,
 
     damageTemplate: { damage: 0 },
-    hitBuffs: [
-        { type: "delink" },
-    ],
 
     trailTicks: 5,
     color: '#ff0044',

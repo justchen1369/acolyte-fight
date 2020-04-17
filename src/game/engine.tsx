@@ -615,6 +615,7 @@ function addHero(world: w.World, heroId: number) {
 		shieldIds: new Set(),
 		horcruxIds: new Set(),
 		focusIds: new Map(),
+		linkedByIds: new Set(),
 		buffs: new Map(),
 		uiHealth: Hero.MaxHealth,
 		uiDestroyedBuffs: [],
@@ -3207,6 +3208,17 @@ function isHeroShielded(hero: w.Hero, world: w.World) {
 	return isShielded;
 }
 
+function queryLinks(hero: w.Hero, world: w.World, callback: (owner: w.Hero) => void) {
+	hero.linkedByIds.forEach(ownerId => {
+		const owner = world.objects.get(ownerId);
+		if (owner && owner.category === "hero" && owner.link && owner.link.targetId === hero.id) {
+			callback(owner);
+		} else {
+			hero.linkedByIds.delete(ownerId);
+		}
+	});
+}
+
 export function isHeroInvisible(hero: w.Hero): w.VanishBuff {
 	if (hero.invisible && hero.invisible.destroyedTick) {
 		hero.invisible = null;
@@ -3468,6 +3480,10 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		render: link.render,
 	};
 	world.behaviours.push({ type: "linkForce", heroId: owner.id });
+
+	if (target.category === "hero") {
+		target.linkedByIds.add(owner.id);
+	}
 
 	return true;
 }
@@ -4904,6 +4920,7 @@ function saberAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sabe
 				shieldId: saber.id,
 				hitInterval: 1,
 				hitTickLookup: new Map(),
+				delink: spell.delink,
 			});
 			sabers.push(saber);
 		});
@@ -5005,6 +5022,17 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 
 		hit = true;
 	});
+
+	if (behaviour.delink) {
+		queryLinks(hero, world, linker => {
+			const linkAngle = vector.angleDiff(linker.body.getPosition(), hero.body.getPosition());
+			const linkAngleDelta = vector.angleDelta(previousAngle, linkAngle);
+			if (Math.sign(linkAngleDelta) === Math.sign(saberAngleDelta) && Math.abs(linkAngleDelta) <= Math.abs(saberAngleDelta)) {
+				// Cut through any links
+				linker.link.expireTick = world.tick;
+			}
+		});
+	}
 
 	if (hit) {
 		saber.hitTick = world.tick;

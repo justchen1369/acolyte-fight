@@ -1115,6 +1115,7 @@ declare interface SaberSpell extends ShieldSpell {
 	damageTemplate?: DamagePacketTemplate; // Damage to apply to anyone we hit
 	hitInterval?: number; // If saber hits multiple times, only apply damage/buffs at this interval
 	hitBuffs?: BuffTemplate[]; // Buffs to apply to whoever we hit
+	delink?: boolean; // Cut through any links that other acolytes have attached to me
 
 	colorize?: number;
 	shine?: number;

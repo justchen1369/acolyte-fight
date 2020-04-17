@@ -420,6 +420,7 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	shieldIds: Set<number>; // Will keep pointing at shield after it is gone
 	horcruxIds: Set<number>; // Will keep pointing at projectiles after they are gone
 	focusIds: Map<string, number>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
+	linkedByIds: Set<number>; // Will keep pointing after links gone
 
 	link?: LinkState;
 	thrust?: ThrustState;
@@ -1063,6 +1064,7 @@ export interface ThrustDecayBehaviour extends BehaviourBase {
 export interface SaberBehaviour extends BehaviourBase, HitSource {
 	type: "saberSwing";
 	shieldId: number;
+	delink?: boolean;
 }
 
 export interface BurnBehaviour extends BehaviourBase {
