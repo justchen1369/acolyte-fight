@@ -2619,7 +2619,7 @@ const shield: Spell = {
     damageMultiplier: 1,
 
     ropeLength: 3 * Hero.MoveSpeedPerSecond / TicksPerSecond, // Enough so the acolyte can gain a 3x speed boost and not be pulled back
-    angularDamping: 5,
+    angularDamping: 3,
 
     buffs: [
         {
