@@ -1,5 +1,12 @@
 declare module "planck-js" {
     namespace PlanckJs {
+        enum LIMIT_STATE {
+            INACTIVE_LIMIT,
+            AT_LOWER_LIMIT,
+            AT_UPPER_LIMIT,
+            EQUAL_LIMITS,
+        }
+
         interface WorldDef {
             gravity?: Vec2;
             allowSleep?: boolean;
@@ -14,6 +21,9 @@ declare module "planck-js" {
         interface World {
             createBody(bodyDef: BodyDef): Body;
             destroyBody(body: Body): void;
+
+            createJoint<T extends Joint>(joint: T): T | null;
+            destroyJoint(joint: Joint): void;
 
             rayCast(from: Vec2, to: Vec2, callback: RayCastCallback): void;
             queryAABB(aabb: AABB, queryCallback: (fixture: Fixture) => boolean): void;
@@ -229,6 +239,144 @@ declare module "planck-js" {
             areEqual(a: AABB, b: AABB): boolean;
             diff(a: AABB, b: AABB): number;
         };
+
+        interface JointEdge {
+            other: Body;  // < provides quick access to the other body attached.
+            joint: Joint;  // < the joint
+            prev: JointEdge | null;  // < the previous joint edge in the body's joint list
+            next: JointEdge | null;  // < the next joint edge in the body's joint list
+        }
+
+        interface Joint {
+            m_type: string;
+            m_bodyA: Body;
+            m_bodyB: Body;
+            m_index: number;
+            m_collideConnected: boolean;
+            m_prev: Joint | null;
+            m_next: Joint | null;
+            m_edgeA: JointEdge;
+            m_edgeB: JointEdge;
+            m_islandFlag: boolean;
+            m_userData: unknown;
+
+            isActive(): boolean;
+            getType(): string;
+            getBodyA(): Body;
+            getBodyB(): Body;
+            getNext(): Joint | null;
+            getUserData(): unknown;
+            setUserData(data: any): void;
+            getCollideConnected(): boolean;
+            getAnchorA(): Vec2;
+            getAnchorB(): Vec2;
+            getReactionForce(inv_dt: number): Vec2;
+            getReactionTorque(inv_dt: number): number;
+            shiftOrigin(newOrigin: Vec2): void;
+            initVelocityConstraints(step: any): void;
+            solveVelocityConstraints(step: any): void;
+            solvePositionConstraints(step: any): boolean;
+        }
+
+        interface DistanceJoint extends Joint {
+            m_type: 'distance-joint';
+
+            // Solver shared
+            m_localAnchorA: Vec2;
+            m_localAnchorB: Vec2;
+            m_length: Vec2;
+            m_frequencyHz: number;
+            m_dampingRatio: number;
+            m_impulse: number;
+            m_gamma: number;
+            m_bias: number;
+
+            getLocalAnchorA(): Vec2;
+            getLocalAnchorB(): Vec2;
+            setLength(length: number): void;
+            getLength(): number;
+            setFrequency(hz: number): void;
+            getFrequency(): number;
+            setDampingRatio(ratio: number): void;
+            getDampingRatio(): number;
+        }
+
+        type JointOpt = Partial<{
+            userData: any,
+            collideConnected: boolean,
+        }>;
+        type JointDef = JointOpt & {
+            bodyA: Body,
+            bodyB: Body,
+        };
+
+        type DistanceJointOpt = JointOpt & Partial<{
+            frequencyHz: number,
+            dampingRatio: number,
+            length: number,
+        }>;
+        type DistanceJointDef = JointDef & DistanceJointOpt & {
+            localAnchorA: Vec2,
+            localAnchorB: Vec2,
+        };
+
+        let DistanceJoint: {
+            new(def: DistanceJointDef): DistanceJoint;
+                (def: DistanceJointDef): DistanceJoint;
+
+            TYPE: 'distance-joint';
+        };
+
+        interface RopeJoint extends Joint {
+            m_type: 'rope-joint';
+
+            m_localAnchorA: Vec2;
+            m_localAnchorB: Vec2;
+            m_maxLength: number;
+            m_mass: number;
+            m_impulse: number;
+            m_length: number;
+            m_state: LIMIT_STATE;
+
+            // Solver temp
+            // m_u; // Vec2
+            // m_rA; // Vec2
+            // m_rB; // Vec2
+            // m_localCenterA; // Vec2
+            // m_localCenterB; // Vec2
+            // m_invMassA; // float
+            // m_invMassB; // float
+            // m_invIA; // float
+            // m_invIB; // float
+            // m_mass; // float
+
+            getLocalAnchorA(): Vec2;
+            getLocalAnchorB(): Vec2;
+            setMaxLength(length: number): void;
+            getMaxLength(): number;
+            getLimitState(): LIMIT_STATE;
+        }
+
+        type RopeJointOpt = JointOpt & Partial<{
+            maxLength: number,
+        }>;
+        type RopeJointDef = JointDef & RopeJointOpt & {
+            localAnchorA: Vec2,
+            localAnchorB: Vec2,
+        };
+
+        let RopeJoint: {
+            new(def: RopeJointDef): RopeJoint;
+            (def: RopeJointDef): RopeJoint;
+
+            new(def: RopeJointOpt, bodyA: Body, bodyB: Body, anchor: Vec2): RopeJoint;
+            (def: RopeJointOpt, bodyA: Body, bodyB: Body, anchor: Vec2): RopeJoint;
+
+            TYPE: 'rope-joint';
+        };
+
+
+
     }
 
     export = PlanckJs;

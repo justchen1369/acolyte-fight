@@ -2604,7 +2604,7 @@ const shield: Spell = {
     name: 'Reflect',
     description: "Reflect away projectile attacks. Ineffective against area-of-effect spells.",
 
-    maxTicks: 1.5 * TicksPerSecond,
+    maxTicks: 2.0 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     categories: Categories.Shield | Categories.Obstacle,
     throttle: false,
@@ -2618,12 +2618,15 @@ const shield: Spell = {
     blocksTeleporters: false,
     damageMultiplier: 1,
 
+    ropeLength: 3 * Hero.MoveSpeedPerSecond / TicksPerSecond, // Enough so the acolyte can gain a 3x speed boost and not be pulled back
+    angularDamping: 1,
+
     buffs: [
         {
             type: "movement",
             maxTicks: 1.5 * TicksPerSecond,
-            movementProportion: 0.25,
-            channelling: true,
+            movementProportion: 0.5,
+            channelling: false,
             decay: true,
         },
     ],

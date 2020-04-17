@@ -329,8 +329,10 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 
 	const body = world.physics.createBody({
 		userData: shieldId,
-		type: 'static',
+		type: spell.ropeLength > 0 ? 'dynamic' : 'static',
 		position: vector.clone(hero.body.getPosition()),
+		linearDamping: hero.linearDamping,
+		angularDamping: spell.angularDamping || world.settings.Hero.AngularDamping,
 	});
 
 	let points: pl.Vec2[] = null;
@@ -347,6 +349,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 
 	let shape: pl.Shape = points ? pl.Polygon(points) : pl.Circle(spell.radius);
 	body.createFixture(shape, {
+		density: spell.density || world.settings.Hero.Density,
 		filterCategoryBits: spell.categories !== undefined ? spell.categories : Categories.Shield, // Might collide like something else
 		filterMaskBits: Categories.Hero | Categories.Projectile,
 		filterGroupIndex: hero.filterGroupIndex,
@@ -388,6 +391,18 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 	if (revs >= 1) {
 		// Only consider a shield if fully enclosed
 		hero.shieldIds.add(shield.id);
+	}
+
+	if (spell.ropeLength > 0) {
+		const joint = new pl.RopeJoint({
+			bodyA: hero.body,
+			bodyB: shield.body,
+			collideConnected: false,
+			localAnchorA: pl.Vec2.zero(),
+			localAnchorB: pl.Vec2.zero(),
+			maxLength: spell.ropeLength,
+		});
+		world.physics.createJoint(joint);
 	}
 
 	return shield;

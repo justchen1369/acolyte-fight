@@ -1059,6 +1059,10 @@ declare interface ReflectSpell extends ShieldSpell {
 	numPoints?: number;
 	maxTurnRatePerTickInRevs?: number;
 
+	angularDamping?: number;
+	density?: number;
+	ropeLength?: number; // If set, knockback that is applied to the shield will apply to the acolyte, but only if it knocks back the acolyte by at least this much
+
 	strike?: RenderStrikeParams;
 }
 
