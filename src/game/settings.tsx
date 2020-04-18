@@ -600,7 +600,7 @@ const firespray: Spell = {
 
     projectile: {
         density: 1,
-        ccd: false,
+        ccd: true,
         collideWith: Categories.All,
         expireOn: Categories.All ^ Categories.Shield,
         radius: 0.002,
