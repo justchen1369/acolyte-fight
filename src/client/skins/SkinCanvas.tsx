@@ -8,6 +8,9 @@ import * as StoreProvider from '../storeProvider';
 
 interface Props {
     skin: h.Skin;
+    bodyIndex?: number; // Only render the body at this index
+    glyphIndex?: number; // Only render the glyph at this index
+    glyphOnly?: boolean;
 
     width: number;
     height: number;
@@ -67,20 +70,48 @@ export class SkinCanvas extends React.PureComponent<Props, State> {
 
             const width = this.elem.width;
             const height = this.elem.height;
+
             const center = pl.Vec2(width / 2.0, height / 2.0);
             const radius = Math.min(width, height) / 2.0 / constants.Rendering.HeroAtlasSizeMultiplier;
 
             const config: h.RenderSkinParams = {
-                bodyFill: '#0cf',
+                bodyFill: this.props.glyphOnly ? null : '#0cf',
                 glyphFill: '#fff8',
 
                 outlineProportion: Visuals.HeroOutlineProportion,
-                outlineFill: Visuals.HeroOutlineColor,
+                outlineFill: this.props.glyphOnly ? null : Visuals.HeroOutlineColor,
             };
 
-            characters.render(ctx, center, radius, this.props.skin, config);
+            ctx.clearRect(0, 0, width, height);
+            ctx.translate(center.x, center.y);
+            ctx.rotate(-Math.PI / 2); // Display acolyte facing upwards
+            const skin = this.filterSkin(this.props.skin, this.props.bodyIndex, this.props.glyphIndex);
+            characters.render(ctx, pl.Vec2.zero(), radius, skin, config);
 
             ctx.restore();
+        }
+    }
+
+    private filterSkin(skin: h.Skin, bodyIndex?: number, glyphIndex?: number): h.Skin {
+        if (typeof bodyIndex === 'number') {
+            const layers =
+                skin.layers
+                .filter((layer, i) => i === bodyIndex)
+                .map(layer => this.filterGlyph(layer, glyphIndex));
+            return { ...skin, layers };
+        } else {
+            return skin;
+        }
+    }
+
+    private filterGlyph(layer: h.Layer, glyphIndex?: number): h.Layer {
+        if (typeof glyphIndex === 'number') {
+            return {
+                ...layer,
+                glyphs: layer.glyphs.filter((glyph, i) => i === glyphIndex),
+            };
+        } else {
+            return layer;
         }
     }
 }
