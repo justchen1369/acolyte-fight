@@ -403,5 +403,5 @@ export interface AtlasHeroInstruction extends AtlasInstructionBase {
 	type: "hero";
 	skin: h.Skin;
 	radius: number;
-	config: h.RenderSkinParams;
+	render: h.RenderSkinParams;
 }

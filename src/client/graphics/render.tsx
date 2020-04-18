@@ -1651,7 +1651,7 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 		skin,
 		height: atlasPixels,
 		width: atlasPixels,
-		config: {
+		render: {
 			outlineProportion: Visuals.HeroOutlineProportion,
 		},
 	};
@@ -1660,12 +1660,12 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 		{
 			...template,
 			id: heroBodyTextureId(heroId),
-			config: { ...template.config, bodyFill: '#fff', outlineFill: Visuals.HeroOutlineColor },
+			render: { ...template.render, bodyFill: '#fff', outlineFill: Visuals.HeroOutlineColor },
 		},
 		{
 			...template,
 			id: heroGlyphTextureId(heroId),
-			config: { ...template.config, glyphFill: '#fff' },
+			render: { ...template.render, glyphFill: '#fff' },
 		},
 	];
 }

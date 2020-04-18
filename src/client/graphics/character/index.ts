@@ -4,16 +4,16 @@ import * as pl from 'planck-js';
 import * as h from '../../../game/character.model';
 import * as vector from '../../../game/vector';
 
-export function render(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: number, skin: h.Skin, config: h.RenderSkinParams) {
+export function render(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: number, skin: h.Skin, render: h.RenderSkinParams) {
     ctx.save();
     ctx.translate(pos.x, pos.y);
     ctx.scale(radius, radius);
 
     // Stroke
-    if (config.outlineFill) {
-        ctx.lineWidth = config.outlineProportion || 0;
-        ctx.strokeStyle = config.outlineFill;
-        ctx.fillStyle = config.outlineFill;
+    if (render.outlineFill) {
+        ctx.lineWidth = render.outlineProportion || 0;
+        ctx.strokeStyle = render.outlineFill;
+        ctx.fillStyle = render.outlineFill;
         for (const layer of skin.layers) {
             ctx.save();
 
@@ -33,8 +33,8 @@ export function render(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: numb
         ctx.save();
 
         // Body
-        if (config.bodyFill) {
-            ctx.fillStyle = config.bodyFill;
+        if (render.bodyFill) {
+            ctx.fillStyle = render.bodyFill;
         } else {
             ctx.fillStyle = 'transparent';
             ctx.globalCompositeOperation = 'destination-out';
@@ -49,8 +49,8 @@ export function render(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: numb
         ctx.globalCompositeOperation = 'source-over';
 
         // Glyphs
-        if (config.glyphFill) {
-            ctx.fillStyle = config.glyphFill;
+        if (render.glyphFill) {
+            ctx.fillStyle = render.glyphFill;
 
             for (const glyph of layer.glyphs) {
                 ctx.save();
