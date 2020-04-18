@@ -136,16 +136,8 @@ function renderIcon(ctxStack: CanvasCtxStack, instruction: r.AtlasIconInstructio
 
 function renderHero(ctxStack: CanvasCtxStack, instruction: r.AtlasHeroInstruction) {
 	const ctx = ctxStack.atlas;
-
     const center = pl.Vec2(instruction.width / 2, instruction.height / 2);
-
-    if (instruction.body) {
-        character.renderBodies(ctx, center, instruction.radius, instruction.skin, instruction.config);
-    }
-    if (instruction.glyph) {
-        character.renderGlyphs(ctx, center, instruction.radius, instruction.skin, instruction.config);
-    }
-
+    character.render(ctx, center, instruction.radius, instruction.skin, instruction.config);
     return instruction;
 }
 

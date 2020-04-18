@@ -1,6 +1,8 @@
-export interface CharacterConfig {
-    strokeWidth: number;
-    strokeStyle: string;
+export interface RenderSkinParams {
+    bodyFill?: string;
+    glyphFill?: string;
+    outlineFill?: string;
+    outlineProportion?: number;
 }
 
 export interface Skin {

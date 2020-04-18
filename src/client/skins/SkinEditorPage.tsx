@@ -2,13 +2,14 @@ import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as constants from '../../game/constants';
-import * as h from '../graphics/character/character.model';
-import * as m from '../../shared/messages.model';
+import * as h from '../../game/character.model';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
-import * as url from '../url';
+import * as skinLibrary from '../../game/skinLibrary';
+import SkinCanvas from './SkinCanvas';
 
 interface Props {
+    settings: AcolyteFightSettings;
 }
 
 interface State {
@@ -16,6 +17,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        settings: state.room.settings,
     };
 }
 
@@ -27,7 +29,15 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <div></div>
+        const skin = skinLibrary.defaultSkin;
+        return <div>
+            <SkinCanvas
+                width={300}
+                height={250}
+                skin={skin}
+                settings={this.props.settings}
+                />
+        </div>
     }
 }
 

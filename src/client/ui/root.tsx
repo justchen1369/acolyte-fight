@@ -90,6 +90,7 @@ class Root extends React.PureComponent<Props> {
                 {page === "about" && this.renderAbout()}
                 {page === "profile" && this.renderProfile()}
                 {page === "settings" && this.renderSettings()}
+                {page === "skin-editor" && this.renderSkinEditor()}
                 {page === "statistics" && this.renderStatistics()}
                 {page === "watch" && this.renderWatch()}
                 {page === "privacy" && this.renderPrivacy()}
@@ -207,6 +208,16 @@ class Root extends React.PureComponent<Props> {
             <NavBar />
             <div className="page">
                 <SettingsPanel />
+            </div>
+        </div>;
+    }
+
+    private renderSkinEditor() {
+        return <div className="content-container">
+            <TitleListener subtitle="Skin Editor" />
+            <NavBar />
+            <div className="page">
+                <SkinEditorPage />
             </div>
         </div>;
     }

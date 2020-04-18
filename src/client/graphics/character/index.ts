@@ -1,62 +1,44 @@
 import _ from 'lodash';
 import Color from 'color';
 import * as pl from 'planck-js';
-import * as h from './character.model';
+import * as h from '../../../game/character.model';
 import * as vector from '../../../game/vector';
 
-export function renderBodies(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: number, skin: h.Skin, config: h.CharacterConfig) {
+export function render(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: number, skin: h.Skin, config: h.RenderSkinParams) {
     ctx.save();
     ctx.translate(pos.x, pos.y);
     ctx.scale(radius, radius);
-
-    ctx.lineWidth = config.strokeWidth;
-    ctx.strokeStyle = config.strokeStyle;
-    ctx.fillStyle = config.strokeStyle;
 
     // Stroke
-    for (const layer of skin.layers) {
-        ctx.save();
+    if (config.outlineFill) {
+        ctx.lineWidth = config.outlineProportion || 0;
+        ctx.strokeStyle = config.outlineFill;
+        ctx.fillStyle = config.outlineFill;
+        for (const layer of skin.layers) {
+            ctx.save();
 
-        applyTransform(ctx, layer.body.transform);
+            applyTransform(ctx, layer.body.transform);
 
-        ctx.beginPath();
-        applyShape(ctx, layer.body.shape);
-        ctx.fill();
-        ctx.stroke();
+            ctx.beginPath();
+            applyShape(ctx, layer.body.shape);
+            ctx.fill();
+            ctx.stroke();
 
-        ctx.restore();
+            ctx.restore();
+        }
     }
-
-    // Fill
-    for (const layer of skin.layers) {
-        ctx.save();
-
-        ctx.fillStyle = '#fff'; // parseColor(layer.body.color);
-        applyTransform(ctx, layer.body.transform);
-
-        ctx.beginPath();
-        applyShape(ctx, layer.body.shape);
-        ctx.fill();
-
-        ctx.restore();
-    }
-
-    ctx.restore();
-}
-
-export function renderGlyphs(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: number, skin: h.Skin, config: h.CharacterConfig) {
-    ctx.save();
-    ctx.translate(pos.x, pos.y);
-    ctx.scale(radius, radius);
 
     // Fill
     for (const layer of skin.layers) {
         ctx.save();
 
         // Body
-        // Use 'destination-out' to blank out anything underneath, so the bodies still cover glyphs even though we are not drawing the bodies
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.fillStyle = 'transparent';
+        if (config.bodyFill) {
+            ctx.fillStyle = config.bodyFill;
+        } else {
+            ctx.fillStyle = 'transparent';
+            ctx.globalCompositeOperation = 'destination-out';
+        }
         applyTransform(ctx, layer.body.transform);
 
         ctx.beginPath();
@@ -64,29 +46,29 @@ export function renderGlyphs(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius
         ctx.fill();
         ctx.clip();
 
-        // Glyphs
         ctx.globalCompositeOperation = 'source-over';
-        for (const glyph of layer.glyphs) {
-            ctx.save();
 
-            ctx.fillStyle = '#fff';
-            applyTransform(ctx, glyph.transform);
+        // Glyphs
+        if (config.glyphFill) {
+            ctx.fillStyle = config.glyphFill;
 
-            ctx.beginPath();
-            applyShape(ctx, glyph.shape);
-            ctx.fill();
+            for (const glyph of layer.glyphs) {
+                ctx.save();
 
-            ctx.restore();
+                applyTransform(ctx, glyph.transform);
+
+                ctx.beginPath();
+                applyShape(ctx, glyph.shape);
+                ctx.fill();
+
+                ctx.restore();
+            }
         }
 
         ctx.restore();
     }
-    
-    ctx.restore();
-}
 
-function parseColor(layerColor: h.LayerColor): string {
-    return Color.hsl(layerColor.h, layerColor.s, layerColor.l).string();
+    ctx.restore();
 }
 
 function applyTransform(ctx: CanvasRenderingContext2D, transform?: h.Transform) {

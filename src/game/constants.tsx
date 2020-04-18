@@ -41,6 +41,10 @@ export namespace GraphicsLevel {
 	export const Minimum = 0.5;
 }
 
+export namespace Rendering {
+	export const HeroAtlasSizeMultiplier = 2; // Draw larger than the hero to ensure the edges are not cut off
+}
+
 export namespace Matchmaking {
 	export const MaxHistoryLength = 15 * 60 * TicksPerSecond;
 	export const WaitForMorePeriod = 10 * TicksPerSecond;

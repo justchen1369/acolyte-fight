@@ -8,6 +8,7 @@ import * as glx from './glx';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as icons from '../core/icons';
 import * as shapes from '../../game/shapes';
+import * as skinLibrary from '../../game/skinLibrary';
 import * as r from './render.model';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
@@ -18,8 +19,6 @@ import ColTuple from '../../game/colorTuple';
 import { renderIconOnly } from './renderIcon';
 
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
-
-const HeroAtlasSizeMultiplier = 2; // Draw larger than the hero to ensure the edges are not cut off
 
 const VectorZero = pl.Vec2(0, 0);
 const MapCenter = pl.Vec2(0.5, 0.5);
@@ -1601,7 +1600,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	*/
 
 	// Dimensions
-	const drawRadius = HeroAtlasSizeMultiplier * radius;
+	const drawRadius = constants.Rendering.HeroAtlasSizeMultiplier * radius;
 
 	// Body
 	const bodyTexRect: ClientRect = atlas.lookup(ctxStack, r.Texture.Images, heroBodyTextureId(hero.id));
@@ -1636,36 +1635,14 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world: w.World): r.AtlasHeroInstruction[] {
 	const Hero = world.settings.Hero;
 	const Visuals = world.settings.Visuals;
+	const HeroAtlasSizeMultiplier = constants.Rendering.HeroAtlasSizeMultiplier
 
 	const heroId = player.heroId;
 	const atlasSizeMultiplier = 2 * HeroAtlasSizeMultiplier; // 2x because need to fit diameter in the atlas not the radius
 	const atlasPixels = Math.ceil(2 * HeroAtlasSizeMultiplier * Hero.Radius / ctxStack.subpixel);
 	const radiusPixels = atlasPixels / atlasSizeMultiplier;
 
-	const skin: r.Skin = {
-		layers: [
-			{
-				body: {
-					shape: { type: "circle" },
-				},
-				glyphs: [
-					{
-						shape: {
-							type: "triangle",
-							peakSpan: 0,
-							indentSpan: 1 / 3.0,
-							indentRise: 4 / 3.0,
-						},
-						transform: {
-							height: 0.75,
-							width: 3,
-							rise: -0.25,
-						},
-					},
-				],
-			},
-		],
-	};
+	const skin: r.Skin = skinLibrary.defaultSkin;
 
 	const template: r.AtlasHeroInstruction = {
 		id: null,
@@ -1674,16 +1651,22 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 		skin,
 		height: atlasPixels,
 		width: atlasPixels,
-	};
-
-	const config: r.CharacterConfig = {
-		strokeStyle: Visuals.HeroOutlineColor,
-		strokeWidth: Visuals.HeroOutlineProportion,
+		config: {
+			outlineProportion: Visuals.HeroOutlineProportion,
+		},
 	};
 
 	return [
-		{...template, id: heroBodyTextureId(heroId), body: true, config },
-		{...template, id: heroGlyphTextureId(heroId), glyph: true, config },
+		{
+			...template,
+			id: heroBodyTextureId(heroId),
+			config: { ...template.config, bodyFill: '#fff', outlineFill: Visuals.HeroOutlineColor },
+		},
+		{
+			...template,
+			id: heroGlyphTextureId(heroId),
+			config: { ...template.config, glyphFill: '#fff' },
+		},
 	];
 }
 

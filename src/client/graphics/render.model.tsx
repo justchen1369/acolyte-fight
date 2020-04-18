@@ -1,12 +1,12 @@
 import * as pl from 'planck-js';
-import * as h from './character/character.model';
+import * as h from '../../game/character.model';
 import { Float32List } from './list';
 import ColTuple from '../../game/colorTuple';
 import { GraphicsLevel } from '../../game/constants';
 import { AudioElement } from '../audio/audio.model';
 
 export { AudioElement } from '../audio/audio.model';
-export * from './character/character.model';
+export * from '../../game/character.model';
 export { GraphicsLevel } from '../../game/constants';
 
 export enum Texture {
@@ -403,8 +403,5 @@ export interface AtlasHeroInstruction extends AtlasInstructionBase {
 	type: "hero";
 	skin: h.Skin;
 	radius: number;
-
-	body?: boolean;
-	glyph?: boolean;
-	config?: h.CharacterConfig;
+	config: h.RenderSkinParams;
 }
