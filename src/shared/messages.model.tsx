@@ -383,6 +383,7 @@ export interface AcoChangeMsg {
     otherTeamId?: string;
     delta: number;
     e?: number; // win probability
+    deflate?: number; // decay points remaining
 }
 
 

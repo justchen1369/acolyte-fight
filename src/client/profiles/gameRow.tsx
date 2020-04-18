@@ -122,7 +122,9 @@ class GameRow extends React.PureComponent<Props, State> {
             return <div key={key} className="adjustment-detail">
                 <div className="adjustment-label">
                     <div className="adjustment-label-title">Activity bonus</div>
-                    <div className="adjustment-label-subtitle">Up to +{constants.Placements.AcoDeflatePerDay} per day, if on leaderboard</div>
+                    {change.deflate > constants.Placements.AcoDeflatePerDay
+                    ? <div className="adjustment-label-subtitle">Up to +{change.deflate} bonus points remaining</div>
+                    : <div className="adjustment-label-subtitle">Up to +{constants.Placements.AcoDeflatePerDay} per day, if on leaderboard</div>}
                 </div>
                 <div className="spacer" />
                 {this.renderRatingDelta(change.delta)}

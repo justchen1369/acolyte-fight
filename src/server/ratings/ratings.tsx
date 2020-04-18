@@ -247,7 +247,7 @@ function applyRanked(playerDelta: acoUpdater.PlayerDelta, initialRating: g.UserR
         const inflate = Math.min(selfRating.acoDeflate, constants.Placements.AcoInflatePerGame);
         selfRating.acoDeflate -= inflate;
 
-        changes.push({ delta: inflate });
+        changes.push({ delta: inflate, deflate: selfRating.acoDeflate });
     }
 
     ++selfRating.acoGames;
