@@ -19,6 +19,7 @@ import ProfilePanel from '../profiles/profilePanel';
 import RecordPanel from '../play/recordPanel';
 import SettingsPanel from './settingsPanel';
 import SpellFrequenciesPanel from './spellFrequenciesPanel';
+import SkinEditorPage from '../skins/SkinEditorPage';
 import TitleListener from '../controls/titleListener';
 import NavBar from '../nav/navbar';
 import RegionsPanel from './regionsPanel';
