@@ -74,6 +74,7 @@ class HomePanel extends React.PureComponent<Props, State> {
                 <div className="secondary-button-row button-row">
                     <Button onClick={() => this.scrollBelowFold()}>Choose Spells</Button>
                 </div>
+
                 <div style={{ flexGrow: 0.1 }} />
                 {!a.noPartyLink && <PartyList />}
                 <div className="spacer" />

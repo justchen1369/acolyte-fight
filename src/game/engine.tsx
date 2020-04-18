@@ -23,6 +23,11 @@ const vectorCenter = pl.Vec2(0.5, 0.5);
 
 const DefaultAttractable: AttractableParameters = {};
 
+const DefaultStrikeCollider: ColliderDefaults = {
+	against: Alliances.All ^ Alliances.Self,
+	detonate: true,
+};
+
 interface BuffContext {
 	fromHeroId?: number;
 	spellId?: string; // If the buff is channelling or passive, only keep active as long as this spell continues to be channelled/passive
@@ -47,6 +52,11 @@ interface DetonateConfig {
 	color?: string;
 	defaultSound?: string;
 	buffDurationMultiplier?: number;
+}
+
+interface ColliderDefaults {
+	against?: number;
+	detonate?: boolean;
 }
 
 interface CollisionConfig {
@@ -1019,16 +1029,16 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 	});
 }
 
-function instantiateCollider(template: ColliderTemplate): w.Collider {
+function instantiateCollider(template: ColliderTemplate, defaults?: ColliderDefaults): w.Collider {
 	return {
 		collideWith: template.collideWith || Categories.All,
-		against: template.against !== undefined ? template.against : Alliances.All,
+		against: template.against ?? defaults?.against ?? Alliances.All,
 		afterTicks: template.afterTicks || 0,
 		collideTypes: template.collideTypes,
 		notCollideTypes: template.notCollideTypes,
 		notMirror: template.notMirror,
 		notLinked: template.notLinked,
-		detonate: template.detonate !== undefined ? template.detonate : true,
+		detonate: template.detonate ?? defaults?.detonate ?? false,
 	};
 }
 
@@ -2340,7 +2350,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		if (spell.strikeCancel) {
 			const strikeToken: w.CollideToken = { collideTick: null };
 
-			const collider = instantiateCollider(spell.strikeCancel);
+			const collider = instantiateCollider(spell.strikeCancel, DefaultStrikeCollider);
 			collider.token = strikeToken;
 			hero.casting.strikeCancelToken = strikeToken;
 
@@ -4930,7 +4940,7 @@ function saberAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sabe
 				delayed: sabers.map(saber => ({ type: "expire", objId: saber.id })),
 
 				collideWith: Categories.Hero,
-				against: Alliances.All,
+				against: Alliances.All ^ Alliances.Self,
 
 				afterTicks: spell.expireAfterHitHeroTicks,
 			};
