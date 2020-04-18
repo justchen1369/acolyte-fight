@@ -56,7 +56,7 @@ class HomePanel extends React.PureComponent<Props, State> {
                 <NavBar />
                 <div className="title-row">
                     <video autoPlay muted loop>
-                        <source src={`${url.base}/cdn/videos/g52d.m4v`} type="video/mp4" />
+                        <source src={`${url.base}/cdn/videos/g8925d.m4v`} type="video/mp4" />
                     </video>
                     <div className="spacer" />
                     <div className="title"><span className="title-left">{this.props.titleLeft}</span> <span className="title-right">{this.props.titleRight}</span></div>
