@@ -12,6 +12,7 @@ import * as options from '../options';
 import * as pages from '../core/pages';
 import * as rankings from '../core/rankings';
 import * as url from '../url';
+import BannerAdRow from '../controls/BannerAdRow';
 import Link from '../controls/link';
 import RankIcon from '../controls/rankIcon';
 import UnrankedTogglePanel from './unrankedTogglePanel';
@@ -90,6 +91,7 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
                 <UserStatsPanel profileId={this.props.myUserId} category={category} showRanking={true} />	
                 <p className="view-more-ad">Go to <Link page="profile" profileId={this.props.myUserId}>your profile</Link> for more stats and replays</p>	
             </>}
+            <BannerAdRow width={728} height={90} />
             <h1>Leaderboard</h1>
             <p>This is the global ranking of all logged-in active players. See the <Link page="about">About page</Link> for more information about the rating system.</p>
             <div className="leaderboard">

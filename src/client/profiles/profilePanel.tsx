@@ -8,6 +8,7 @@ import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
 import * as url from '../url';
 import AccountPanel from './accountPanel';
+import BannerAdRow from '../controls/BannerAdRow';
 import CategorySelector from '../controls/categorySelector';
 import ProfileGameList from './profileGameList';
 import RecentGamesList from './recentGameList';
@@ -75,6 +76,7 @@ export class ProfilePanel extends React.PureComponent<Props, State> {
                 showBuild={true}
                 pageTitle={true}
                 />
+            <BannerAdRow width={728} height={90} />
             <h1>Replays</h1>
             {isMe
                 ? <RecentGamesList category={category} />
