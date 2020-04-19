@@ -71,11 +71,11 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
                 <div className="skin-adjust-section-title">Size</div>
                 <div className="skin-adjust-row">
                     <div className="skin-adjust-row-label">Width</div>
-                    {this.renderPercentageSlider(transform.width ?? 1, 0, 5, (width) => onUpdate({ ...transform, width }))}
+                    {this.renderPercentageSlider(transform.width ?? 1, 0, 3, (width) => onUpdate({ ...transform, width }))}
                 </div>
                 <div className="skin-adjust-row">
                     <div className="skin-adjust-row-label">Height</div>
-                    {this.renderPercentageSlider(transform.height ?? 1, 0, 5, (height) => onUpdate({ ...transform, height }))}
+                    {this.renderPercentageSlider(transform.height ?? 1, -2, 2, (height) => onUpdate({ ...transform, height }))}
                 </div>
             </div>
             <div className="skin-adjust-section">

@@ -74,7 +74,7 @@ export function render(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: numb
 function applyTransform(ctx: CanvasRenderingContext2D, transform?: h.Transform) {
     if (transform) {
         ctx.translate(transform.rise || 0, 0);
-        ctx.scale(transform.height || 1, transform.width || 1); // Yes this looks backwards, because we imagine the base at the bottom but it's not since 0 degrees points to the right
+        ctx.scale(transform.height ?? 1, transform.width ?? 1); // Yes this looks backwards, because we imagine the base at the bottom but it's not since 0 degrees points to the right
     }
 }
 
