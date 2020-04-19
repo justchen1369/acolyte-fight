@@ -44,7 +44,7 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
         const className = classNames("skin-edit-selector-layer", {
             'layer-selected': bodyIndex === this.props.edit.bodyIndex,
         });
-        return <div className={className}>
+        return <div key={`layer-${bodyIndex}`} className={className}>
             {this.renderSelectorBody(skin, bodyIndex)}
             {layer.glyphs.map((glyph, i) => this.renderSelectorGlyph(skin, bodyIndex, i))}
         </div>
@@ -55,6 +55,7 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
             'icon-selected': bodyIndex === this.props.edit.bodyIndex && this.props.edit.glyphIndex === null,
         });
         return <SkinCanvas
+            key={`body-${bodyIndex}`}
             className={className}
             width={48}
             height={48}
@@ -73,6 +74,7 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
             'icon-selected': bodyIndex === this.props.edit.bodyIndex && glyphIndex === this.props.edit.glyphIndex,
         });
         return <SkinCanvas
+            key={`glyph-${bodyIndex}-${glyphIndex}`}
             className={className}
             width={48}
             height={48}
