@@ -57,6 +57,7 @@ export class GameAdPanel extends React.PureComponent<Props, State> {
                 className="dialog-panel game-banner-ad"
                 width={300} height={250}
                 minScreenWidthProportion={2} minScreenHeightProportion={2}
+                hideUntilLoaded={true}
                 />
         } else {
             return null;

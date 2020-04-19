@@ -4,14 +4,13 @@ import * as ReactRedux from 'react-redux';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as options from '../options';
-import * as storage from '../storage';
-import * as url from '../url';
 import './BannerAd.scss';
 
 interface Props {
     className?: string;
     width: number;
     height: number;
+    hideUntilLoaded?: boolean;
 
     minScreenWidthProportion?: number;
     minScreenHeightProportion?: number;
@@ -53,7 +52,6 @@ export class BannerAd extends React.PureComponent<Props, State> {
         const minScreenWidth = (this.props.minScreenWidthProportion ?? 1) * this.props.width;
         const minScreenHeight = (this.props.minScreenHeightProportion ?? 1) * this.props.height;
         if (this.state.screenWidth < minScreenWidth || this.state.screenHeight < minScreenHeight) {
-            console.log("Too small", this.state.screenWidth, this.state.screenHeight, minScreenWidth, minScreenHeight);
             return null; // Screen too small
         }
 
@@ -61,6 +59,7 @@ export class BannerAd extends React.PureComponent<Props, State> {
         const className = classNames('banner-ad', this.props.className, {
             'banner-ad-ready': this.state.ready,
             'banner-ad-not-ready': !this.state.ready,
+            'banner-hide-until-loaded': this.props.hideUntilLoaded,
         });
         return <div
             id={id}

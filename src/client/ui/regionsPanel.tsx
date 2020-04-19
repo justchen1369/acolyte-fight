@@ -9,6 +9,7 @@ import * as s from '../store.model';
 import * as options from '../options';
 import * as pages from '../core/pages';
 import * as regions from '../core/regions';
+import BannerAdRow from '../controls/BannerAdRow';
 import './regionsPanel.scss';
 
 const RetestCount = 3;
@@ -118,6 +119,7 @@ class RegionList extends React.PureComponent<Props, State> {
             {this.state.regions.valueSeq().map(region => <a className="region" key={region.name} href={region.url} onClick={(ev) => this.onRegionClick(ev, region)}>
                 <span className="region-name">{region.name}</span>: <span className="region-details">{region.numPlayers} players online, ping {region.pingMilliseconds} ms</span>
             </a>).toArray()}
+            <BannerAdRow width={728} height={90} />
         </div>;
     }
 

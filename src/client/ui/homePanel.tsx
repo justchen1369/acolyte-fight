@@ -6,6 +6,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as options from '../options';
 import * as url from '../url';
+import BannerAdRow from '../controls/BannerAdRow';
 import Button from '../controls/button';
 import NameConfig from './nameConfig';
 import PlayButton from './playButton';
@@ -92,6 +93,7 @@ class HomePanel extends React.PureComponent<Props, State> {
                 </p>
                 <h2>Your Name</h2>
                 <NameConfig />
+                <BannerAdRow width={728} height={90} />
                 <SpellBtnConfig />
                 <h1>More Settings</h1>
                 <p className="view-more-ad">Go to <Link page="settings">Settings</Link> for more settings</p>
