@@ -17,8 +17,8 @@ export class PrivacyPolicyPanel extends React.PureComponent<Props, State> {
         return <div>
             <h1>Privacy Policy</h1>
             <p>
-                Replays and game stats are collected for the purpose of balancing the game and making it better.
-                No data is given to third parties.
+                This website uses cookies to personalise content and ads.
+                Replays, game stats and site usage analytics are collected for the purpose of balancing the game and making it better.
             </p>
         </div>
     }
