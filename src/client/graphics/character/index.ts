@@ -94,14 +94,17 @@ function applyTriangle(ctx: CanvasRenderingContext2D, shape: h.Triangle) {
 
     ctx.moveTo(-1, -1); // Base left corner
 
-    ctx.lineTo(1, -shape.peakSpan); // Peak left
-    ctx.lineTo(1, shape.peakSpan); // Peak right
+    ctx.lineTo(1, -shape.peakPinch); // Peak left
+    ctx.lineTo(1, shape.peakPinch); // Peak right
 
     ctx.lineTo(-1, 1); // Base right corner
 
-    ctx.lineTo(-1, shape.indentSpan); // Indent right
-    ctx.lineTo(-1 + shape.indentRise, 0); // Indent peak
-    ctx.lineTo(-1, -shape.indentSpan); // Indent left
+    ctx.lineTo(-1, shape.basePinch); // Indent base right
+
+    ctx.lineTo(-1 + shape.indentRise, shape.indentPinch); // Indent peak right
+    ctx.lineTo(-1 + shape.indentRise, -shape.indentPinch); // Indent peak left
+
+    ctx.lineTo(-1, -shape.basePinch); // Indent base left
 
     ctx.closePath(); // Back to the base left corner
 }

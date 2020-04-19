@@ -79,21 +79,35 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
     }
 
     private renderAdjustTriangle(shape: h.Triangle, onUpdate: (newShape: h.Shape) => void) {
-        return <div className="skin-adjust-section">
-            <div className="skin-adjust-section-title">Shape</div>
-            <div className="skin-adjust-row">
-                <div className="skin-adjust-row-label">Peak</div>
-                {this.renderPercentageSlider(shape.peakSpan, 0, 1, (peakSpan) => onUpdate({ ...shape, peakSpan }))}
+        return <>
+            <div className="skin-adjust-section">
+                <div className="skin-adjust-section-title">Peak</div>
+                <div className="skin-adjust-row">
+                    <div className="skin-adjust-row-label">Pinch</div>
+                    {this.renderPercentageSlider(shape.peakPinch, 0, 1, (peakSpan) => onUpdate({ ...shape, peakPinch: peakSpan }))}
+                </div>
             </div>
-            <div className="skin-adjust-row">
-                <div className="skin-adjust-row-label">Indent</div>
-                {this.renderPercentageSlider(shape.indentRise, 0, 2, (indentRise) => onUpdate({ ...shape, indentRise }))}
+
+            <div className="skin-adjust-section">
+                <div className="skin-adjust-section-title">Indent</div>
+                <div className="skin-adjust-row">
+                    <div className="skin-adjust-row-label">Rise</div>
+                    {this.renderPercentageSlider(shape.indentRise, 0, 2, (indentRise) => onUpdate({ ...shape, indentRise }))}
+                </div>
+                <div className="skin-adjust-row">
+                    <div className="skin-adjust-row-label">Pinch</div>
+                    {this.renderPercentageSlider(shape.indentPinch, 0, 2, (indentPinch) => onUpdate({ ...shape, indentPinch }))}
+                </div>
             </div>
-            <div className="skin-adjust-row">
-                <div className="skin-adjust-row-label">Base</div>
-                {this.renderPercentageSlider(shape.indentSpan, 0, 1, (indentSpan) => onUpdate({ ...shape, indentSpan }))}
+
+            <div className="skin-adjust-section">
+                <div className="skin-adjust-section-title">Base</div>
+                <div className="skin-adjust-row">
+                    <div className="skin-adjust-row-label">Pinch</div>
+                    {this.renderPercentageSlider(shape.basePinch, 0, 1, (basePinch) => onUpdate({ ...shape, basePinch }))}
+                </div>
             </div>
-        </div>
+        </>
     }
 
     private renderPercentageSlider(value: number, min: number, max: number, onUpdate: (newValue: number) => void) {

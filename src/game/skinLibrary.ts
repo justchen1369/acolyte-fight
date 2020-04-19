@@ -10,8 +10,10 @@ export const defaultSkin: h.Skin = {
                 {
                     shape: {
                         type: "triangle",
-                        peakSpan: 0,
-                        indentSpan: 1 / 3.0,
+                        peakPinch: 0,
+                        indentPinch: 0,
+                        basePinch: 1 / 3.0,
+
                         indentRise: 4 / 3.0,
                     },
                     transform: {

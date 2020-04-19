@@ -37,12 +37,14 @@ export interface Circle {
 export interface Triangle {
     type: "triangle";
 
-    peakSpan: number;
+    peakPinch: number;
     peakBend?: number;
 
     indentRise: number;
-    indentSpan: number;
+    indentPinch: number;
     indentBend?: number;
+
+    basePinch: number;
 }
 
 export interface Transform {
