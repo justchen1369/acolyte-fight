@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import pl from 'planck-js';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
@@ -7,6 +8,8 @@ import * as constants from '../../game/constants';
 import * as StoreProvider from '../storeProvider';
 
 interface Props {
+    className?: string;
+
     skin: h.Skin;
     bodyIndex?: number; // Only render the body at this index
     glyphIndex?: number; // Only render the glyph at this index
@@ -36,7 +39,9 @@ export class SkinCanvas extends React.PureComponent<Props, State> {
         const width = this.props.width;
         const height = this.props.height;
 
+        const className = classNames('skin-canvas', this.props.className);
         return <canvas
+            className={className}
             style={{ width, height }}
             ref={(elem: HTMLCanvasElement) => this.onCanvasElem(elem)}
             width={width * retinaMultiplier}

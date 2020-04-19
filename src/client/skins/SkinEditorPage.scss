@@ -1,0 +1,26 @@
+.skin-edit-page {
+    display: flex;
+    flex-direction: row;
+}
+
+.skin-edit-preview-panel {
+    flex-grow: 1;
+
+    display: flex;
+    align-items: center;
+    justify-items: center;
+}
+
+.skin-edit-selector {
+    display: flex;
+    flex-direction: column;
+}
+
+.skin-edit-selector-layer {
+    display: flex;
+    flex-direction: column;
+}
+
+.skin-adjust {
+    flex-basis: 512px;
+}

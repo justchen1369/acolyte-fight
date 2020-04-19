@@ -8,9 +8,12 @@ import * as k from './skins.model';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 import * as skinLibrary from '../../game/skinLibrary';
+import NavBar from '../nav/navbar';
 import SkinAdjuster from './SkinAdjuster';
 import SkinCanvas from './SkinCanvas';
 import SkinEditSelector from './SkinEditSelector';
+import TitleListener from '../controls/titleListener';
+import './SkinEditorPage.scss';
 
 interface Props {
     settings: AcolyteFightSettings;
@@ -40,30 +43,37 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <div className="skin-edit-page">
-            {this.renderPreview()}
-            <SkinEditSelector
-                skin={this.state.skin}
-                edit={this.state.edit}
-                settings={this.props.settings}
-                onSelect={edit => this.setState({ edit })}
-                />
-            <SkinAdjuster
-                skin={this.state.skin}
-                edit={this.state.edit}
-                settings={this.props.settings}
-                onUpdate={skin => this.setState({ skin })}
-                />
+        return <div className="content-container full-height-page">
+            <TitleListener subtitle="Skin Editor" />
+            <NavBar />
+            <div className="skin-edit-page">
+                {this.renderPreview()}
+                <SkinEditSelector
+                    skin={this.state.skin}
+                    edit={this.state.edit}
+                    settings={this.props.settings}
+                    onSelect={edit => this.setState({ edit })}
+                    />
+                <SkinAdjuster
+                    skin={this.state.skin}
+                    edit={this.state.edit}
+                    settings={this.props.settings}
+                    onUpdate={skin => this.setState({ skin })}
+                    />
+            </div>
         </div>
     }
 
     private renderPreview() {
-        return <SkinCanvas
+        return <div className="skin-edit-preview-panel">
+            <SkinCanvas
+            className="skin-edit-preview"
             width={300}
             height={250}
             skin={this.state.skin}
             settings={this.props.settings}
             />
+        </div>
     }
 }
 
