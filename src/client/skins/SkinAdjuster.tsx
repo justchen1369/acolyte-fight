@@ -53,14 +53,39 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
 
     private renderAdjustBody(body: h.LayerBody, bodyIndex: number) {
         return <div className="skin-adjust">
+            {this.renderAdjustTransform(body.transform ?? {}, transform => this.updateBody(bodyIndex, { ...body, transform }))}
             {this.renderAdjustShape(body.shape, shape => this.updateBody(bodyIndex, { ...body, shape }))}
         </div>
     }
 
     private renderAdjustGlyph(glyph: h.LayerGlyph, bodyIndex: number, glyphIndex: number) {
         return <div className="skin-adjust">
+            {this.renderAdjustTransform(glyph.transform ?? {}, transform => this.updateGlyph(bodyIndex, glyphIndex, { ...glyph, transform }))}
             {this.renderAdjustShape(glyph.shape, shape => this.updateGlyph(bodyIndex, glyphIndex, { ...glyph, shape }))}
         </div>
+    }
+
+    private renderAdjustTransform(transform: h.Transform, onUpdate: (transform: h.Transform) => void) {
+        return <>
+            <div className="skin-adjust-section">
+                <div className="skin-adjust-section-title">Size</div>
+                <div className="skin-adjust-row">
+                    <div className="skin-adjust-row-label">Width</div>
+                    {this.renderPercentageSlider(transform.width ?? 1, 0, 5, (width) => onUpdate({ ...transform, width }))}
+                </div>
+                <div className="skin-adjust-row">
+                    <div className="skin-adjust-row-label">Height</div>
+                    {this.renderPercentageSlider(transform.height ?? 1, 0, 5, (height) => onUpdate({ ...transform, height }))}
+                </div>
+            </div>
+            <div className="skin-adjust-section">
+                <div className="skin-adjust-section-title">Position</div>
+                <div className="skin-adjust-row">
+                    <div className="skin-adjust-row-label">Rise</div>
+                    {this.renderPercentageSlider(transform.rise ?? 0, -1, 1, (rise) => onUpdate({ ...transform, rise }))}
+                </div>
+            </div>
+        </>
     }
 
     private renderAdjustShape(shape: h.Shape, onUpdate: (newShape: h.Shape) => void) {
@@ -84,7 +109,7 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
                 <div className="skin-adjust-section-title">Peak</div>
                 <div className="skin-adjust-row">
                     <div className="skin-adjust-row-label">Pinch</div>
-                    {this.renderPercentageSlider(shape.peakPinch, 0, 1, (peakSpan) => onUpdate({ ...shape, peakPinch: peakSpan }))}
+                    {this.renderPercentageSlider(shape.peakPinch, 0, 1, (peakPinch) => onUpdate({ ...shape, peakPinch }))}
                 </div>
             </div>
 
