@@ -1,0 +1,22 @@
+.skin-edit-selector {
+    display: flex;
+    flex-direction: column;
+}
+
+.skin-edit-selector-layer {
+    display: flex;
+    flex-direction: column;
+}
+
+.skin-edit-selector-icon {
+    cursor: pointer;
+    pointer-events: all;
+}
+
+.skin-edit-selector-icon.icon-selected {
+    background: #fff4;
+}
+
+.skin-edit-selector-icon:hover {
+    background: #fff6;
+}

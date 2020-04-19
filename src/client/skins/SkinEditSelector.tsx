@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
@@ -8,6 +9,7 @@ import * as k from './skins.model';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 import SkinCanvas from './SkinCanvas';
+import './SkinEditSelector.scss';
 
 interface Props {
     settings: AcolyteFightSettings;
@@ -39,25 +41,39 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
         const layer = skin.layers[bodyIndex];
         if (!layer) { return null; }
 
-        return <div className="skin-edit-selector-layer">
+        const className = classNames("skin-edit-selector-layer", {
+            'layer-selected': bodyIndex === this.props.edit.bodyIndex,
+        });
+        return <div className={className}>
             {this.renderSelectorBody(skin, layer, bodyIndex)}
             {layer.glyphs.map((glyph, i) => this.renderSelectorGlyph(skin, layer, bodyIndex, i))}
         </div>
     }
 
     private renderSelectorBody(skin: h.Skin, layer: h.Layer, bodyIndex: number) {
+        const className = classNames("skin-edit-selector-icon", {
+            'icon-selected': bodyIndex === this.props.edit.bodyIndex && this.props.edit.glyphIndex === null,
+        });
         return <SkinCanvas
+            className={className}
             width={48}
             height={48}
             skin={this.props.skin}
             bodyIndex={bodyIndex}
             glyphIndex={-1}
             settings={this.props.settings}
+            attr={{
+                onMouseDown: () => this.props.onSelect({ bodyIndex, glyphIndex: null }),
+            }}
             />
     }
 
     private renderSelectorGlyph(skin: h.Skin, layer: h.Layer, bodyIndex: number, glyphIndex: number) {
+        const className = classNames("skin-edit-selector-icon", {
+            'icon-selected': bodyIndex === this.props.edit.bodyIndex && glyphIndex === this.props.edit.glyphIndex,
+        });
         return <SkinCanvas
+            className={className}
             width={48}
             height={48}
             skin={this.props.skin}
@@ -65,6 +81,9 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
             glyphIndex={glyphIndex}
             glyphOnly={true}
             settings={this.props.settings}
+            attr={{
+                onMouseDown: () => this.props.onSelect({ bodyIndex, glyphIndex }),
+            }}
             />
     }
 }

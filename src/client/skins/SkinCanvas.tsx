@@ -19,6 +19,9 @@ interface Props {
     height: number;
 
     settings: AcolyteFightSettings;
+
+    attr?: React.HTMLAttributes<HTMLCanvasElement>;
+    style?: React.CSSProperties;
 }
 
 interface State {
@@ -41,8 +44,9 @@ export class SkinCanvas extends React.PureComponent<Props, State> {
 
         const className = classNames('skin-canvas', this.props.className);
         return <canvas
+            {...this.props.attr}
             className={className}
-            style={{ width, height }}
+            style={{ ...this.props.style, width, height }}
             ref={(elem: HTMLCanvasElement) => this.onCanvasElem(elem)}
             width={width * retinaMultiplier}
             height={height * retinaMultiplier}
