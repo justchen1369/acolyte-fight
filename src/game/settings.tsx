@@ -2416,9 +2416,9 @@ const saber: Spell = {
     delink: true,
     takesOwnership: true,
     blocksTeleporters: false,
-    shiftMultiplier: 0.25,
+    shiftMultiplier: 0.5,
     speedMultiplier: 2,
-    maxSpeed: 0.75,
+    maxSpeed: 0.5,
     maxTurnRatePerTickInRevs: 0.1,
     damageMultiplier: 1,
 
@@ -2478,9 +2478,9 @@ const dualSaber: Spell = {
     delink: true,
     takesOwnership: true,
     blocksTeleporters: false,
-    shiftMultiplier: 0.25,
+    shiftMultiplier: 0.5,
     speedMultiplier: 2,
-    maxSpeed: 0.75,
+    maxSpeed: 0.5,
     maxTurnRatePerTickInRevs: 0.1,
     damageMultiplier: 1,
 
