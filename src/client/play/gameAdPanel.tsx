@@ -19,6 +19,8 @@ interface Props {
 }
 interface State {
     showingForGameId: string;
+    screenWidth: number;
+    screenHeight: number;
 }
 
 function stateToProps(state: s.State): Props {
@@ -36,23 +38,51 @@ function stateToProps(state: s.State): Props {
 }
 
 export class GameAdPanel extends React.PureComponent<Props, State> {
+    private resizeListener = this.recheckScreenSize.bind(this);
+
     constructor(props: Props) {
         super(props);
         this.state = {
             showingForGameId: null,
+            screenWidth: 0,
+            screenHeight: 0,
         };
+    }
+
+    componentDidMount() {
+        window.addEventListener('resize', this.resizeListener);
+        this.recheckScreenSize();
     }
 
     componentDidUpdate() {
         setImmediate(() => this.recheck());
     }
 
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.resizeListener);
+    }
+
     render() {
+        if (this.props.touched) {
+            return null; // Don't show on mobile
+        }
+
+        if (this.state.screenWidth < 800 || this.state.screenHeight < 600) {
+            return null; // Screen too small
+        }
+
         if (this.props.gameId === this.state.showingForGameId) {
             return <BannerAd className="dialog-panel game-banner-ad" width={300} height={250} />
         } else {
             return null;
         }
+    }
+
+    private recheckScreenSize() {
+        this.setState({
+            screenWidth: document.body.clientWidth,
+            screenHeight: document.body.clientHeight,
+        });
     }
 
     private recheck() {
