@@ -45,12 +45,12 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
             'layer-selected': bodyIndex === this.props.edit.bodyIndex,
         });
         return <div className={className}>
-            {this.renderSelectorBody(skin, layer, bodyIndex)}
-            {layer.glyphs.map((glyph, i) => this.renderSelectorGlyph(skin, layer, bodyIndex, i))}
+            {this.renderSelectorBody(skin, bodyIndex)}
+            {layer.glyphs.map((glyph, i) => this.renderSelectorGlyph(skin, bodyIndex, i))}
         </div>
     }
 
-    private renderSelectorBody(skin: h.Skin, layer: h.Layer, bodyIndex: number) {
+    private renderSelectorBody(skin: h.Skin, bodyIndex: number) {
         const className = classNames("skin-edit-selector-icon", {
             'icon-selected': bodyIndex === this.props.edit.bodyIndex && this.props.edit.glyphIndex === null,
         });
@@ -58,7 +58,7 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
             className={className}
             width={48}
             height={48}
-            skin={this.props.skin}
+            skin={skin}
             bodyIndex={bodyIndex}
             glyphIndex={-1}
             settings={this.props.settings}
@@ -68,7 +68,7 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
             />
     }
 
-    private renderSelectorGlyph(skin: h.Skin, layer: h.Layer, bodyIndex: number, glyphIndex: number) {
+    private renderSelectorGlyph(skin: h.Skin, bodyIndex: number, glyphIndex: number) {
         const className = classNames("skin-edit-selector-icon", {
             'icon-selected': bodyIndex === this.props.edit.bodyIndex && glyphIndex === this.props.edit.glyphIndex,
         });
@@ -76,7 +76,7 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
             className={className}
             width={48}
             height={48}
-            skin={this.props.skin}
+            skin={skin}
             bodyIndex={bodyIndex}
             glyphIndex={glyphIndex}
             glyphOnly={true}

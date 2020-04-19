@@ -8,6 +8,7 @@ import * as k from './skins.model';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 import SkinCanvas from './SkinCanvas';
+import './SkinAdjuster.scss';
 
 interface Props {
     settings: AcolyteFightSettings;
@@ -31,25 +32,18 @@ class SkinEditorPage extends React.PureComponent<Props, State> {
         const skin = this.props.skin;
         const bodyIndex = this.props.edit.bodyIndex;
         const glyphIndex = this.props.edit.glyphIndex;
-        if (typeof bodyIndex === 'number') {
-            const layer = skin.layers[bodyIndex];
-            if (!layer) {
-                return this.renderNoAdjusters();
-            }
 
-            if (typeof glyphIndex === 'number') {
-                const glyph = layer.glyphs[glyphIndex];
-                if (!glyph) {
-                    return this.renderNoAdjusters();
-                }
-
-                return this.renderAdjustGlyph(glyph, bodyIndex, glyphIndex);
-            } else {
-                return this.renderAdjustBody(layer.body, bodyIndex);
-            }
-        } else {
+        const layer = skin.layers[bodyIndex];
+        if (!layer) {
             return this.renderNoAdjusters();
         }
+
+        const glyph = layer.glyphs[glyphIndex];
+        if (!glyph) {
+            return this.renderAdjustBody(layer.body, bodyIndex);
+        }
+
+        return this.renderAdjustGlyph(glyph, bodyIndex, glyphIndex);
     }
 
     private renderNoAdjusters() {
