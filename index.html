@@ -87,6 +87,15 @@
 			aiptag.cmd.display = aiptag.cmd.display || []; aiptag.cmd.player = aiptag.cmd.player || [];
 			aiptag.gdprShowConsentTool = false;
 			aiptag.gdprAlternativeConsentTool = true;
+			window.googletag = window.googletag || { cmd: [] };
+			window.googletag.cmd.push(function() {
+				var a = googletag.pubads();
+				a.set('adsense_background_color', '#222');
+				a.set('adsense_border_color', '#000');
+				a.set('adsense_link_color', '#0cf');
+				a.set('adsense_text_color', '#fff');
+				a.set('adsense_url_color', '#0cf');
+			});
 		</script>
 		<script async src="//api.adinplay.com/libs/aiptag/pub/ACF/acolytefight.io/tag.min.js"></script>
 		<!-- End AdInPlay code -->
