@@ -4438,12 +4438,16 @@ function notifyWin(world: w.World) {
 	removeBots(world);
 }
 
+export function remainingHeroIds(world: w.World) {
+	return wu(world.objects.values()).filter(h => h.category === "hero").map(h => h.id).toArray();
+}
+
 function isGameWon(world: w.World) {
 	if (world.tick < world.startTick) {
 		return false;
 	}
 
-	const aliveHeroIds = wu(world.objects.values()).filter(h => h.category === "hero").map(h => h.id).toArray();
+	const aliveHeroIds = remainingHeroIds(world);
 	if (aliveHeroIds.length === 0) {
 		return true;
 	}

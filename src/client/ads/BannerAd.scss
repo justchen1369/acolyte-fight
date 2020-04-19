@@ -1,0 +1,14 @@
+.banner-ad {
+    display: block;
+    overflow: hidden;
+
+    animation: fade-in 0.5s ease;
+}
+
+.banner-ad.banner-ad-not-ready {
+    display: none;
+}
+
+.banner-ad.banner-ad-ready {
+    display: block;
+}

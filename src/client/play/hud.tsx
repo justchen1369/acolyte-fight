@@ -10,10 +10,10 @@ import * as StoreProvider from '../storeProvider';
 import ActionWheelSidePanel from './buttons/actionWheelSidePanel';
 import AutoJoinConfigButton from './buttons/autoJoinConfigButton';
 import Button from '../controls/button';
-import ButtonPanelLabel from './buttons/buttonPanelLabel';
 import ChatButton from './buttons/chatButton';
 import InfoPanel from './infoPanel';
 import FinishedPanel from './finishedPanel';
+import GameAdPanel from './gameAdPanel';
 import GameKeyCustomizer from './gameKeyCustomizer';
 import GraphicsLevelPanel from './buttons/graphicsLevelPanel';
 import HelpMessage from './messages/helpMessage';
@@ -187,6 +187,7 @@ class HUD extends React.PureComponent<Props, State> {
             </PlayBar>
             <Layout anchorBottom={true} anchorRight={true}>
                 <SpellInfoPanel />
+                <GameAdPanel />
             </Layout>
             <Layout anchorTop={true} anchorRight={true}>
                 <InfoPanel />

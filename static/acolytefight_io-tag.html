@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="minimal-ui, user-scalable=no, initial-scale=1, maximum-scale=1, width=device-width" />
+	<title>AdinPlay Ads</title>
+	<script>
+	window.aiptag = window.aiptag || {cmd: []};
+	aiptag.cmd.display = aiptag.cmd.display || [];	aiptag.cmd.player = aiptag.cmd.player || [];
+	// Show GDPR consent tool
+	aiptag.gdprShowConsentTool = true;
+	// If you use your own GDPR consent tool please set aiptag.gdprConsent = false; if an EU user has declined or not yet accepted marketing cookies, for users outside the EU or for users that accepted the GDPR please use aiptag.gdprConsent = true;
+
+	aiptag.cmd.player.push(function() {
+		adplayer = new aipPlayer({			AD_WIDTH: 960,
+			AD_HEIGHT: 540,
+			AD_FULLSCREEN: false,
+			AD_CENTERPLAYER: false,
+			LOADING_TEXT: 'loading advertisement',
+			PREROLL_ELEM: function(){return document.getElementById('preroll')},
+			AIP_COMPLETE: function ()  {
+				/*******************
+				 ***** WARNING *****
+				 *******************
+				 Please do not remove the PREROLL_ELEM
+				 from the page, it will be hidden automaticly.
+				 If you do want to remove it use the AIP_REMOVE callback.
+				*/
+				alert("Ad Completed");
+			},
+			AIP_REMOVE: function ()  {
+				// Here it's save to remove the PREROLL_ELEM from the page.
+				// But it's not necessary.
+			}		});
+	});
+	</script>
+	<script async src="//api.adinplay.com/libs/aiptag/pub/ACF/acolytefight.io/tag.min.js"></script>
+</head>
+<body style="margin:0;padding:0;">
+	<p>Documentation: <a href="https://adinplay.com/api/" target="_blank">https://adinplay.com/api/</a></p>
+	AIP ID: ACF/acolytefight.io<br>
+		AIP PLACEMENT ID: acolytefight-io_300x250<br>
+		AIP PLACEMENT ID: acolytefight-io_728x90<br>
+		AIP PLACEMENT ID: acolytefight-io_320x50<br>
+		AIP PLACEMENT ID: acolytefight-io_336x280<br>
+		AIP PLACEMENT ID: acolytefight-io_468x60<br>
+		<br>
+
+		<div id='acolytefight-io_300x250'>
+		<script type='text/javascript'>
+			aiptag.cmd.display.push(function() { aipDisplayTag.display('acolytefight-io_300x250'); });
+		</script>
+	</div>
+	<button onclick="aiptag.cmd.display.push(function() { aipDisplayTag.display('acolytefight-io_300x250'); });">Refresh Ad</button>
+		<div id='acolytefight-io_728x90'>
+		<script type='text/javascript'>
+			aiptag.cmd.display.push(function() { aipDisplayTag.display('acolytefight-io_728x90'); });
+		</script>
+	</div>
+	<button onclick="aiptag.cmd.display.push(function() { aipDisplayTag.display('acolytefight-io_728x90'); });">Refresh Ad</button>
+		<div id='acolytefight-io_320x50'>
+		<script type='text/javascript'>
+			aiptag.cmd.display.push(function() { aipDisplayTag.display('acolytefight-io_320x50'); });
+		</script>
+	</div>
+	<button onclick="aiptag.cmd.display.push(function() { aipDisplayTag.display('acolytefight-io_320x50'); });">Refresh Ad</button>
+		<div id='acolytefight-io_336x280'>
+		<script type='text/javascript'>
+			aiptag.cmd.display.push(function() { aipDisplayTag.display('acolytefight-io_336x280'); });
+		</script>
+	</div>
+	<button onclick="aiptag.cmd.display.push(function() { aipDisplayTag.display('acolytefight-io_336x280'); });">Refresh Ad</button>
+		<div id='acolytefight-io_468x60'>
+		<script type='text/javascript'>
+			aiptag.cmd.display.push(function() { aipDisplayTag.display('acolytefight-io_468x60'); });
+		</script>
+	</div>
+	<button onclick="aiptag.cmd.display.push(function() { aipDisplayTag.display('acolytefight-io_468x60'); });">Refresh Ad</button>
+			<br><br>
+	<button onclick="aiptag.cmd.player.push(function() { adplayer.startPreRoll(); });">Show Video Ad</button>
+	<div id="preroll"></div>
+		</body>
+</html>
