@@ -1,0 +1,40 @@
+.skin-adjust {
+    height: 100%;
+    background: #333;
+    overflow: hidden scroll;
+}
+
+.skin-adjust-section {
+    padding: 1em 0;
+    border-bottom: 1px #0004 solid;
+}
+
+.skin-adjust-section-title {
+    font-weight: bold;
+    padding: 0 1em;
+    margin-bottom: 0.5em;
+}
+
+.skin-adjust-row {
+    font-size: 80%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    padding: 0 1em;
+}
+
+.skin-adjust-row:hover {
+    background: #666;
+}
+
+.skin-adjust-row .skin-adjust-row-label {
+    flex-grow: 1;
+    text-align: right;
+    margin: 0 0.5em;
+}
+
+.skin-adjust-row input[type=range] {
+    display: block;
+    width: 80%;
+}
