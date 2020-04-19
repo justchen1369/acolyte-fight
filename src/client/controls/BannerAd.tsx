@@ -12,12 +12,18 @@ interface Props {
     className?: string;
     width: number;
     height: number;
+
+    minScreenWidthProportion?: number;
+    minScreenHeightProportion?: number;
 }
 interface State {
     ready: boolean;
+    screenWidth: number;
+    screenHeight: number;
 }
 
 export class BannerAd extends React.PureComponent<Props, State> {
+    private resizeListener = this.recheckScreenSize.bind(this);
     private intervalHandle: NodeJS.Timeout = null;
     private elem: HTMLDivElement = null;
 
@@ -25,18 +31,32 @@ export class BannerAd extends React.PureComponent<Props, State> {
         super(props);
         this.state = {
             ready: false,
+            screenWidth: 0,
+            screenHeight: 0,
         };
     }
 
     componentDidMount() {
+        window.addEventListener('resize', this.resizeListener);
+        this.recheckScreenSize();
+
         this.intervalHandle = setInterval(() => this.onTimer(), 500);
     }
 
     componentWillUnmount() {
         clearInterval(this.intervalHandle);
+
+        window.removeEventListener('resize', this.resizeListener);
     }
 
     render() {
+        const minScreenWidth = (this.props.minScreenWidthProportion ?? 1) * this.props.width;
+        const minScreenHeight = (this.props.minScreenHeightProportion ?? 1) * this.props.height;
+        if (this.state.screenWidth < minScreenWidth || this.state.screenHeight < minScreenHeight) {
+            console.log("Too small", this.state.screenWidth, this.state.screenHeight, minScreenWidth, minScreenHeight);
+            return null; // Screen too small
+        }
+
         const id = `acolytefight-io_${this.props.width}x${this.props.height}`;
         const className = classNames('banner-ad', this.props.className, {
             'banner-ad-ready': this.state.ready,
@@ -50,7 +70,18 @@ export class BannerAd extends React.PureComponent<Props, State> {
             />
     }
 
+    private recheckScreenSize() {
+        this.setState({
+            screenWidth: document.body.clientWidth,
+            screenHeight: document.body.clientHeight,
+        });
+    }
+
     private onElem(elem: HTMLDivElement) {
+        if (this.elem === elem) {
+            return;
+        }
+
         this.elem = elem;
         if (elem) {
             BannerAd.display(elem);
