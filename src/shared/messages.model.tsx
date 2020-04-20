@@ -26,7 +26,7 @@ export namespace GameCategory {
 export namespace LockType {
     export const ModPreview = "mod-preview";
     export const Tutorial = "tutorial";
-    export const Blocked = "blocked";
+    export const Banned = "banned";
     export const AssignedParty = "assigned-party"; // Private parties that wait for everyone to join
 }
 
