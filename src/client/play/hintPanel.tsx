@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
@@ -194,8 +195,11 @@ class HintPanel extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <div className="customize-hint-container">
-            <div className="customize-hint">{this.renderModifierClick()} a button below to change spells</div>
+        const className = classNames("customize-hint-container", {
+            'in-tutorial': this.props.inTutorial,
+        });
+        return <div className={className}>
+            <div className="customize-hint customize-spell-hint">{this.renderModifierClick()} a button below to change spells</div>
         </div>
     }
 

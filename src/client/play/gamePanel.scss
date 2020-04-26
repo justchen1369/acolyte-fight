@@ -674,6 +674,16 @@ table.player-list {
     transform: scale(1.2);
 }
 
+.customize-hint-container.in-tutorial .customize-spell-hint {
+    transform: scale(1);
+    animation: emphasise-grow alternate 0.6s infinite ease;
+}
+
+@keyframes emphasise-grow {
+    from { transform: scale(1) }
+    to { transform: scale(1.01) }
+}
+
 #game-panel .navbar-container {
     position: fixed;
     top: 0;
