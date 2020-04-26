@@ -2764,7 +2764,7 @@ const icewall: Spell = {
     length: 0.005,
     width: 0.15,
     density: 100,
-    linearDamping: 6,
+    linearDamping: 10,
     angularDamping: 100,
 
     categories: Categories.Shield | Categories.Obstacle,
@@ -2863,7 +2863,7 @@ const thrust: Spell = {
         {
             type: "mass",
             radius: 1.5 * Hero.Radius,
-            density: 10,
+            density: 100,
             maxTicks: 16,
             appendCollideWith: Categories.Shield,
             render: {
