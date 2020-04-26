@@ -89,6 +89,10 @@ canvas.game {
     left: 0;
 }
 
+canvas#ui {
+    mix-blend-mode: screen;
+}
+
 .anchored-panel {
     position: fixed;
     display: flex;

@@ -66,15 +66,18 @@ export class AboutSection extends React.PureComponent<Props, State> {
             </p>
             <h2>Special rules</h2>
             <p>
-                The map shrinks over <b>{World.SecondsToShrink} seconds</b>. The area outside of the map is called the void. It does <b>{World.LavaDamagePerSecond}</b> damage per second.
+                The map shrinks over <b>{World.SecondsToShrink} seconds</b>.
+                The area outside of the map is called the void.
+                It does <b>{(World.LavaDamage.damage * constants.TicksPerSecond / World.LavaDamageInterval).toFixed(1)}</b> damage per second.
             </p>
             <p>
                 Most spells have lifesteal - that means a proportion of damage dealt is added to your health.
-                The last player to knockback an enemy receives <b>{100 * World.LavaLifestealProportion}% lifesteal</b> from the void damage.
+                The last player to knockback an enemy receives <b>{100 * World.LavaDamage.lifeSteal}% lifesteal</b> from the void damage.
             </p>
             <p>
                 If multiple opponents attack you within <b>{Hero.DamageMitigationTicks / constants.TicksPerSecond} seconds</b>,
-                you will only take damage from the opponent who did the most damage.
+                you will only take damage from the opponent who did the most damage,
+                and you will also gain <b>{100 * Hero.CooldownMitigationPerOpponent}% cooldown reduction</b> and <b>{100 * Hero.LifeStealMitigationPerOpponent}% additional lifesteal</b>.
             </p>
         </div>
     }
