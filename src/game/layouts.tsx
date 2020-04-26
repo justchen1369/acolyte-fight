@@ -1,12 +1,12 @@
 export const Layouts: Layouts = {
     "circle": {
-        "color": "#222835",
-        "background": "#181b20",
+        "color": "#45294a",
+        "background": "#361e3b",
         "obstacles": []
     },
     "cold": {
-        "color": "#1d2e33",
-        "background": "#121d20",
+        "color": "#422f52",
+        "background": "#321c45",
         "numPoints": 6,
         "obstacles": [
             {
@@ -44,8 +44,8 @@ export const Layouts: Layouts = {
         ]
     },
     "octogon": {
-        "color": "#192c36",
-        "background": "#121c21",
+        "color": "#423052",
+        "background": "#2f1a40",
         "obstacles": [
             {
                 "type": "slow",
@@ -78,8 +78,8 @@ export const Layouts: Layouts = {
         "numPoints": 8
     },
     "return": {
-        "color": "#33272c",
-        "background": "#211b1d",
+        "color": "#452e37",
+        "background": "#36232a",
         "obstacles": [
             {
                 "type": "volcano",
@@ -112,8 +112,8 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.2
     },
     "double": {
-        "color": "#332e26",
-        "background": "#1f1a18",
+        "color": "#453b2a",
+        "background": "#362a18",
         "numPoints": 4,
         "obstacles": [
             {
@@ -136,8 +136,8 @@ export const Layouts: Layouts = {
         ]
     },
     "ring": {
-        "color": "#232833",
-        "background": "#161c21",
+        "color": "#4a3232",
+        "background": "#3b1c1c",
         "obstacles": [
             {
                 "type": "fast",
@@ -169,8 +169,8 @@ export const Layouts: Layouts = {
         "numPoints": 4
     },
     "exit": {
-        "color": "#1f2333",
-        "background": "#151a20",
+        "color": "#45372e",
+        "background": "#36281f",
         "obstacles": [
             {
                 "type": "outward",
@@ -215,8 +215,8 @@ export const Layouts: Layouts = {
     },
     "heal": {
         "startMessage": "Game started. Fight over this healing pool!",
-        "color": "#1d2e2c",
-        "background": "#0d211d",
+        "color": "#52302e",
+        "background": "#40201f",
         "obstacles": [
             {
                 "type": "healing",
@@ -249,8 +249,8 @@ export const Layouts: Layouts = {
         "numPoints": 6
     },
     "snowflake": {
-        "color": "#2f1f33",
-        "background": "#190d21",
+        "color": "#452931",
+        "background": "#362026",
         "numPoints": 6,
         "angleOffsetInRevs": 0.08333333333,
         "obstacles": [
@@ -283,8 +283,8 @@ export const Layouts: Layouts = {
         ]
     },
     "inside5": {
-        "color": "#332529",
-        "background": "#21141b",
+        "color": "#452931",
+        "background": "#362026",
         "numPoints": 5,
         "obstacles": [
             {
@@ -306,8 +306,8 @@ export const Layouts: Layouts = {
         ]
     },
     "single": {
-        "color": "#292032",
-        "background": "#170b21",
+        "color": "#4f2b45",
+        "background": "#38112d",
         "numPoints": 3,
         "obstacles": [
             {
@@ -322,8 +322,8 @@ export const Layouts: Layouts = {
         ]
     },
     "pepper": {
-        "color": "#33302a",
-        "background": "#211f1b",
+        "color": "#453b2a",
+        "background": "#362a18",
         "obstacles": [
             {
                 "numObstacles": 5,
@@ -347,8 +347,8 @@ export const Layouts: Layouts = {
         "numPoints": 5
     },
     "mirrors": {
-        "color": "#212332",
-        "background": "#0d1021",
+        "color": "#412f4f",
+        "background": "#342042",
         "obstacles": [
             {
                 "type": "mirror",
@@ -364,8 +364,8 @@ export const Layouts: Layouts = {
         "numPoints": 7
     },
     "innerStar": {
-        "color": "#33292d",
-        "background": "#21181b",
+        "color": "#452e37",
+        "background": "#36232a",
         "obstacles": [
             {
                 "type": "volcano",
@@ -397,8 +397,8 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.1
     },
     "mirrorhenge": {
-        "color": "#242b33",
-        "background": "#171e21",
+        "color": "#45332e",
+        "background": "#38231d",
         "obstacles": [
             {
                 "type": "fast",
@@ -441,8 +441,8 @@ export const Layouts: Layouts = {
         ]
     },
     "spiral": {
-        "color": "#1a2233",
-        "background": "#0c131f",
+        "color": "#453426",
+        "background": "#362518",
         "obstacles": [
             {
                 "type": "inward",
@@ -474,8 +474,8 @@ export const Layouts: Layouts = {
         ]
     },
     "triplet": {
-        "color": "#1e2933",
-        "background": "#111321",
+        "color": "#442b4a",
+        "background": "#301836",
         "obstacles": [
             {
                 "type": "spinner",
@@ -491,8 +491,8 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.16666667
     },
     "square": {
-        "color": "#1a2233",
-        "background": "#0e1521",
+        "color": "#40262d",
+        "background": "#361a21",
         "numPoints": 4,
         "obstacles": [
             {
@@ -516,8 +516,8 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.125
     },
     "surrounded": {
-        "color": "#282333",
-        "background": "#171221",
+        "color": "#45352a",
+        "background": "#362113",
         "obstacles": [
             {
                 "numObstacles": 15,
@@ -554,8 +554,8 @@ export const Layouts: Layouts = {
         ]
     },
     "tripletSwirl": {
-        "color": "#332b2f",
-        "background": "#211a1e",
+        "color": "#472a39",
+        "background": "#361927",
         "obstacles": [
             {
                 "type": "volcano",
