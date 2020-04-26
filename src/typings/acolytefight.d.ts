@@ -1273,6 +1273,7 @@ interface VisualSettings {
 	WorldAnimateWinTicks: number;
 	WorldWinGrowth: number;
 	WorldWinDarken: number; // Darken/lighten from the hero color by this proportion
+	WorldWinBackgroundDarken: number; // Darken/lighten the background from the hero color by this proportion
 
 	// How much to shake the map when projectiles hit
 	ShakeDistance: number;

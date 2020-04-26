@@ -207,8 +207,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	renderCursor(ctxStack, world);
 	renderInterface(ctxStack.ui, world, rect, options);
 
-	const background = ColTuple.parse(options.hideMap ? '#000' : world.background);
-	glx.renderGl(ctxStack, worldRect, rect, background);
+	glx.renderGl(ctxStack, worldRect, rect, calculateBackgroundColor(world, options));
 
 	playSounds(ctxStack, world, options);
 
@@ -755,6 +754,21 @@ function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
 	if (world.tick < highlight.fromTick + highlight.maxTicks) {
 		world.ui.highlights.push(highlight);
 	}
+}
+
+function calculateBackgroundColor(world: w.World, options: RenderOptions) {
+	if (options.hideMap) {
+		return ColTuple.parse('#000');
+	}
+
+	const Visuals = world.settings.Visuals;
+	const color = ColTuple.parse(world.background);
+	if (world.winner) {
+		const proportion = Math.min(1, (world.tick - world.winTick) / Visuals.WorldAnimateWinTicks);
+		const targetColor = ColTuple.parse(heroColor(world.winner, world)).darken(Visuals.WorldWinBackgroundDarken);
+		color.mix(targetColor, proportion);
+	}
+	return color;
 }
 
 function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
