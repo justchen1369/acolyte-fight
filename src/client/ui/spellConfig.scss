@@ -209,6 +209,8 @@
     box-shadow: 4px 4px 2px #0004;
     border: 1px #000c solid;
 
+    mix-blend-mode: hard-light;
+
     transform: scale(1);
 
     transition: border 0.2s ease, background-color 0.2s ease, transform 0.2s ease;

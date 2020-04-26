@@ -716,8 +716,8 @@ table.player-list {
         transform: scale(1.2);
     }
 
-    &.button-panel-secondary {
-        color: #666;
+    &.button-panel-secondary:not(:hover) {
+        opacity: 0.5;
     }
 
     .button-panel-row-label {
