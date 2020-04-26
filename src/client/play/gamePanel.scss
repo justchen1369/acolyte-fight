@@ -210,6 +210,10 @@ table.player-list {
     border: none;
 }
 
+.text-message-container:not(.text-message-focus) {
+    opacity: 0.5;
+}
+
 .mobile .text-message-container {
     cursor: pointer;
     pointer-events: all;
@@ -235,12 +239,7 @@ table.player-list {
     font-style: italic;
 }
 
-.desktop .text-message-container .hint {
-    color: #888;
-}
-
 .text-message-container .hint .hint-enter-key {
-    color: #ccc;
     font-weight: bold;
 }
 
