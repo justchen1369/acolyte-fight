@@ -13,6 +13,7 @@ interface HashValues {
 interface PlayerValues {
     userId?: string;
     userHash: string;
+    teamId?: string;
     rank: number;
 }
 
@@ -84,6 +85,7 @@ function extractValues(gameStats: m.GameStatsMsg): HashValues {
         players: gameStats.players.map(player => ({
             userId: player.userId,
             userHash: player.userHash,
+            teamId: player.teamId,
             rank: player.rank,
         })),
     };
