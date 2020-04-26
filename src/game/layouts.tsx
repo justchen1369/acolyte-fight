@@ -1,12 +1,12 @@
 export const Layouts: Layouts = {
     "circle": {
         "color": "#45294a",
-        "background": "#361e3b",
+        "background": "#301037",
         "obstacles": []
     },
     "cold": {
         "color": "#422f52",
-        "background": "#321c45",
+        "background": "#2d1541",
         "numPoints": 6,
         "obstacles": [
             {
@@ -58,7 +58,7 @@ export const Layouts: Layouts = {
                 "angularWidthInRevs": 0.333333
             },
             {
-                type: "lightweight",
+                "type": "lightweight",
                 "numObstacles": 20,
                 "layoutRadius": 0.25,
                 "layoutAngleOffsetInRevs": 0,
@@ -113,7 +113,7 @@ export const Layouts: Layouts = {
     },
     "double": {
         "color": "#453b2a",
-        "background": "#362a18",
+        "background": "#362812",
         "numPoints": 4,
         "obstacles": [
             {
@@ -169,8 +169,8 @@ export const Layouts: Layouts = {
         "numPoints": 4
     },
     "exit": {
-        "color": "#45372e",
-        "background": "#36281f",
+        "color": "#45332e",
+        "background": "#371f15",
         "obstacles": [
             {
                 "type": "outward",
@@ -250,7 +250,7 @@ export const Layouts: Layouts = {
     },
     "snowflake": {
         "color": "#452931",
-        "background": "#362026",
+        "background": "#361b22",
         "numPoints": 6,
         "angleOffsetInRevs": 0.08333333333,
         "obstacles": [
@@ -323,7 +323,7 @@ export const Layouts: Layouts = {
     },
     "pepper": {
         "color": "#453b2a",
-        "background": "#362a18",
+        "background": "#302716",
         "obstacles": [
             {
                 "numObstacles": 5,
@@ -348,7 +348,7 @@ export const Layouts: Layouts = {
     },
     "mirrors": {
         "color": "#412f4f",
-        "background": "#342042",
+        "background": "#2c183a",
         "obstacles": [
             {
                 "type": "mirror",
@@ -441,8 +441,8 @@ export const Layouts: Layouts = {
         ]
     },
     "spiral": {
-        "color": "#453426",
-        "background": "#362518",
+        "color": "#453126",
+        "background": "#361e12",
         "obstacles": [
             {
                 "type": "inward",
@@ -475,7 +475,7 @@ export const Layouts: Layouts = {
     },
     "triplet": {
         "color": "#442b4a",
-        "background": "#301836",
+        "background": "#2f1236",
         "obstacles": [
             {
                 "type": "spinner",
@@ -492,7 +492,7 @@ export const Layouts: Layouts = {
     },
     "square": {
         "color": "#40262d",
-        "background": "#361a21",
+        "background": "#32161d",
         "numPoints": 4,
         "obstacles": [
             {
@@ -517,7 +517,7 @@ export const Layouts: Layouts = {
     },
     "surrounded": {
         "color": "#45352a",
-        "background": "#362113",
+        "background": "#321f11",
         "obstacles": [
             {
                 "numObstacles": 15,
@@ -555,7 +555,7 @@ export const Layouts: Layouts = {
     },
     "tripletSwirl": {
         "color": "#472a39",
-        "background": "#361927",
+        "background": "#331423",
         "obstacles": [
             {
                 "type": "volcano",
@@ -602,4 +602,4 @@ export const Layouts: Layouts = {
             }
         ]
     }
-}
+};
