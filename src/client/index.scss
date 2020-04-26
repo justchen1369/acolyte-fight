@@ -142,8 +142,8 @@ a:hover, a:active {
 }
 
 @keyframes loading-text-animation {
-    from { color: white; }
-    to { color: #888; }
+    from { opacity: 1; }
+    to { opacity: 0.5; }
 }
 
 .btn {
