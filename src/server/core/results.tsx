@@ -32,24 +32,36 @@ export function calculateResult(game: g.Game) {
 }
 
 function findStats(game: g.Game): m.GameStatsMsg {
-    const Majority = 0.51;
-    const corroborateThreshold = Math.max(1, Math.ceil(game.scores.size * Majority));
+    const Majority = 0.5;
+    const majorityThreshold = Math.max(1, Math.ceil(game.scores.size * Majority));
+
     const candidates = new Map<string, CandidateHash>();
     for (const gameStats of wu(game.scores.values()).toArray()) {
         const hash = hashStats(gameStats);
         if (candidates.has(hash)) {
             const candidate = candidates.get(hash);
             candidate.frequency += 1;
-            if (candidate.frequency >= corroborateThreshold) {
-                // This candidate has been corroborated by enough players
-                return candidate.gameStats;
+            if (candidate.frequency > majorityThreshold) {
+                break;
             }
         } else {
             candidates.set(hash, { gameStats, hash, frequency: 1 });
         }
     }
-    // No candidates corroborated
-    return null;
+
+    let best: CandidateHash = null;
+    candidates.forEach(candidate => {
+        if (!best || candidate.frequency > best.frequency) {
+            best = candidate;
+        }
+    });
+
+    if (best && best.frequency >= majorityThreshold) {
+        return best.gameStats;
+    } else {
+        // Not enough to corroborate this result
+        return null;
+    }
 }
 
 function validateGameStats(gameStats: m.GameStatsMsg, game: g.Game) {
