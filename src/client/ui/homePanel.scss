@@ -40,7 +40,8 @@
     font-size: 600%;
     font-style: italic;
     letter-spacing: -0.05em;
-    animation: emphasise-flash alternate 0.5s infinite linear;
+    animation: emphasise-flash alternate 0.6s infinite linear;
+    transform: scale(1);
 }
 
 .home .subtitle {
@@ -51,8 +52,8 @@
 }
 
 @keyframes emphasise-flash {
-    from { opacity: 0.8 }
-    to { opacity: 1 }
+    from { opacity: 0.8; transform: scale(1) }
+    to { opacity: 1; transform: scale(1.01) }
 }
 
 @media (max-width: 768px) {
