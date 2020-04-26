@@ -59,6 +59,7 @@ class HomePanel extends React.PureComponent<Props, State> {
                     <video autoPlay muted loop>
                         <source src={`${url.base}/cdn/videos/g8925d.m4v`} type="video/mp4" />
                     </video>
+                    <div className="mask"></div>
                     <div className="spacer" />
                     <div className="title"><span className="title-left">{this.props.titleLeft}</span> <span className="title-right">{this.props.titleRight}</span></div>
                     {!_.isEmpty(this.props.subtitleLeft) && !_.isEmpty(this.props.subtitleRight) && <>
@@ -66,7 +67,6 @@ class HomePanel extends React.PureComponent<Props, State> {
                         <div className="subtitle"><span className="subtitle-left">{this.props.subtitleLeft}</span> <span className="subtitle-right">{this.props.subtitleRight}</span></div>
                     </>}
                     <div className="spacer" />
-                    <div className="mask"></div>
                 </div>
                 <div className="spacer" />
                 <div className="primary-button-row button-row">

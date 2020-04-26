@@ -29,8 +29,9 @@
     width: 100%;
 
     font-weight: bold;
+    mix-blend-mode: luminosity;
 
-    @include strokeShadow(0 0 0.1em #fff4, 0.1em 0.1em 0 #000c);
+    @include strokeShadow(0 0 8px #fffc, 0.1em 0.1em 0 #000c);
 }
 
 .home .title {
@@ -38,12 +39,13 @@
     font-family: "ChicagoFLF", "Helvetica", sans-serif;
     font-size: 600%;
     font-style: italic;
+    letter-spacing: -0.05em;
     animation: emphasise-flash alternate 0.5s infinite linear;
 }
 
 .home .subtitle {
     color: #fff;
-    opacity: 0.8;
+    opacity: 0.7;
     font-size: 200%;
     letter-spacing: 0.2em;
 }
