@@ -125,7 +125,7 @@ const Visuals: VisualSettings = {
 	WorldAnimateWinTicks: 15,
     WorldWinGrowth: 0.05,
     WorldWinDarken: 0.5,
-    WorldWinBackgroundDarken: 0.8,
+    WorldWinBackgroundDarken: 0.75,
 
 	DefaultGlowRadius: 4 * Pixel,
     GradientAngleInRevs: 3 / 8,
