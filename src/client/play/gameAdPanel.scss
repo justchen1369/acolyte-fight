@@ -1,0 +1,13 @@
+.banner-ad.game-banner-ad {
+    padding: 0;
+    mix-blend-mode: screen;
+
+    position: absolute;
+    right: 0;
+    bottom: 40px;
+    margin-bottom: 2.5em; /* Same height as SocialBar */
+}
+
+.banner-ad.game-banner-ad.game-banner-ad-covered {
+    display: none;
+}

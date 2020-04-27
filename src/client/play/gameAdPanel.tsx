@@ -1,5 +1,7 @@
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
@@ -7,14 +9,15 @@ import * as options from '../options';
 import * as storage from '../storage';
 import * as url from '../url';
 import BannerAd from '../controls/BannerAd';
+import './gameAdPanel.scss';
 
 interface Props {
     gameId: string;
+    hoveringSpell: boolean;
+    isPlaying: boolean;
     isDead: boolean;
     isWon: boolean;
     isStarted: boolean;
-    noAutoJoin: boolean;
-    numRemainingPlayers: number;
     touched: boolean;
 }
 interface State {
@@ -25,12 +28,12 @@ function stateToProps(state: s.State): Props {
     const world = state.world;
     const myHeroId = world.ui.myHeroId;
     return {
+        hoveringSpell: !!(state.world.ui.toolbar.alternativeSpellId || state.world.ui.toolbar.hoverSpellId),
         gameId: world.ui.myGameId,
+        isPlaying: !!myHeroId,
         isDead: engine.isDead(myHeroId, world),
         isWon: !!world.winner,
-        isStarted: world.tick >= world.startTick,
-        noAutoJoin: state.options.noAutoJoin,
-        numRemainingPlayers: engine.remainingHeroIds(world).length,
+        isStarted: world.startTick < constants.Matchmaking.MaxHistoryLength,
         touched: state.touched,
     };
 }
@@ -52,9 +55,12 @@ export class GameAdPanel extends React.PureComponent<Props, State> {
             return null; // Don't show on mobile
         }
 
-        if (this.props.gameId === this.state.showingForGameId) {
+        if (!!this.state.showingForGameId) {
+            const className = classNames('game-banner-ad', {
+                'game-banner-ad-covered': this.props.hoveringSpell,
+            });
             return <BannerAd
-                className="dialog-panel game-banner-ad"
+                className={className}
                 width={300} height={250}
                 minScreenWidthProportion={2} minScreenHeightProportion={2}
                 hideUntilLoaded={true}
@@ -69,13 +75,15 @@ export class GameAdPanel extends React.PureComponent<Props, State> {
             return; // Already showing
         }
 
-        if (!this.props.isStarted) {
-            return; // Don't show before game starts
-        }
+        if (this.props.isStarted
+            && this.props.isPlaying
+            && (this.props.isDead || this.props.isWon)) {
 
-        if (this.props.isStarted && this.props.isDead && !this.props.isWon && this.props.numRemainingPlayers > 1) {
-            // Only show if the user is likely to be on this screen for a long time
+            // This game is complete, show an ad
             this.setState({ showingForGameId: this.props.gameId });
+        } else if (!!this.state.showingForGameId && this.props.gameId !== this.state.showingForGameId && this.props.isStarted) {
+            // Previous game was showing an ad, stop showing as soon as this game starts
+            this.setState({ showingForGameId: null });
         }
     }
 }

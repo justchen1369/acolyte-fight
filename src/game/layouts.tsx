@@ -1,7 +1,7 @@
 export const Layouts: Layouts = {
     "circle": {
-        "color": "#432f46",
-        "background": "#341e38",
+        "color": "#413243",
+        "background": "#332136",
         "obstacles": []
     },
     "cold": {
