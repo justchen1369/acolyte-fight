@@ -9,8 +9,6 @@
     border-collapse: collapse;
     margin: 2em 0;
 
-    background: #282828;
-
     border: 1px black solid;
     border-radius: 5px;
 
@@ -25,7 +23,11 @@
 }
 
 .spell-frequencies-table thead tr {
-    background-color: #444;
+    background-color: #fff2;
+}
+
+.spell-frequencies-table tbody tr {
+    background: #fff1;
 }
 
 .spell-frequencies-table tr:hover {

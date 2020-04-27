@@ -7,15 +7,14 @@ html, body {
 }
 
 body {
-    background-color: #222;
-    background-image: linear-gradient(
+    background: #222 linear-gradient(
         160deg,
         #282222 0%,
-        #353333 25%,
+        #393232 25%,
         #282222 25%,
-        #353333 75%,
+        #393232 75%,
         #282222 75%,
-        #353333 100%,
+        #393232 100%,
     );
 
     font-family: "Maven Pro", "Helvetica", "Arial", sans-serif;

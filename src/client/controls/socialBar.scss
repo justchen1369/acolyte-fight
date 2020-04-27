@@ -29,11 +29,13 @@
     }
 
     a, a:visited {
-        color: #eee6;
+        color: #eee;
+        opacity: 0.5;
     }
 
     a:hover, a:active {
         color: #eee;
+        opacity: 1;
         text-shadow: 0 0 8px #fff8;
     }
 

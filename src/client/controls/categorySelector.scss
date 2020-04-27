@@ -4,6 +4,8 @@
     position: absolute;
     top: 0;
     right: 0;
+
+    @include floatShadow();
 }
 
 .category-selector .category {
@@ -14,13 +16,11 @@
     font-weight: bold;
     font-size: 120%;
     padding: 10px 20px;
-    background: #333;
+    background: #fff1;
 
     border: 1px black solid;
     transition: background-color 0.2s ease, transform 0.2s ease;
     transform: scale(1);
-
-    @include floatShadow();
 }
 
 .category-selector .category:hover {
@@ -36,7 +36,7 @@
 }
 
 .category-selector .category-selected {
-    background: #444;
+    background: #fff3;
     color: #00ccff;
 }
 
