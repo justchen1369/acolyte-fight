@@ -638,7 +638,7 @@ const meteor: Spell = {
         attractable: false,
         linkable: true,
         swappable: true,
-        radius: 0.03,
+        radius: 0.036,
         speed: 0.2,
         speedDecayPerTick: 0.2,
         restitution: 0,
@@ -655,8 +655,8 @@ const meteor: Spell = {
         color: '#ff0000',
         renderers: [
             { type: "bloom", radius: 0.06 },
-            { type: "projectile", ticks: 15, light: null, shine: 0, smoke: 0.5, fade: "#333", shadow: 0.5 },
-            { type: "strike", ticks: 15, flash: true, growth: 0.1 },
+            { type: "projectile", ticks: 18, light: null, shine: 0, smoke: 0.5, fade: "#333", shadow: 0.5 },
+            { type: "strike", ticks: 18, flash: true, growth: 0.1 },
         ],
     },
 };
@@ -699,7 +699,7 @@ const meteorite: Spell = {
     icon: "fragmentedMeteor",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 6 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -3049,7 +3049,7 @@ const swap: Spell = {
 const voidRush: Spell = {
     id: 'voidRush',
     name: 'Void Rush',
-    description: "For 2.5 seconds, increase movement speed 80%, and also become immune to damage from the void.",
+    description: "For 3 seconds, increase movement speed 80%, and also become immune to damage from the void.",
     effects: [
         cleanse,
         voidRecharge,
@@ -3065,13 +3065,13 @@ const voidRush: Spell = {
         {
             type: "movement",
             movementProportion: 1.8,
-            maxTicks: 2.5 * TicksPerSecond,
+            maxTicks: 3 * TicksPerSecond,
         },
         {
             type: "armor",
             proportion: -1,
             source: "lava",
-            maxTicks: 2.5 * TicksPerSecond,
+            maxTicks: 3 * TicksPerSecond,
             sound: "voidRush-lavaImmunity",
             render: {
                 color: "#8800ff",
@@ -3097,7 +3097,7 @@ const voidRush: Spell = {
 const vanish: Spell = {
     id: 'vanish',
     name: 'Vanish',
-    description: "Vanish from sight for 2.5 seconds, and also increase movement speed 80%.",
+    description: "Vanish from sight for 3 seconds, and also increase movement speed 80%.",
     effects: [
         cleanse,
         voidRecharge,
@@ -3111,12 +3111,12 @@ const vanish: Spell = {
     debuff: true,
     movementProportionWhileChannelling: 1.8,
     interruptibleAfterTicks: 15,
-    maxChannellingTicks: 2.5 * TicksPerSecond,
+    maxChannellingTicks: 3 * TicksPerSecond,
 
     buffs: [
         {
             type: "vanish",
-            maxTicks: 2.5 * TicksPerSecond,
+            maxTicks: 3 * TicksPerSecond,
             channelling: true,
             cancelOnBump: true,
             sound: "vanish",
