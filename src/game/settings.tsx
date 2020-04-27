@@ -87,6 +87,7 @@ const World: WorldSettings = {
     SecondsToShrink: 90,
     ShrinkPowerMinPlayers: 1.5,
     ShrinkPowerMaxPlayers: 0.25,
+    ShrinkCatchupProportionPerTick: 0.01,
 
     ProjectileSpeedDecayFactorPerTick: 0.05,
     SlopSpeed: 0.001,

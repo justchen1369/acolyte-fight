@@ -4256,16 +4256,34 @@ function isPositionInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
 }
 
 function shrink(world: w.World) {
-	const Matchmaking = world.settings.Matchmaking;
-	const World = world.settings.World;
-	if (world.tick >= world.startTick && !world.winner) {
-		const seconds = (world.tick - world.startTick) / TicksPerSecond;
-		const proportion = Math.max(0, 1.0 - seconds / World.SecondsToShrink);
+	if (world.tick > world.startTick && !world.winner) {
+		const World = world.settings.World;
 
-		const powerAlpha = Math.min(1, world.players.size / Matchmaking.MaxPlayers);
-		const power = powerAlpha * World.ShrinkPowerMaxPlayers + (1 - powerAlpha) * World.ShrinkPowerMinPlayers;
-		world.shrink = Math.pow(proportion, power);
+		const numPlayers = remainingHeroIds(world).length;
+
+		const newShrink = calculateShrinkAtTick(world.tick, world.startTick, numPlayers, world.settings);
+		const previousShrink = calculateShrinkAtTick(world.tick - 1, world.startTick, numPlayers, world.settings);
+		const delta = newShrink - previousShrink;
+		world.shrink += delta;
+
+		const catchup = World.ShrinkCatchupProportionPerTick * (newShrink - world.shrink);
+		world.shrink += catchup;
 	}
+}
+
+function calculateShrinkAtTick(tick: number, startTick: number, numPlayers: number, settings: AcolyteFightSettings) {
+	const Matchmaking = settings.Matchmaking;
+	const World = settings.World;
+
+	const availableTicks = World.SecondsToShrink * TicksPerSecond;
+	const finalTick = startTick + availableTicks;
+	const remainingTicks = Math.max(0, finalTick - tick);
+	const proportion = remainingTicks / availableTicks;
+
+	const powerAlpha = Math.min(1, numPlayers / Matchmaking.MaxPlayers);
+	const power = powerAlpha * World.ShrinkPowerMaxPlayers + (1 - powerAlpha) * World.ShrinkPowerMinPlayers;
+
+	return Math.pow(proportion, power);
 }
 
 export function calculateWorldMinExtent(world: w.World) {

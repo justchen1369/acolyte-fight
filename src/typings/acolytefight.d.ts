@@ -108,6 +108,7 @@ declare interface WorldSettings {
 	SecondsToShrink: number;
 	ShrinkPowerMinPlayers: number; // Make the shrinking non-linear. Higher values mean faster shrinking at the start of the game.
 	ShrinkPowerMaxPlayers: number;
+	ShrinkCatchupProportionPerTick: number; // As players leave, shrink faster to catch up to what the map size would've been if we had started with fewer players
 
 	MaxLifeSteal: number; // A single hit can never do more than this much lifesteal, no matter how many lifesteal buffs it has
 	
