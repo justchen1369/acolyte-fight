@@ -200,6 +200,7 @@ declare interface SwatchColor {
 	color: string;
 	deadColor?: string;
 	flash?: boolean; // Whether to flash when obstacle hit. Defaults to true.
+	tint?: number; // Add this proportion of the map color to the obstacle color
 }
 
 declare interface SwatchFill extends SwatchColor {

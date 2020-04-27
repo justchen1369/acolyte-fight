@@ -325,16 +325,18 @@ const defaultTemplate: ObstacleTemplate = {
         outline,
         {
             type: "solid",
-            color: '#ddd',
+            color: '#bbb',
             deadColor: '#c33',
             gradient: 0.2,
+            tint: 1,
         },
         {
             type: "solid",
-            color: '#999',
+            color: '#777',
             deadColor: '#822',
             gradient: 0.3,
             expand: -0.003,
+            tint: 1,
         },
     ],
 };
@@ -360,16 +362,18 @@ const lightweight: ObstacleTemplate = {
         outline,
         {
             type: "solid",
-            color: '#eee',
+            color: '#ccc',
             deadColor: '#c33',
             gradient: 0.2,
+            tint: 1,
         },
         {
             type: "solid",
-            color: '#aaa',
+            color: '#999',
             deadColor: '#822',
             gradient: 0.3,
             expand: -0.003,
+            tint: 1,
         },
     ],
 };
@@ -505,16 +509,18 @@ const spinner: ObstacleTemplate = {
         outline,
         {
             type: "solid",
-            color: '#ddd',
+            color: '#bbb',
             deadColor: '#c33',
             gradient: 0.2,
+            tint: 1,
         },
         {
             type: "solid",
-            color: '#999',
+            color: '#777',
             deadColor: '#822',
             gradient: 0.3,
             expand: -0.003,
+            tint: 1,
         },
     ],
 

@@ -111,6 +111,14 @@ export default class ColTuple {
         return this;
     }
 
+    add(newCol: ColTuple, fraction: number) {
+        this.tuple[0] += Math.min(1.0, fraction * newCol.tuple[0]);
+        this.tuple[1] += Math.min(1.0, fraction * newCol.tuple[1]);
+        this.tuple[2] += Math.min(1.0, fraction * newCol.tuple[2]);
+        // Don't change alpha
+        return this;
+    }
+
     adjust(fraction: number) {
         if (fraction > 0) {
             return this.lighten(fraction);

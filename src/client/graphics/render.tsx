@@ -933,6 +933,10 @@ function calculateObstacleColor(obstacle: w.Obstacle, context: RenderObstacleCon
 		}
 	}
 
+	if (fill.tint > 0) {
+		color.add(ColTuple.parse(world.color), fill.tint);
+	}
+
 	return color;
 }
 
