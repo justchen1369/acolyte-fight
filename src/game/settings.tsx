@@ -1356,7 +1356,7 @@ const link: Spell = {
     ],
     action: "projectile",
 
-    color: '#0000ff',
+    color: '#6600ff',
     icon: "andromedaChain",
 
     maxAngleDiffInRevs: 0.01,
