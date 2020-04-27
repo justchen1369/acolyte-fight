@@ -5787,7 +5787,7 @@ function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, wor
 	obstacle.health = Math.min(obstacle.maxHealth, Math.max(0, obstacle.health - packet.damage));
 }
 
-function getMinExtent(obj: w.WorldObject): number {
+export function getMinExtent(obj: w.WorldObject): number {
 	if (obj.category === "hero") {
 		return obj.radius;
 	} else if (obj.category === "projectile") {

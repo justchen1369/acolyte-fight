@@ -271,6 +271,7 @@ function worldToState(world: w.World, myHeroId: number): AI.World {
                 type: obj.type,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
+                minExtent: engine.getMinExtent(obj),
             };
         }
     });

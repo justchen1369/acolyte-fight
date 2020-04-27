@@ -75,4 +75,5 @@ export interface CooldownsRemaining {
 
 export interface Obstacle extends WorldObject {
 	type: string;
+	minExtent: number; // The distance between the position of the obstacle and its nearest edge
 }
