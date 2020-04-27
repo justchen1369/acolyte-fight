@@ -25,35 +25,57 @@
     align-items: center;
 }
 
+.title-mask {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-overlay {
+    mix-blend-mode: screen;
+}
+
+.title-underlay {
+    mix-blend-mode: color-dodge;
+    top: 6px;
+    left: 6px;
+
+    filter: drop-shadow(0 0 8px #eeec)
+}
+
+.title-gap {
+    padding-bottom: 1em;
+}
+
 .home .title, .home .subtitle {
     width: 100%;
 
     font-weight: bold;
-    mix-blend-mode: luminosity;
-
-    @include strokeShadow(0 0 8px #fffc, 0.1em 0.1em 0 #000c);
 }
 
 .home .title {
-    opacity: 0.9;
     font-family: "ChicagoFLF", "Helvetica", sans-serif;
     font-size: 600%;
     font-style: italic;
     letter-spacing: -0.05em;
     animation: emphasise-flash alternate 0.6s infinite linear;
     transform: scale(1);
+    color: #eee;
 }
 
 .home .subtitle {
-    color: #fff;
-    opacity: 0.8;
+    color: #eee;
     font-size: 200%;
     letter-spacing: 0.2em;
 }
 
 @keyframes emphasise-flash {
-    from { opacity: 0.8; transform: scale(1) }
-    to { opacity: 1; transform: scale(1.01) }
+    from { transform: scale(1) }
+    to { transform: scale(1.01) }
 }
 
 @media (max-width: 768px) {

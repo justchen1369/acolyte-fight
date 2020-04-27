@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import classNames from 'classnames';
 import scrollIntoView from 'scroll-into-view';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
@@ -60,13 +61,8 @@ class HomePanel extends React.PureComponent<Props, State> {
                         <source src={`${url.base}/cdn/videos/g8925d.m4v`} type="video/mp4" />
                     </video>
                     <div className="mask"></div>
-                    <div className="spacer" />
-                    <div className="title"><span className="title-left">{this.props.titleLeft}</span> <span className="title-right">{this.props.titleRight}</span></div>
-                    {!_.isEmpty(this.props.subtitleLeft) && !_.isEmpty(this.props.subtitleRight) && <>
-                        <div className="spacer" style={{ flexGrow: 0.1 }} />
-                        <div className="subtitle"><span className="subtitle-left">{this.props.subtitleLeft}</span> <span className="subtitle-right">{this.props.subtitleRight}</span></div>
-                    </>}
-                    <div className="spacer" />
+                    {this.renderTitleMask("title-underlay")}
+                    {this.renderTitleMask("title-overlay")}
                 </div>
                 <div className="spacer" />
                 <div className="primary-button-row button-row">
@@ -99,6 +95,16 @@ class HomePanel extends React.PureComponent<Props, State> {
                 <p className="view-more-ad">Go to <Link page="settings">Settings</Link> for more settings</p>
             </div>
         </div>;
+    }
+
+    private renderTitleMask(className: string) {
+        return <div className={classNames('title-mask', className)}>
+            <div className="title"><span className="title-left">{this.props.titleLeft}</span> <span className="title-right">{this.props.titleRight}</span></div>
+            {!_.isEmpty(this.props.subtitleLeft) && !_.isEmpty(this.props.subtitleRight) && <>
+                <div className="title-gap" />
+                <div className="subtitle"><span className="subtitle-left">{this.props.subtitleLeft}</span> <span className="subtitle-right">{this.props.subtitleRight}</span></div>
+            </>}
+        </div>
     }
 
     private scrollBelowFold() {
