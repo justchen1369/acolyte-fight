@@ -246,10 +246,10 @@ export const conveyorBase: ObstacleTemplate = {
     render: [
         {
             type: "solid",
-            "color": "rgba(64, 64, 64, 0.25)",
-            deadColor: "rgba(64, 64, 64, 0.1)",
+            "color": "#3334",
+            deadColor: "#3331",
             glow: 0.2,
-            light: 0.5,
+            tint: 1,
         },
         {
             type: "smoke",
