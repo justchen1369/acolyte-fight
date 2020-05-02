@@ -26,7 +26,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
 class PlayerName extends React.PureComponent<Props> {
     render() {
         const player = this.props.player;
-        const color = heroColor(player.heroId, this.props.world);
+        const color = heroColor(player.heroId, this.props.world).string();
 
         let title = player.name;
         if (player.isBot) {

@@ -36,8 +36,8 @@ export namespace CastStage {
 
 export interface World {
 	seed: number | null;
-	color: string;
-	background: string;
+	color: ColTuple;
+	background: ColTuple;
 	startMessage: string;
 
 	tick: number;
@@ -92,7 +92,7 @@ export interface Collision {
 
 export interface Team {
 	teamId: string;
-	color: string;
+	color: ColTuple;
 	heroIds: number[];
 }
 
@@ -223,13 +223,13 @@ export interface Player {
 	left?: boolean; // This was a human player who left
 
 	// Not synced across clients
-	uiBaseColor: string;
-	uiColor: string;
+	uiBaseColor: ColTuple;
+	uiColor: ColTuple;
 }
 
 export interface ButtonRenderState {
 	key: string;
-	color: string;
+	color: ColTuple;
 	icon: string;
 	cooldownText: string;
 	emphasis: number;
@@ -469,7 +469,7 @@ export interface ShieldBase extends WorldObjectBase {
 	destroying?: boolean;
 	owner: number;
 
-	color: string;
+	color: ColTuple;
 	selfColor?: boolean;
 	hitTick?: number;
 
@@ -545,14 +545,14 @@ export interface CastState {
 	strikeCancelToken?: CollideToken;
 
 	proportion?: number;
-	color?: string;
+	color?: ColTuple;
 
 	uiScale?: number;
 }
 
 export interface CastHistoryItem {
 	spellId: string;
-	color: string;
+	color: ColTuple;
 	glow?: number;
 	castTick: number;
 }
@@ -777,7 +777,7 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	expireOnMirror?: boolean;
 	destructible?: DestructibleParameters;
 
-	color: string;
+	color: ColTuple;
 	renderers: RenderParams[];
 	sound?: string;
 	soundHit?: string;
@@ -1170,7 +1170,7 @@ export interface TeleportEvent extends WorldEventBase {
 export interface SetCooldownEvent extends WorldEventBase {
 	type: "cooldown";
 	heroId: number;
-	color?: string;
+	color?: ColTuple;
 	sound?: string;
 }
 
@@ -1187,7 +1187,7 @@ export interface PushEvent extends WorldEventBase {
 	owner: number;
 	objectId: number;
 	direction: pl.Vec2;
-	color?: string;
+	color?: ColTuple;
 }
 
 export interface LeaveEvent extends WorldEventBase {
@@ -1203,7 +1203,7 @@ export interface Action {
 }
 
 export interface MapHighlight {
-	color: string;
+	color: ColTuple;
 	fromTick: number;
 	maxTicks: number;
 }
@@ -1220,7 +1220,7 @@ export interface TrailBase {
 	initialTick: number;
 	max: number;
 
-	fillStyle: string;
+	fillStyle: ColTuple;
 	shine?: number; // Lighten to start with
 	fade?: string; // Fade away into this color
 	vanish?: number; // Fade away into transparent

@@ -2,6 +2,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import pl, { World } from 'planck-js';
 import wu from 'wu';
+import ColTuple from './colorTuple';
 import * as Immutable from 'immutable';
 import * as arrayUtils from '../utils/arrayUtils';
 import * as colorWheel from './colorWheel';
@@ -50,7 +51,7 @@ interface DetonateConfig {
 	impulseMultiplier?: number;
 
 	sourceId: number;
-	color?: string;
+	color?: ColTuple;
 	defaultSound?: string;
 	buffDurationMultiplier?: number;
 }
@@ -107,8 +108,8 @@ export function initialWorld(mod: Object): w.World {
 
 	let world: w.World = {
 		seed: null,
-		color: Visuals.DefaultWorldColor,
-		background: Visuals.Background,
+		color: ColTuple.parse(Visuals.DefaultWorldColor),
+		background: ColTuple.parse(Visuals.Background),
 		startMessage: World.DefaultGameStartMessage,
 
 		tick: 0,
@@ -387,7 +388,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		angularWidth: revs * vector.Tau,
 		points,
 		turnRate: (spell.maxTurnRatePerTickInRevs || 1) * vector.Tau,
-		color: spell.color,
+		color: ColTuple.parse(spell.color),
 		colorize: spell.colorize,
 		light: spell.light,
 		glow: spell.glow,
@@ -459,7 +460,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		owner: hero.id,
 		points,
 		extent,
-		color: spell.color,
+		color: ColTuple.parse(spell.color),
 		selfColor: spell.selfPassthrough,
 		light: spell.light,
 		glow: spell.glow,
@@ -528,7 +529,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 		owner: hero.id,
 		points,
 
-		color: spell.color,
+		color: ColTuple.parse(spell.color),
 		colorize: spell.colorize,
 		shine: spell.shine,
 		light: spell.light,
@@ -893,7 +894,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		sound: projectileTemplate.sound,
 		soundHit: projectileTemplate.soundHit,
 
-		color: projectileTemplate.color,
+		color: ColTuple.parse(projectileTemplate.color),
 		renderers: projectileTemplate.renderers,
 		radius: projectileTemplate.radius,
 
@@ -1639,10 +1640,10 @@ function seedEnvironment(ev: n.EnvironmentMsg, world: w.World) {
 	}
 
 	if (layout.color) {
-		world.color = layout.color;
+		world.color = ColTuple.parse(layout.color);
 	}
 	if (layout.background) {
-		world.background = layout.background;
+		world.background = ColTuple.parse(layout.background);
 	}
 	
 	if (layout.numPoints) {
@@ -1870,7 +1871,7 @@ function assignTeams(teams: number[][], world: w.World) {
 	for (let i = 0; i < teams.length; ++i) {
 		const team = teams[i];
 		const teamId = `team${i}`;
-		const teamColor = team.some(heroId => isPresentOrPastSelf(heroId, world)) ? Visuals.AllyColor : Visuals.TeamColors[i];
+		const teamColor = ColTuple.parse(team.some(heroId => isPresentOrPastSelf(heroId, world)) ? Visuals.AllyColor : Visuals.TeamColors[i]);
 
 		for (let j = 0; j < team.length; ++j) {
 			const heroId = team[j];
@@ -1879,7 +1880,7 @@ function assignTeams(teams: number[][], world: w.World) {
 			let player = world.players.get(heroId);
 			player = {
 				...player,
-				uiColor: isPresentOrPastSelf(heroId, world) ? Visuals.MyHeroColor : colorWheel.teamColor(teamColor)
+				uiColor: isPresentOrPastSelf(heroId, world) ? ColTuple.parse(Visuals.MyHeroColor) : colorWheel.teamColor(teamColor)
 			};
 			world.players = world.players.set(heroId, player);
 		}
@@ -1927,7 +1928,7 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
-	const color = Visuals.BotColor || chooseNewPlayerColor(null, world);
+	const color = Visuals.BotColor ? ColTuple.parse(Visuals.BotColor) : chooseNewPlayerColor(null, world);
 	const player: w.Player = {
 		heroId: hero.id,
 		controlKey: ev.controlKey,
@@ -1991,11 +1992,11 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 	return true;
 }
 
-function choosePlayerColor(heroId: number, userHash: string, baseColor: string, world: w.World) {
+function choosePlayerColor(heroId: number, userHash: string, baseColor: ColTuple, world: w.World): ColTuple {
 	const Visuals = world.settings.Visuals;
 	
 	if (heroId === world.ui.myHeroId || userHash === world.ui.myUserHash) {
-		return Visuals.MyHeroColor;
+		return ColTuple.parse(Visuals.MyHeroColor);
 	} else if (world.teamAssignments.has(heroId)) {
 		const teamId = world.teamAssignments.get(heroId);
 		const team = world.teams.get(teamId);
@@ -2005,7 +2006,7 @@ function choosePlayerColor(heroId: number, userHash: string, baseColor: string, 
 	}
 }
 
-function chooseNewPlayerColor(userHash: string, world: w.World) {
+function chooseNewPlayerColor(userHash: string, world: w.World): ColTuple {
 	const Visuals = world.settings.Visuals;
 
 	const preferredColor = userHash ? colorWheel.getPreferredColor(userHash) : null;
@@ -2016,7 +2017,7 @@ function chooseNewPlayerColor(userHash: string, world: w.World) {
 			const player = world.players.get(hero.id);
 			if (player && player.userHash !== userHash) {
 				// If player reconnecting, allow their color to be reused
-				alreadyUsedColors.add(player.uiBaseColor);
+				alreadyUsedColors.add(player.uiBaseColor.string());
 			}
 		}
 	});
@@ -2035,7 +2036,7 @@ function chooseNewPlayerColor(userHash: string, world: w.World) {
 		colorWheel.setPreferredColor(userHash, uiColor);
 	}
 
- 	return uiColor;	
+ 	return ColTuple.parse(uiColor);	
 }
 
 function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
@@ -2344,7 +2345,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		hero.casting = {
 			id: world.nextObjectId++,
 			action: action,
-			color: spell.color,
+			color: ColTuple.parse(spell.color),
 			stage: w.CastStage.Cooldown,
 			initialAngle: vector.angleDiff(action.target, hero.body.getPosition()),
 		};
@@ -3144,7 +3145,7 @@ function emitPushFromProjectile(projectile: w.Projectile, toHero: w.Hero, world:
 	emitPush(projectile.owner, direction, projectile.color, toHero.id, world);
 }
 
-function emitPush(fromHeroId: number, direction: pl.Vec2, color: string, toObjectId: number, world: w.World) {
+function emitPush(fromHeroId: number, direction: pl.Vec2, color: ColTuple, toObjectId: number, world: w.World) {
 	const push: w.PushEvent = {
 		type: "push",
 		tick: world.tick,
@@ -5092,7 +5093,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 	const detonate = instantiateDetonate(spell.detonate, hero.id, world);
 	detonateAt(hero.body.getPosition(), hero, detonate, world, {
 		sourceId: hero.id,
-		color: spell.color,
+		color: ColTuple.parse(spell.color),
 		defaultSound: spell.sound,
 	});
 
@@ -5434,7 +5435,7 @@ function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.Wor
 		world.ui.events.push({
 			type: "cooldown",
 			tick: world.tick,
-			color: template.color,
+			color: template.color ? ColTuple.parse(template.color) : undefined,
 			sound: template.sound,
 			heroId: hero.id,
 		});

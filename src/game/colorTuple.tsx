@@ -14,7 +14,7 @@ export default class ColTuple {
     static parse(str: string): ColTuple {
         let col = parseCache.get(str);
         if (!col) {
-            const color = Color(str).rgb();
+            const color = Color(str || '#0000').rgb();
             col = ColTuple.fromColor(color);
             parseCache.set(str, col);
         }

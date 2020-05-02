@@ -40,7 +40,7 @@ const ShadowOffset = pl.Vec2(0, 0.005);
 const EaseDecay = 0.9;
 
 interface SwirlContext {
-	color?: string;
+	color?: ColTuple;
 	baseVelocity?: pl.Vec2;
 	tag?: number;
 	multiplier?: number;
@@ -438,7 +438,7 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 			initialTick: world.tick,
 			pos,
 			velocity,
-			fillStyle: "white",
+			fillStyle: ColTuple.parse('#fff'),
 			radius: hero.radius,
 			glow: 0.05,
 			bloom: DefaultBloomRadius,
@@ -473,7 +473,7 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 			radius: particleRadius,
 			initialTick: world.tick,
 			max: 30,
-			fillStyle: '#fff',
+			fillStyle: ColTuple.parse('#fff'),
 			fade: 'rgba(0, 0, 0, 0)',
 		}, world);
 	}
@@ -603,7 +603,7 @@ function renderCast(ctxStack: CanvasCtxStack, ev: w.CastEvent, world: w.World, o
 		from: points[0],
 		to: points[2],
 		width: Visuals.CastFailedLineWidth,
-		fillStyle: Visuals.CastFailedColor,
+		fillStyle: ColTuple.parse(Visuals.CastFailedColor),
 		vanish: 1,
 		light: null,
 	}, world);
@@ -614,7 +614,7 @@ function renderCast(ctxStack: CanvasCtxStack, ev: w.CastEvent, world: w.World, o
 		from: points[1],
 		to: points[3],
 		width: Visuals.CastFailedLineWidth,
-		fillStyle: Visuals.CastFailedColor,
+		fillStyle: ColTuple.parse(Visuals.CastFailedColor),
 		vanish: 1,
 		light: null,
 	}, world);
@@ -648,7 +648,7 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 		max: ev.explosionTicks,
 		initialTick: ev.tick,
 		pos: ev.pos,
-		fillStyle: 'white',
+		fillStyle: ColTuple.parse('#fff'),
 		radius: ev.radius,
 		light: null,
 		glow: DefaultGlow,
@@ -705,7 +705,7 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 	}
 }
 
-function renderJumpSmoke(ctxStack: CanvasCtxStack, color: string, pos: pl.Vec2, world: w.World, initialTick: number = world.tick) {
+function renderJumpSmoke(ctxStack: CanvasCtxStack, color: ColTuple, pos: pl.Vec2, world: w.World, initialTick: number = world.tick) {
 	const Hero = world.settings.Hero;
 	const MaxTicks = 15;
 	const NumParticles = 5;
@@ -749,7 +749,7 @@ function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
 	const highlight: w.MapHighlight = {
 		fromTick: ev.tick,
 		maxTicks: Visuals.HighlightTicks,
-		color: ev.color || '#ffffff',
+		color: ev.color || ColTuple.parse('#fff'),
 	};
 	if (world.tick < highlight.fromTick + highlight.maxTicks) {
 		world.ui.highlights.push(highlight);
@@ -762,10 +762,10 @@ function calculateBackgroundColor(world: w.World, options: RenderOptions) {
 	}
 
 	const Visuals = world.settings.Visuals;
-	const color = ColTuple.parse(world.background);
+	const color = world.background.clone();
 	if (world.winner) {
 		const proportion = Math.min(1, (world.tick - world.winTick) / Visuals.WorldAnimateWinTicks);
-		const targetColor = ColTuple.parse(heroColor(world.winner, world)).darken(Visuals.WorldWinBackgroundDarken);
+		const targetColor = heroColor(world.winner, world).clone().darken(Visuals.WorldWinBackgroundDarken);
 		color.mix(targetColor, proportion);
 	}
 	return color;
@@ -790,10 +790,10 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	if (world.winner) {
 		const proportion = Math.max(0, 1 - (world.tick - (world.winTick || 0)) / Visuals.WorldAnimateWinTicks);
 		scale *= 1 + Visuals.WorldWinGrowth * proportion;
-		color = ColTuple.parse(heroColor(world.winner, world)).darken(Visuals.WorldWinDarken * (1 - proportion));
+		color = heroColor(world.winner, world).clone().darken(Visuals.WorldWinDarken * (1 - proportion));
 		hexColor = color.clone();
 	} else {
-		color = ColTuple.parse(world.color);
+		color = world.color.clone();
 		hexColor = color.clone();
 	}
 
@@ -801,8 +801,8 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	if (highlight && options.shake) {
 		const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
 
-		color.mix(ColTuple.parse(highlight.color), Visuals.HighlightFactor * proportion);
-		hexColor.mix(ColTuple.parse(highlight.color).lighten(Visuals.HighlightHexShineFactor * proportion), Visuals.HighlightHexFactor * proportion);
+		color.mix(highlight.color, Visuals.HighlightFactor * proportion);
+		hexColor.mix(highlight.color.lighten(Visuals.HighlightHexShineFactor * proportion), Visuals.HighlightHexFactor * proportion);
 	}
 
 	const easeMultiplier = ease(world.ui.initialRenderTick, world);
@@ -934,7 +934,7 @@ function calculateObstacleColor(obstacle: w.Obstacle, context: RenderObstacleCon
 	}
 
 	if (fill.tint > 0) {
-		color.add(ColTuple.parse(world.color), fill.tint);
+		color.add(world.color, fill.tint);
 	}
 
 	return color;
@@ -1145,7 +1145,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 		radius: particleRadius,
 		initialTick: world.tick,
 		max: smoke.ticks,
-		fillStyle: smoke.color,
+		fillStyle: ColTuple.parse(smoke.color),
 		light: smoke.light !== undefined ? smoke.light : null,
 		colorize: smoke.colorize,
 		shine: smoke.shine,
@@ -1417,9 +1417,9 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.Buff, hero: w.Hero, heroPos: pl.Vec2, world: w.World) {
 	const Visuals = world.settings.Visuals;
 
-	let color = render.color;
+	let color = ColTuple.parse(render.color);
 	if (render.selfColor && buff.owner === world.ui.myHeroId) {
-		color = Visuals.MyHeroColor;
+		color = ColTuple.parse(Visuals.MyHeroColor);
 	} else if (render.heroColor) {
 		color = heroColor(hero.id, world);
 	}
@@ -1434,7 +1434,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 	}
 
 	if (alpha < 1) {
-		color = ColTuple.parse(color).alpha(alpha).string();
+		color.alpha(alpha);
 	}
 
 	let numParticles = render.numParticles !== undefined ? render.numParticles : 1;
@@ -1479,7 +1479,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		}
 		const layer = render.light ? r.Layer.Trail : r.Layer.Solid;
 		glx.circleTrail(ctxStack, heroPos, {
-			color: ColTuple.parse(color),
+			color,
 			maxRadius: 0,
 			feather: {
 				sigma,
@@ -1529,7 +1529,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		radius += highlight.growth * radius;
 	}
 
-	let style = ColTuple.parse(color);
+	let style = color;
 	if (highlight && highlight.flash) {
 		style.lighten(highlight.flash);
 
@@ -1573,7 +1573,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 
 	// Charging
 	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
-		const strokeColor = ColTuple.parse(hero.casting.color).alpha(hero.casting.proportion);
+		const strokeColor = hero.casting.color.clone().alpha(hero.casting.proportion);
 		glx.circleSwatch(ctxStack, pos, {
 			color: strokeColor,
 			minRadius: 0,
@@ -1591,7 +1591,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	} else if (hero.uiCastTrail) {
 		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / Visuals.CastingFlashTicks;
 		if (proportion > 0) {
-			const strokeColor = ColTuple.parse(color).alpha(proportion);
+			const strokeColor = color.clone().alpha(proportion);
 			glx.circleTrail(ctxStack, pos, {
 				color: strokeColor,
 				maxRadius: 0,
@@ -1904,7 +1904,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 
 	const highlight = applyHighlight(shield.hitTick, shield, world, shield.strike);
 
-	let color = ColTuple.parse((shield.selfColor && shield.owner === world.ui.myHeroId) ? Visuals.MyHeroColor : shield.color);
+	let color = (shield.selfColor && shield.owner === world.ui.myHeroId) ? ColTuple.parse(Visuals.MyHeroColor) : shield.color.clone();
 	if (shield.colorize && ctxStack.rtx > r.GraphicsLevel.Low) {
 		color.colorize(ColTuple.hsl(Math.random(), 1.0, 0.5), shield.colorize);
 	}
@@ -2117,24 +2117,24 @@ function playShieldSounds(ctxStack: CanvasCtxStack, obj: w.Shield, world: w.Worl
 	}
 }
 
-export function heroColor(heroId: number, world: w.World) {
+export function heroColor(heroId: number, world: w.World): ColTuple {
 	const Visuals = world.settings.Visuals;
 
 	const player = world.players.get(heroId);
 	if (player.userHash === world.ui.myUserHash) {
-		return Visuals.MyHeroColor;
+		return ColTuple.parse(Visuals.MyHeroColor);
 	}
 	
 	if (!world.ui.myHeroId) {
-		return player.uiColor;
+		return player.uiColor.clone();
 	}
 
 	if (heroId === world.ui.myHeroId) {
-		return Visuals.MyHeroColor;
+		return ColTuple.parse(Visuals.MyHeroColor);
 	} else if (engine.calculateAlliance(world.ui.myHeroId, heroId, world) & Alliances.Ally) {
-		return Visuals.AllyColor;
+		return ColTuple.parse(Visuals.AllyColor);
 	} else {
-		return player.uiColor;
+		return player.uiColor.clone();
 	}
 }
 
@@ -2180,7 +2180,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 	const velocity = swirl.smoke ? particleVelocity(context.baseVelocity, swirl.smoke, -1) : null;
 	
 	const multiplier = context.multiplier !== undefined ? context.multiplier : 1;
-	const fillStyle = context.color || swirl.color;
+	const fillStyle = context.color || ColTuple.parse(swirl.color);
 	for (let i = 0; i < numParticles; ++i) {
 		const angle = angleOffset + (2 * Math.PI) * i / numParticles;
 		pushTrail({
@@ -2204,7 +2204,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 
 	if (swirl.bloom && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		glx.circleTrail(ctxStack, location, {
-			color: ColTuple.parse(fillStyle),
+			color: fillStyle,
 			maxRadius: 0,
 			feather: {
 				sigma: swirl.bloom,
@@ -2330,7 +2330,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 			max: 15,
 			initialTick: world.tick,
 			pos: projectile.body.getPosition().clone(),
-			fillStyle: 'white',
+			fillStyle: ColTuple.parse('#fff'),
 			radius: strike.detonate,
 			bloom: DefaultBloomRadius,
 			glow: DefaultGlow,
@@ -2349,7 +2349,7 @@ function renderUnattachedLink(ctxStack: CanvasCtxStack, projectile: w.Projectile
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, world: w.World, render: RenderLink, highlight?: w.TrailHighlight) {
 	const Visuals = world.settings.Visuals;
 
-	let color = ColTuple.parse(projectileColor(render, owner, world));
+	let color = projectileColor(render, owner, world);
 	let scale = 1;
 
 	if (render.colorize && ctxStack.rtx > r.GraphicsLevel.Low) {
@@ -2503,7 +2503,7 @@ function renderBloom(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: 
 		return;
 	}
 
-	let color = ColTuple.parse(projectileColor(render, projectile, world));
+	let color = projectileColor(render, projectile, world);
 	if (render.colorize && ctxStack.rtx > r.GraphicsLevel.Low) {
 		color.colorize(ColTuple.hsl(Math.random(), 1.0, 0.5), render.colorize);
 	}
@@ -2533,11 +2533,11 @@ function projectileRadiusMultiplier(projectile: w.Projectile, world: w.World, re
 	return multiplier;
 }
 
-function projectileColor(render: ProjectileColorParams, obj: w.WorldObject, world: w.World): string {
+function projectileColor(render: ProjectileColorParams, obj: w.WorldObject, world: w.World): ColTuple {
 	const Visuals = world.settings.Visuals;
 
 	if (render.selfColor && obj.owner === world.ui.myHeroId) {
-		return Visuals.MyHeroColor;
+		return ColTuple.parse(Visuals.MyHeroColor);
 	}
 
 	if (render.ownerColor) {
@@ -2545,14 +2545,14 @@ function projectileColor(render: ProjectileColorParams, obj: w.WorldObject, worl
 	}
 
 	if (render.color) {
-		return render.color;
+		return ColTuple.parse(render.color);
 	}
 
 	if (obj.category === "projectile") {
-		return obj.color;
+		return obj.color.clone();
 	}
 
-	return "#0000";
+	return ColTuple.parse("#0000");
 }
 
 function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
@@ -2567,7 +2567,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	const proportion = 1.0 * remaining / trail.max;
 	let scale = 1;
 
-	let color = ColTuple.parse(trail.fillStyle);
+	let color = trail.fillStyle.clone();
 
 	const light = parseLight(trail.light, ctxStack.rtx);
 	applyLight(light, color);
@@ -2842,9 +2842,9 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 			const spell = world.settings.Spells[spellId];
 			if (!spell) { continue }
 
-			let color = spell.passive ? "#111" : spell.color;
+			let color = ColTuple.parse(spell.passive ? "#111" : spell.color);
 			if (spell.id === hoverSpellId) {
-				color = ColTuple.parse(color).lighten(0.25).string();
+				color.lighten(0.25);
 			}
 
 			const btnState: w.ButtonRenderState = {
@@ -3147,7 +3147,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	const rebindingLookup = keyboardUtils.getRebindingLookup({ rebindings, settings });
 	let button: w.ButtonRenderState = {
 		key: spell.passive ? "" : (rebindingLookup.get(key) || ""),
-		color: spell.color,
+		color: ColTuple.parse(spell.color),
 		icon: spell.icon,
 		cooldownText: null,
 		emphasis: 1,
@@ -3159,26 +3159,26 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
 
 	if (isSelected) {
-		button.color = '#f0f0f0';
+		button.color = ColTuple.parse('#f0f0f0');
 	} else if (spell.passive) {
-		button.color = '#111';
+		button.color = ColTuple.parse('#111');
 		button.emphasis = 0.4;
 	} else if (remainingInSeconds > 1) {
-		button.color = '#222';
+		button.color = ColTuple.parse('#222');
 		button.emphasis = 0.7;
 	} else if (remainingInSeconds > 0.2) {
-		button.color = '#777';
+		button.color = ColTuple.parse('#777');
 	} else if (remainingInSeconds > 0.1) {
-		button.color = '#111';
+		button.color = ColTuple.parse('#111');
 	} else if (remainingInSeconds > 0) {
-		button.color = '#eee';
+		button.color = ColTuple.parse('#eee');
 	}
 
 	if (age < 0.1) {
-		button.color = ColTuple.parse(button.color).darken(0.5).string();
+		button.color.darken(0.5);
 	}
 	if (isHovered) {
-		button.color = ColTuple.parse(button.color).lighten(0.25).string();
+		button.color.lighten(0.25);
 	} 
 
 	if (!spell.passive && remainingInSeconds > 0) {
@@ -3210,10 +3210,10 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 		ctx.lineWidth = 1;
 
 		const gradient = ctx.createLinearGradient(size * 1/3, 0, size * 2/3, size);
-        gradient.addColorStop(0, ColTuple.parse(buttonState.color).lighten(0.1).string());
-        gradient.addColorStop(0.4, ColTuple.parse(buttonState.color).lighten(0.3).string());
-        gradient.addColorStop(0.4, buttonState.color);
-        gradient.addColorStop(1, ColTuple.parse(buttonState.color).lighten(0.2).string());
+        gradient.addColorStop(0, buttonState.color.clone().lighten(0.1).string());
+        gradient.addColorStop(0.4, buttonState.color.clone().lighten(0.3).string());
+        gradient.addColorStop(0.4, buttonState.color.string());
+        gradient.addColorStop(1, buttonState.color.clone().lighten(0.2).string());
 		ctx.fillStyle = gradient;
 		
         ctx.beginPath();
@@ -3266,10 +3266,10 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 		buttonCenter.x - size / 2, buttonCenter.y - size / 2,
 		buttonCenter.x + size / 2, buttonCenter.y + size / 2);
 
-	gradient.addColorStop(0, ColTuple.parse(buttonState.color).lighten(0.1).string());
-	gradient.addColorStop(0.45, ColTuple.parse(buttonState.color).lighten(0.3).string());
-	gradient.addColorStop(0.45, buttonState.color);
-	gradient.addColorStop(1, ColTuple.parse(buttonState.color).lighten(0.2).string());
+	gradient.addColorStop(0, buttonState.color.clone().lighten(0.1).string());
+	gradient.addColorStop(0.45, buttonState.color.clone().lighten(0.3).string());
+	gradient.addColorStop(0.45, buttonState.color.string());
+	gradient.addColorStop(1, buttonState.color.clone().lighten(0.2).string());
 
 	ctx.lineWidth = 1;
 	ctx.strokeStyle = "#000";

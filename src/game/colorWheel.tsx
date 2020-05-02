@@ -1,4 +1,5 @@
 import Color from 'color';
+import ColTuple from './colorTuple';
 
 let nextAge = 1; // start at 1 because 0 means never used before
 
@@ -52,7 +53,7 @@ function ageColor(color: string) {
     }
 }
 
-export function teamColor(baseColor: string): string {
+export function teamColor(baseColor: ColTuple): ColTuple {
     const color = Color(baseColor);
-    return color.hue(color.hue() - 30 * Math.random()).darken(0.2 * Math.random()).string();
+    return ColTuple.fromColor(color.hue(color.hue() - 30 * Math.random()).darken(0.2 * Math.random()));
 }

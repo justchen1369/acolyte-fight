@@ -258,7 +258,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         const qualityMultiplier = this.state.hd ? 8 : 1;
         const videoRecorder = new VideoRecorder(stream, qualityMultiplier);
         try {
-            this.setState({ background: this.state.hideMap ? '#000' : world.background });
+            this.setState({ background: this.state.hideMap ? '#000' : world.background.string() });
 
             await videoRecorder.start();
             console.log("Recording started...", replay.id);
