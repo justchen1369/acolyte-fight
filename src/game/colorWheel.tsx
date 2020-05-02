@@ -54,6 +54,6 @@ function ageColor(color: string) {
 }
 
 export function teamColor(baseColor: ColTuple): ColTuple {
-    const color = Color(baseColor);
+    const color = baseColor.toColor();
     return ColTuple.fromColor(color.hue(color.hue() - 30 * Math.random()).darken(0.2 * Math.random()));
 }
