@@ -3179,7 +3179,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	let cooldownText: string = null;
 	if (!spell.passive && remainingInSeconds > 0) {
 		// Cooldown
-		let cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
+		cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
 		cooldownText = cooldownText;
 	}
 
