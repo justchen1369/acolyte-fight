@@ -24,6 +24,7 @@ const vectorCenter = pl.Vec2(0.5, 0.5);
 const DefaultAttractable: AttractableParameters = {};
 
 const DefaultStrikeCollider: ColliderDefaults = {
+	collideWith: Categories.Projectile,
 	against: Alliances.All ^ Alliances.Self,
 	detonate: true,
 };
@@ -55,6 +56,7 @@ interface DetonateConfig {
 }
 
 interface ColliderDefaults {
+	collideWith?: number;
 	against?: number;
 	detonate?: boolean;
 }
@@ -1031,7 +1033,7 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 
 function instantiateCollider(template: ColliderTemplate, defaults?: ColliderDefaults): w.Collider {
 	return {
-		collideWith: template.collideWith || Categories.All,
+		collideWith: template.collideWith ?? defaults?.collideWith ?? Categories.All,
 		against: template.against ?? defaults?.against ?? Alliances.All,
 		afterTicks: template.afterTicks || 0,
 		collideTypes: template.collideTypes,

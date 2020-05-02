@@ -1476,7 +1476,7 @@ const grapple: Spell = {
     unlink: true,
 
     strikeCancel: {
-        collideWith: Categories.Hero | Categories.Projectile,
+        collideWith: Categories.Projectile,
         notCollideTypes: ["meteor", "meteorite"],
         notLinked: true,
         against: Alliances.All ^ Alliances.Self,

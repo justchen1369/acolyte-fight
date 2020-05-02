@@ -939,7 +939,7 @@ declare interface RenderBuff {
 }
 
 declare interface DebuffTemplate extends BuffTemplateBase {
-	type: "debuff";
+	type: "debuff"; // Cleanse the receiver of this buff
 }
 
 declare interface MovementBuffTemplate extends BuffTemplateBase {
