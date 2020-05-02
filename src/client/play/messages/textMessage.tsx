@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
+import * as chats from '../chats';
 import * as playerHelper from '../playerHelper';
 import * as StoreProvider from '../../storeProvider';
 import * as s from '../../store.model';
@@ -52,7 +53,7 @@ class TextMessage extends React.PureComponent<Props, State> {
     }
 
     private renderMessage(text: string) {
-        if (text.startsWith("http")) {
+        if (chats.isLink(text)) {
             return <a href={text} target="_blank" className="text-message">{text}</a>
         } else {
             return <span className="text-message">{text}</span>

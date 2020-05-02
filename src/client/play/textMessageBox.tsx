@@ -5,16 +5,8 @@ import * as s from '../store.model';
 import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
+import * as chats from './chats';
 import * as online from '../core/online';
-
-const MaxCharsPerSecond = 5;
-const MinCharsPerMessage = 10;
-const RecentMessageSeconds = 5;
-
-interface RecentMessage {
-    timestamp: number;
-    length: number;
-}
 
 interface Props {
     live: boolean;
@@ -40,7 +32,16 @@ function stateToProps(state: s.State): Props {
 class TextMessageBox extends React.PureComponent<Props, State> {
     private keyDownListener = this.onWindowKeyDown.bind(this);
     private textMessageBox: HTMLInputElement = null;
-    private recentMessages = new Array<RecentMessage>();
+    private chatThrottler = new chats.MessageThrottler({
+        maxCharsPerSecond: 10,
+        minCharsPerMessage: 10,
+        historySeconds: 5,
+    });
+    private linkThrottler = new chats.MessageThrottler({
+        maxCharsPerSecond: 5,
+        minCharsPerMessage: 100,
+        historySeconds: 30,
+    });
 
     constructor(props: Props) {
         super(props);
@@ -118,30 +119,33 @@ class TextMessageBox extends React.PureComponent<Props, State> {
     private onKeyDown(ev: React.KeyboardEvent) {
         ev.stopPropagation();
         if (ev.keyCode === 13) {
-            if (this.state.text && this.state.text.length > 0) {
-                if (this.isTooMany()) {
-                    this.blur("Too many messages, please wait");
-                } else {
-                    online.sendTextMessage(this.state.text);
-                    this.recentMessages.push({ timestamp: Date.now(), length: this.state.text.length });
-                    this.blur();
-                }
-            } else {
-                this.blur();
-            }
+            this.onSendMessage();
         } else if (ev.keyCode === 27) {
             this.blur();
         }
     }
 
-    private isTooMany() {
-        const cutoff = Date.now() - RecentMessageSeconds * 1000;
-        while (this.recentMessages.length > 0 && this.recentMessages[0].timestamp < cutoff) {
-            this.recentMessages.shift();
-        }
+    private onSendMessage() {
+        const text = this.state.text;
+        if (text && text.length > 0) {
+            const isLink = chats.isLink(text);
+            if (this.chatThrottler.isTooMany() || this.chatThrottler.isDuplicate(text)) {
+                this.blur("Too many messages, please wait");
+            } else if (isLink && (this.linkThrottler.isTooMany() || this.linkThrottler.isDuplicate(text))) {
+                this.blur("Too many messages, please wait");
+            } else {
+                online.sendTextMessage(text);
 
-        const total = _(this.recentMessages).map(x => Math.max(MinCharsPerMessage, x.length)).sum();
-        return total >= RecentMessageSeconds * MaxCharsPerSecond;
+                this.chatThrottler.add(text);
+                if (isLink) {
+                    this.linkThrottler.add(text);
+                }
+
+                this.blur();
+            }
+        } else {
+            this.blur();
+        }
     }
 
     private onWindowKeyDown(ev: KeyboardEvent) {
