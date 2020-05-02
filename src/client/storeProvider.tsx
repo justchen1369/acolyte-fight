@@ -184,7 +184,7 @@ function reducer(state: s.State, action: s.Action): s.State {
         return {
             ...state,
             world: action.world,
-            messages: state.messages.filter(x => !x.message.gameId), // Keep only messages relevant cross-games
+            messages: state.messages.filter(x => !x.message.gameId || x.message.type === "ratingAdjustment"), // Keep only messages relevant cross-games
             current: {
                 ...state.current,
                 gameId: action.world.ui.myGameId,
