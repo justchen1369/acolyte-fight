@@ -17,7 +17,7 @@ interface Props {
     isPlaying: boolean;
     isDead: boolean;
     isWon: boolean;
-    isStarted: boolean;
+    isStarting: boolean;
     touched: boolean;
 }
 interface State {
@@ -33,7 +33,7 @@ function stateToProps(state: s.State): Props {
         isPlaying: !!myHeroId,
         isDead: engine.isDead(myHeroId, world),
         isWon: !!world.winner,
-        isStarted: world.startTick < constants.Matchmaking.MaxHistoryLength,
+        isStarting: (world.startTick - world.tick) <= constants.Matchmaking.JoinPeriod,
         touched: state.touched,
     };
 }
@@ -75,13 +75,13 @@ export class GameAdPanel extends React.PureComponent<Props, State> {
             return; // Already showing
         }
 
-        if (this.props.isStarted
+        if (this.props.isStarting
             && this.props.isPlaying
             && (this.props.isDead || this.props.isWon)) {
 
             // This game is complete, show an ad
             this.setState({ showingForGameId: this.props.gameId });
-        } else if (!!this.state.showingForGameId && this.props.gameId !== this.state.showingForGameId && this.props.isStarted) {
+        } else if (!!this.state.showingForGameId && this.props.gameId !== this.state.showingForGameId && this.props.isStarting) {
             // Previous game was showing an ad, stop showing as soon as this game starts
             this.setState({ showingForGameId: null });
         }
