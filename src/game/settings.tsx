@@ -2456,7 +2456,7 @@ const saber: Spell = {
         ticks: 6,
         flash: true,
         bloom: 0.03,
-        growth: 0.15,
+        growth: 0.3,
     },
 
     sound: "saber",
@@ -2518,7 +2518,7 @@ const dualSaber: Spell = {
         ticks: 6,
         flash: true,
         bloom: 0.03,
-        growth: 0.15,
+        growth: 0.3,
     },
 
     sound: "saber",
