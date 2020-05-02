@@ -2538,11 +2538,6 @@ const scourge: Spell = {
             title: "Heavy",
             text: "Knockback reduced 75% while overloading.",
         },
-        {
-            icon: "fas fa-clock",
-            title: "Recharge",
-            text: "Each enemy you hit reduces cooldowns for all your spells except Overload by 3 seconds.",
-        },
     ],
 
     chargeBuffs: [
@@ -2567,16 +2562,6 @@ const scourge: Spell = {
         minImpulse: 0.001,
         maxImpulse: 0.002,
         renderTicks: 30,
-
-        buffs: [
-            {
-                type: "cooldown",
-                owner: true,
-                against: Alliances.Enemy,
-                notSpellIds: ["scourge"],
-                adjustCooldown: -4 * TicksPerSecond,
-            },
-        ],
     },
     chargeTicks: 0.5 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
