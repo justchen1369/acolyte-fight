@@ -749,7 +749,7 @@ function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
 	const highlight: w.MapHighlight = {
 		fromTick: ev.tick,
 		maxTicks: Visuals.HighlightTicks,
-		color: ev.color || ColTuple.parse('#fff'),
+		color: ev.color?.clone() || ColTuple.parse('#fff'),
 	};
 	if (world.tick < highlight.fromTick + highlight.maxTicks) {
 		world.ui.highlights.push(highlight);
@@ -802,7 +802,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 		const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
 
 		color.mix(highlight.color, Visuals.HighlightFactor * proportion);
-		hexColor.mix(highlight.color.lighten(Visuals.HighlightHexShineFactor * proportion), Visuals.HighlightHexFactor * proportion);
+		hexColor.mix(highlight.color.clone().lighten(Visuals.HighlightHexShineFactor * proportion), Visuals.HighlightHexFactor * proportion);
 	}
 
 	const easeMultiplier = ease(world.ui.initialRenderTick, world);
@@ -3145,48 +3145,51 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 
 	const settings = world.settings;
 	const rebindingLookup = keyboardUtils.getRebindingLookup({ rebindings, settings });
-	let button: w.ButtonRenderState = {
-		key: spell.passive ? "" : (rebindingLookup.get(key) || ""),
-		color: ColTuple.parse(spell.color),
-		icon: spell.icon,
-		cooldownText: null,
-		emphasis: 1,
-	};
 
 	let isSelected = selectedAction === spell.id || world.ui.nextSpellId === spell.id;
 	let isHovered = world.ui.toolbar.hoverSpellId === spell.id;
 	let age = (world.tick - (hero.spellChangedTick.get(spell.id) || 0)) / constants.TicksPerSecond;
 	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
 
+	let color = ColTuple.parse(spell.color);
+	let emphasis = 1;
 	if (isSelected) {
-		button.color = ColTuple.parse('#f0f0f0');
+		color = ColTuple.parse('#f0f0f0');
 	} else if (spell.passive) {
-		button.color = ColTuple.parse('#111');
-		button.emphasis = 0.4;
+		color = ColTuple.parse('#111');
+		emphasis = 0.4;
 	} else if (remainingInSeconds > 1) {
-		button.color = ColTuple.parse('#222');
-		button.emphasis = 0.7;
+		color = ColTuple.parse('#222');
+		emphasis = 0.7;
 	} else if (remainingInSeconds > 0.2) {
-		button.color = ColTuple.parse('#777');
+		color = ColTuple.parse('#777');
 	} else if (remainingInSeconds > 0.1) {
-		button.color = ColTuple.parse('#111');
+		color = ColTuple.parse('#111');
 	} else if (remainingInSeconds > 0) {
-		button.color = ColTuple.parse('#eee');
+		color = ColTuple.parse('#eee');
 	}
 
 	if (age < 0.1) {
-		button.color.darken(0.5);
+		color.darken(0.5);
 	}
 	if (isHovered) {
-		button.color.lighten(0.25);
+		color.lighten(0.25);
 	} 
 
+	let cooldownText: string = null;
 	if (!spell.passive && remainingInSeconds > 0) {
 		// Cooldown
 		let cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
-		button.cooldownText = cooldownText;
+		cooldownText = cooldownText;
 	}
 
+	let button: w.ButtonRenderState = {
+		key: spell.passive ? "" : (rebindingLookup.get(key) || ""),
+		color,
+		icon: spell.icon,
+		cooldownText,
+		emphasis,
+	};
 	return button;
 }
 

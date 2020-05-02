@@ -3152,7 +3152,7 @@ function emitPush(fromHeroId: number, direction: pl.Vec2, color: ColTuple, toObj
 		owner: fromHeroId,
 		objectId: toObjectId,
 		direction,
-		color,
+		color: color?.clone(),
 	};
 	world.ui.events.push(push);
 }
