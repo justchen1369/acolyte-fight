@@ -101,7 +101,7 @@ export class SpellUsageAccumulator {
         this.distribution.forEach(frequency => {
             const winRate = frequency.wins / frequency.usages;
             const advantage = frequency.wins / frequency.probability;
-            logger.info(`SpellFrequency: category=${this.category} league=${this.league} spellId=${frequency.spellId} winRate=${(winRate * 100).toFixed(1)}% advantage=${advantage.toPrecision(2)} usages=${frequency.usages}`);
+            logger.info(`SpellFrequency: category=${this.category} league=${this.league} spellId=${frequency.spellId} winRate=${(winRate * 100).toFixed(1)}% advantage=${advantage.toFixed(3)} usages=${frequency.usages}`);
         });
     }
 }
