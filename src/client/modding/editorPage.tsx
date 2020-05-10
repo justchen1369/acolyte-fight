@@ -15,6 +15,7 @@ interface OwnProps {
 }
 interface Props extends OwnProps {
     mod: ModTree;
+    settings: AcolyteFightSettings;
     selfId: string;
     party: s.PartyState;
 }
@@ -25,6 +26,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
         mod: state.room.mod,
+        settings: state.room.settings,
         selfId: state.socketId,
         party: state.party,
     };
@@ -51,10 +53,11 @@ class EditorPage extends React.PureComponent<Props, State> {
             <div className="page mod-readonly">
                 <h1>Modding</h1>
                 <p>Modding allows you to change the rules of the game.</p>
-                {Object.keys(this.props.mod).length > 0 && <p>
+                {!this.props.settings.Mod.private && Object.keys(this.props.mod).length > 0 && <p>
                     Currently, the following modifications will affect your games:
                     <CodeEditor code={JSON.stringify(this.props.mod, null, "\t")} />
                 </p>}
+                {this.props.settings.Mod.private && <p>A mod titled <b>{this.props.settings.Mod.titleLeft} {this.props.settings.Mod.titleRight}</b> has been applied.</p>}
                 <p>Only the party leader can change the mod.</p>
             </div>
         </div>

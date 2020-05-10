@@ -3316,6 +3316,8 @@ export const Mod: ModSettings = {
 
     subtitleLeft: "SKILLSHOT",
     subtitleRight: "ARENA",
+
+    private: false,
 };
 
 export const DefaultSettings: AcolyteFightSettings = {

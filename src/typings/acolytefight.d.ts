@@ -68,6 +68,8 @@ declare interface ModSettings {
 
 	subtitleLeft: string;
 	subtitleRight: string;
+
+	private: boolean; // If true, other players in a party will be unable to see the contents of the mod
 }
 
 declare interface HeroSettings {
