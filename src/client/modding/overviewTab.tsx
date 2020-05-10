@@ -212,6 +212,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
             titleRight: "Mod!",
             subtitleLeft: "",
             subtitleRight: "",
+            private: false,
         };
         const initialMod: ModTree = {
             Mod: meta,
