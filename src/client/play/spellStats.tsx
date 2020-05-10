@@ -89,7 +89,7 @@ class SpellStats extends React.PureComponent<Props, State> {
         } else if (spell.action === "scourge") {
             return <div className="spell-stats">
                 <span className="spell-stats-item" title="Damage"><i className="fas fa-sword" />{spell.detonate.damage}</span>
-                <span className="spell-stats-item" title="Damage to self"><i className="fas fa-heart" />-{spell.selfDamage}</span>
+                <span className="spell-stats-item" title="Damage to self"><i className="fas fa-heart" />{-spell.selfDamage}</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
 
