@@ -40,11 +40,18 @@
 }
 
 .title-underlay {
-    mix-blend-mode: color-dodge;
     top: 6px;
     left: 6px;
+    visibility: hidden;
+}
 
-    filter: drop-shadow(0 0 8px #eeec)
+@supports(mix-blend-mode: color-dodge) {
+    .title-underlay {
+        visibility: visible;
+
+        mix-blend-mode: color-dodge;
+        filter: drop-shadow(0 0 8px #eeec)
+    }
 }
 
 .title-gap {
