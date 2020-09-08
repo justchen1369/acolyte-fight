@@ -4,6 +4,12 @@ This is the source code to Acolyte Fight! It is provided as is. It is probably v
 # How to run
 This game is very hard to run. I can't remember all the details, here are some pointers which might help you figure it out.
 
+Things to install:
+* yarn
+* NodeJS 8 - cannot be higher because it uses the native uws library which was not compiled for Node 10
+* docker
+* Google Cloud SDK
+
 Environment variables:
 * ENIGMA_SECRET: Set this to whatever you want, it's used to validate authentication among other things. Just once you set it, never change it.
 * GOOGLE_APPLICATION_CREDENTIALS: Path to the file with Google Cloud Platform credentials.
@@ -28,7 +34,9 @@ You may use this codebase in part or in full for any free project, as long as yo
 # Author
 @raysplaceinspace: https://twitter.com/raysplacenspace
 
-# Notes
+# Technical notes
 The game is a deterministic simulation. The server arbitrates the input sequence and all clients replay the sequence in the same order and should get the same result. The lowest-latency client decides the authoritative world state in case of desyncs, and also runs all the bots. The server is very lightweight, does no simulation, and so should scale to thousands of concurrent clients.
 
-Properties that end in XX will be mangled, so that the game is harder to hack.
+## Coding conventions
+* Properties that begin with "ui" are not synced across clients and can be modified non-deterministically.
+* Properties that end in XX will be mangled, so that the game is harder to hack.
