@@ -34,6 +34,9 @@ You may use this codebase in part or in full for any free project, as long as yo
 # Author
 @raysplaceinspace: https://twitter.com/raysplacenspace
 
+# Discord
+Join the Discord: https://discord.gg/sZvgpZk
+
 # Technical notes
 The game is a deterministic simulation. The server arbitrates the input sequence and all clients replay the sequence in the same order and should get the same result. The lowest-latency client decides the authoritative world state in case of desyncs, and also runs all the bots. The server is very lightweight, does no simulation, and so should scale to thousands of concurrent clients.
 
