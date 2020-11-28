@@ -1,4 +1,31 @@
 # Acolyte Fight!
+This is the source for Acolyte Fight, made by [rayhidayat](https://github.com/rayhidayat).
+
+# Prerequisites
+You will need NodeJS version 8.17.0. I recommend using [nvm](https://github.com/nvm-sh/nvm) to manage your node versions. You will also need Yarn to install all of the required packages.
+
+# Compilation
+To compile the source code, first install node version `8.17.0`.
+```
+nvm install 8.17.0
+```
+Install deps:
+```
+yarn
+```
+compile the game:
+```
+npm run build
+```
+set enviroment variables for a firebase account with Firestore and run the server:
+```bash
+GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json node dist/server.js
+```
+
+
+# start of old README
+
+# Acolyte Fight!
 This is the source code to Acolyte Fight! It is provided as is. It is probably very hard to run as it probably requires various keys to Google Cloud Platform and Discord to be passed in as environment variables. This is not an example of perfect code, it is an example of realistic code. In reality code has to be written very fast on a small budget and has to change a lot.
 
 # How to run
